@@ -156,7 +156,7 @@ void moveCharacter()
     if (g_abKeyPressed[K_LEFT] && g_sChar.m_cLocation.X > 0 && g_adBounceTime[K_LEFT] < g_dElapsedTime)
     {
         //Beep(1440, 30);
-        g_sChar.m_cLocation.X--;
+        g_sChar.m_cLocation.X -= 2;
 		bSomethingHappened = true;
     }
     if (g_abKeyPressed[K_DOWN] && g_sChar.m_cLocation.Y < g_Console.getConsoleSize().Y - 1 && g_adBounceTime[K_DOWN] < g_dElapsedTime)
@@ -165,10 +165,10 @@ void moveCharacter()
         g_sChar.m_cLocation.Y++;
 		bSomethingHappened = true;
     }
-    if (g_abKeyPressed[K_RIGHT] && g_sChar.m_cLocation.X < g_Console.getConsoleSize().X - 1 && g_adBounceTime[K_RIGHT] < g_dElapsedTime)
+    if (g_abKeyPressed[K_RIGHT] && g_sChar.m_cLocation.X < g_Console.getConsoleSize().X - 2 && g_adBounceTime[K_RIGHT] < g_dElapsedTime)
     {
         //Beep(1440, 30);
-        g_sChar.m_cLocation.X++;
+        g_sChar.m_cLocation.X += 2;
 		bSomethingHappened = true;
     }
     if (g_abKeyPressed[K_SPACE] && g_adBounceTime[K_SPACE] < g_dElapsedTime)
@@ -244,7 +244,10 @@ void renderCharacter()
     {
         charColor = 0x0A;
     }
-    g_Console.writeToBuffer(g_sChar.m_cLocation, (char)1, charColor);
+	COORD charCoord = g_sChar.m_cLocation;
+    g_Console.writeToBuffer(charCoord, "@", charColor);
+	charCoord.X += 1;
+	g_Console.writeToBuffer(charCoord, "@", charColor);
 }
 
 void renderFramerate()

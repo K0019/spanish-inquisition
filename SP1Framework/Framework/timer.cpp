@@ -53,6 +53,7 @@ double CStopWatch::LiToSecs( LARGE_INTEGER & liInput) {
 void CStopWatch::startTimer( void )
 {
     QueryPerformanceCounter(&m_liPrevTime) ;
+	m_liStartTime = m_liPrevTime;
 }
  
 //--------------------------------------------------------------
@@ -78,20 +79,25 @@ double CStopWatch::getElapsedTime( void )
 // Input    : time to sleep (long long)
 // Output   : void
 //--------------------------------------------------------------
-void CStopWatch::waitUntil(long long llTime)
+void CStopWatch::waitUntil(double llTime)
 {
     LARGE_INTEGER liCurTime;
-    LONGLONG llTimeElapsed;
+    double llTimeElapsed;
     while (true)
     {
         // get current time
         QueryPerformanceCounter(&liCurTime);
         // Calculate time elapsed
-        llTimeElapsed = ((liCurTime.QuadPart - m_liPrevTime.QuadPart) * 1000 / m_liFrequency.QuadPart);
+        llTimeElapsed = (((double)liCurTime.QuadPart - (double)m_liPrevTime.QuadPart) * 1000.0 / (double)m_liFrequency.QuadPart);
         // llTime has passed, return and end sleep
         if (llTimeElapsed > llTime)
             return;
         else if (llTime - llTimeElapsed > 1)
             Sleep(1);
     }
+}
+
+double CStopWatch::accurateElapsedTime()
+{
+	return LiToSecs(this->m_liCurrTime) - LiToSecs(this->m_liStartTime);
 }

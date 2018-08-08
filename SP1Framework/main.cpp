@@ -5,8 +5,8 @@
 
 CStopWatch g_Timer;                            // Timer function to keep track of time and the frame rate
 bool g_bQuitGame = false;                    // Set to true if you want to quit the game
-const unsigned char gc_ucFPS = 100;                // FPS of this game
-const unsigned int gc_uFrameTime = 1000 / gc_ucFPS;    // time for each frame
+const unsigned int gc_ucFPS = 100;                // FPS of this game
+const double gc_uFrameTime = 1000 / (double)gc_ucFPS;    // time for each frame
 
 //main loop declaration
 void mainLoop( void );
@@ -35,8 +35,8 @@ void mainLoop( void )
     while (!g_bQuitGame)      // run this loop until user wants to quit 
     {        
         getInput();                         // get keyboard input
-        update(g_Timer.getElapsedTime());   // update the game
+        update(&g_Timer);   // update the game
         render();                           // render the graphics output to screen
-        g_Timer.waitUntil((__int64)((double)gc_uFrameTime - g_Timer.getElapsedTime()));   // Frame rate limiter. Limits each frame to a specified time in ms.      
+        g_Timer.waitUntil(gc_uFrameTime - g_Timer.getElapsedTime());   // Frame rate limiter. Limits each frame to a specified time in ms.      
     }    
 }

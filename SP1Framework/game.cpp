@@ -9,6 +9,7 @@
 
 double  g_dElapsedTime;
 double  g_dDeltaTime;
+double	g_dAccurateElapsedTime;
 bool    g_abKeyPressed[K_COUNT];
 
 // Game specific variables here
@@ -92,11 +93,13 @@ void getInput( void )
 // Input    : dt = deltatime
 // Output   : void
 //--------------------------------------------------------------
-void update(double dt)
+void update(CStopWatch * timer)
 {
+	double dt = timer->getElapsedTime();
     // get the delta time
     g_dElapsedTime += dt;
     g_dDeltaTime = dt;
+	g_dAccurateElapsedTime = timer->accurateElapsedTime();
 
     switch (g_eGameState)
     {
@@ -130,7 +133,7 @@ void render()
 
 void splashScreenWait()    // waits for time to pass in splash screen
 {
-    if (g_dElapsedTime > 3.0) // wait for 3 seconds to switch to game mode, else do nothing
+    if (g_dAccurateElapsedTime > 3.0) // wait for 3 seconds to switch to game mode, else do nothing
         g_eGameState = S_GAME;
 }
 
@@ -263,10 +266,16 @@ void renderFramerate()
 
     // displays the elapsed time
     ss.str("");
-    ss << g_dElapsedTime << "secs";
+    ss << g_dAccurateElapsedTime << "secs";
     c.X = 0;
     c.Y = 0;
     g_Console.writeToBuffer(c, ss.str(), 0x59);
+
+	if (DEBUG)
+	{
+		ss.str("");
+		// TODO: Show dropped frames
+	}
 }
 void renderToScreen()
 {

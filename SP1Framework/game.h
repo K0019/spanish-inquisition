@@ -1,5 +1,6 @@
 #ifndef _GAME_H
 #define _GAME_H
+#define DEBUG true
 
 #include "Framework\timer.h"
 
@@ -35,7 +36,7 @@ struct SGameChar
 
 void init        ( void );      // initialize your variables, allocate memory, etc
 void getInput    ( void );      // get input from player
-void update      ( double dt ); // update the game and the state of the game
+void update      ( CStopWatch * timer ); // update the game and the state of the game
 void render      ( void );      // renders the current state of the game to the console
 void shutdown    ( void );      // do clean up, free memory
 

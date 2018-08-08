@@ -14,7 +14,7 @@ bool    g_abKeyPressed[K_COUNT];
 // Game specific variables here
 SGameChar   g_sChar;
 EGAMESTATES g_eGameState = S_SPLASHSCREEN;
-double  g_dBounceTime; // this is to prevent key bouncing, so we won't trigger keypresses more than once
+double  g_adBounceTime[K_COUNT]; // this is to prevent key bouncing, so we won't trigger keypresses more than once
 
 // Console object
 Console g_Console(80, 25, "SP1 Framework");
@@ -30,7 +30,7 @@ void init( void )
 {
     // Set precision for floating point output
     g_dElapsedTime = 0.0;
-    g_dBounceTime = 0.0;
+    for (int i = 0; i < K_COUNT; i++) g_adBounceTime[i] = 0.0;
 
     // sets the initial state for the game
     g_eGameState = S_SPLASHSCREEN;
@@ -143,47 +143,47 @@ void gameplay()            // gameplay logic
 
 void moveCharacter()
 {
-    bool bSomethingHappened = false;
-    if (g_dBounceTime > g_dElapsedTime)
-        return;
+	bool bSomethingHappened = false;
 
     // Updating the location of the character based on the key press
     // providing a beep sound whenver we shift the character
-    if (g_abKeyPressed[K_UP] && g_sChar.m_cLocation.Y > 0)
+    if (g_abKeyPressed[K_UP] && g_sChar.m_cLocation.Y > 0 && g_adBounceTime[K_UP] < g_dElapsedTime)
     {
         //Beep(1440, 30);
         g_sChar.m_cLocation.Y--;
-        bSomethingHappened = true;
+		bSomethingHappened = true;
     }
-    if (g_abKeyPressed[K_LEFT] && g_sChar.m_cLocation.X > 0)
+    if (g_abKeyPressed[K_LEFT] && g_sChar.m_cLocation.X > 0 && g_adBounceTime[K_LEFT] < g_dElapsedTime)
     {
         //Beep(1440, 30);
         g_sChar.m_cLocation.X--;
-        bSomethingHappened = true;
+		bSomethingHappened = true;
     }
-    if (g_abKeyPressed[K_DOWN] && g_sChar.m_cLocation.Y < g_Console.getConsoleSize().Y - 1)
+    if (g_abKeyPressed[K_DOWN] && g_sChar.m_cLocation.Y < g_Console.getConsoleSize().Y - 1 && g_adBounceTime[K_DOWN] < g_dElapsedTime)
     {
         //Beep(1440, 30);
         g_sChar.m_cLocation.Y++;
-        bSomethingHappened = true;
+		bSomethingHappened = true;
     }
-    if (g_abKeyPressed[K_RIGHT] && g_sChar.m_cLocation.X < g_Console.getConsoleSize().X - 1)
+    if (g_abKeyPressed[K_RIGHT] && g_sChar.m_cLocation.X < g_Console.getConsoleSize().X - 1 && g_adBounceTime[K_RIGHT] < g_dElapsedTime)
     {
         //Beep(1440, 30);
         g_sChar.m_cLocation.X++;
-        bSomethingHappened = true;
+		bSomethingHappened = true;
     }
-    if (g_abKeyPressed[K_SPACE])
+    if (g_abKeyPressed[K_SPACE] && g_adBounceTime[K_SPACE] < g_dElapsedTime)
     {
         g_sChar.m_bActive = !g_sChar.m_bActive;
-        bSomethingHappened = true;
+		bSomethingHappened = true;
     }
 
-    if (bSomethingHappened)
-    {
-        // set the bounce time to some time in the future to prevent accidental triggers
-        g_dBounceTime = g_dElapsedTime + 0.125; // 125ms should be enough
-    }
+	if (bSomethingHappened)
+	{
+		for (int i = 0; i < K_COUNT; i++)
+		{
+			if (g_abKeyPressed[i]) g_adBounceTime[i] = g_dElapsedTime + 0.125;
+		}
+	}
 }
 void processUserInput()
 {

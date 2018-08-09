@@ -97,7 +97,7 @@ void CStopWatch::waitUntil(double llTime)
     }
 }
 
-double CStopWatch::accurateElapsedTime()
+double CStopWatch::accurateTotalTime()
 {
 	return LiToSecs(this->m_liCurrTime) - LiToSecs(this->m_liStartTime);
 }

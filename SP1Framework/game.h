@@ -1,6 +1,10 @@
 #ifndef _GAME_H
 #define _GAME_H
 #define DEBUG true
+#define GRID_X 3
+#define GRID_Y 5
+#define ROOM_X 5
+#define ROOM_Y 7
 
 #include "Framework\timer.h"
 
@@ -34,6 +38,16 @@ struct SGameChar
     bool  m_bActive;
 };
 
+struct SEasyCoord
+{
+	COORD c;
+
+	SEasyCoord(int X, int Y);
+	void modifyX(int X);
+	void modifyY(int Y);
+	void modifyAll(int X, int Y);
+};
+
 void init        ( void );      // initialize your variables, allocate memory, etc
 void getInput    ( void );      // get input from player
 void update      ( CStopWatch * timer ); // update the game and the state of the game
@@ -51,5 +65,6 @@ void renderMap();           // renders the map to the buffer first
 void renderCharacter();     // renders the character into the buffer
 void renderFramerate();     // renders debug information, frame rate, elapsed time, etc
 void renderToScreen();      // dump the contents of the buffer to the screen, one frame worth of game
+void renderLevelBorders();  // renders the borders of the rooms
 
 #endif // _GAME_H

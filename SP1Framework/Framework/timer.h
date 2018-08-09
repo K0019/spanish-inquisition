@@ -27,7 +27,7 @@ public:
     void    startTimer        ( void );                // start the timer by getting current time and store it
     double  getElapsedTime    ( void );                // get time in seconds since the last call to this function
     void    waitUntil         ( double llTime);     // wait until this time in milliseconds has passed
-	double accurateElapsedTime();
+	double accurateTotalTime();
 };
 
 #endif // _TIMER_H

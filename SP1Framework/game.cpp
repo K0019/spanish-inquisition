@@ -18,7 +18,7 @@ EGAMESTATES g_eGameState = S_SPLASHSCREEN;
 double  g_adBounceTime[K_COUNT]; // this is to prevent key bouncing, so we won't trigger keypresses more than once
 
 // Console object
-Console g_Console(80, 25, "SP1 Framework");
+Console g_Console(100, 25, "SP1 Framework");
 
 //--------------------------------------------------------------
 // Purpose  : Initialisation function
@@ -99,7 +99,7 @@ void update(CStopWatch * timer)
     // get the delta time
     g_dElapsedTime += dt;
     g_dDeltaTime = dt;
-	g_dAccurateElapsedTime = timer->accurateElapsedTime();
+	g_dAccurateElapsedTime = timer->accurateTotalTime();
 
     switch (g_eGameState)
     {
@@ -198,7 +198,7 @@ void processUserInput()
 void clearScreen()
 {
     // Clears the buffer with this colour attribute
-    g_Console.clearBuffer(0x1F);
+    g_Console.clearBuffer(0x00);
 }
 
 void renderSplashScreen()  // renders the splash screen
@@ -217,7 +217,8 @@ void renderSplashScreen()  // renders the splash screen
 
 void renderGame()
 {
-    renderMap();        // renders the map to the buffer first
+    //renderMap();        // renders the map to the buffer first
+	renderLevelBorders();
     renderCharacter();  // renders the character into the buffer
 }
 
@@ -281,4 +282,66 @@ void renderToScreen()
 {
     // Writes the buffer to the console, hence you will see what you have written
     g_Console.flushBufferToConsole();
+}
+
+// *******************************************************
+// * Custom functions outside framework to go below here *
+// *******************************************************
+
+void renderLevelBorders()
+{
+	// Start from offset of 1,1
+	COORD c;
+	c.X = 1;
+	c.Y = 1;
+
+	// Render top-most and left-most lines
+	for (int gridColumn = 0; gridColumn <= GRID_Y * (ROOM_Y + 1); gridColumn++)
+	{
+		g_Console.writeToBuffer(c, "  ", 0x80);
+		c.X += 2;
+	}
+	c.X = 1;
+	c.Y++;
+
+	// Render remaining lines
+	for (int gridRow = 0; gridRow < GRID_X; gridRow++)
+	{
+		for (int cRow = 0; cRow < ROOM_X; cRow++)
+		{
+			for (int gridColumn = 0; gridColumn <= GRID_Y; gridColumn++)
+			{
+				g_Console.writeToBuffer(c, "  ", 0x80);
+				c.X += (ROOM_Y << 1) + 2;
+			}
+			c.X = 1;
+			c.Y++;
+		}
+		for (int gridColumn = 0; gridColumn <= GRID_Y * (ROOM_Y + 1); gridColumn++)
+		{
+			g_Console.writeToBuffer(c, "  ", 0x80);
+			c.X += 2;
+		}
+		c.X = 1;
+		c.Y++;
+	}
+}
+
+SEasyCoord::SEasyCoord(int X, int Y)
+{
+	c.X = X;
+	c.Y = Y;
+}
+void SEasyCoord::modifyX(int X)
+{
+	c.X = X;
+}
+void SEasyCoord::modifyY(int Y)
+{
+	c.Y = Y;
+}
+void SEasyCoord::modifyAll(int X, int Y)
+{
+	c.X = X;
+	c.Y = Y;
 }

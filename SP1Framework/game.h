@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef _GAME_H
 #define _GAME_H
 #define DEBUG true
@@ -7,6 +9,10 @@
 #define ROOM_Y 7
 
 #include "Framework\timer.h"
+#include <string>
+#include <cstdlib>
+#include <vector>
+#include <algorithm>
 
 extern CStopWatch g_swTimer;
 extern bool g_bQuitGame;
@@ -38,14 +44,14 @@ struct SGameChar
     bool  m_bActive;
 };
 
-struct SEasyCoord
+struct SLevel
 {
-	COORD c;
+	COORD playerStartRoom, exitRoom;
+	std::string level[1 + (ROOM_X + 1) * GRID_X]; // Includes borders
 
-	SEasyCoord(int X, int Y);
-	void modifyX(int X);
-	void modifyY(int Y);
-	void modifyAll(int X, int Y);
+	void generateLevel();
+	std::vector<COORD> seekToEnd(std::vector<COORD>& returned);
+	void modifyTile(COORD c, std::string ch);
 };
 
 void init        ( void );      // initialize your variables, allocate memory, etc

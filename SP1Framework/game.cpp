@@ -15,6 +15,7 @@ bool    g_abKeyPressed[K_COUNT];
 // Game specific variables here
 SGameChar   g_sChar;
 EGAMESTATES g_eGameState = S_SPLASHSCREEN;
+SLevel		g_sLevel;
 double  g_adBounceTime[K_COUNT]; // this is to prevent key bouncing, so we won't trigger keypresses more than once
 
 // Console object
@@ -29,6 +30,7 @@ Console g_Console(100, 25, "SP1 Framework");
 //--------------------------------------------------------------
 void init( void )
 {
+	srand((unsigned int)time(NULL));
     // Set precision for floating point output
     g_dElapsedTime = 0.0;
     for (int i = 0; i < K_COUNT; i++) g_adBounceTime[i] = 0.0;
@@ -36,9 +38,12 @@ void init( void )
     // sets the initial state for the game
     g_eGameState = S_SPLASHSCREEN;
 
-    g_sChar.m_cLocation.X = g_Console.getConsoleSize().X / 2;
-    g_sChar.m_cLocation.Y = g_Console.getConsoleSize().Y / 2;
+    g_sChar.m_cLocation.X = g_Console.getConsoleSize().X / 2 - 9;
+    g_sChar.m_cLocation.Y = g_Console.getConsoleSize().Y / 2 - 2;
     g_sChar.m_bActive = true;
+	g_sLevel.playerStartRoom.X = 1;
+	g_sLevel.playerStartRoom.Y = 2;
+	g_sLevel.generateLevel();
     // sets the width, height and the font name to use in the console
     g_Console.setConsoleFont(0, 16, L"Consolas");
 }
@@ -295,53 +300,155 @@ void renderLevelBorders()
 	c.X = 1;
 	c.Y = 1;
 
-	// Render top-most and left-most lines
+	// Go through each character inside level and print its respective character
+	for (unsigned int row = 0; row < 1 + (ROOM_X + 1) * GRID_X; row++)
+	{
+		for (unsigned int column = 0; column < g_sLevel.level[row].length(); column++)
+		{
+			switch (g_sLevel.level[row][column])
+			{
+			case '#':
+				c.X = 1 + column;
+				g_Console.writeToBuffer(c, " ", 0x80);
+				break;
+			case '$':
+				c.X = 1 + column;
+				g_Console.writeToBuffer(c, " ", 0x40);
+				break;
+			}
+		}
+		c.Y++;
+	}
+}
+
+void SLevel::generateLevel()
+{
+	// -----Borders and Padding-----
+	// Add the top border
 	for (int gridColumn = 0; gridColumn <= GRID_Y * (ROOM_Y + 1); gridColumn++)
 	{
-		g_Console.writeToBuffer(c, "  ", 0x80);
-		c.X += 2;
+		this->level[0] += "##";
 	}
-	c.X = 1;
-	c.Y++;
 
-	// Render remaining lines
+	// Add the rest w/ padding
 	for (int gridRow = 0; gridRow < GRID_X; gridRow++)
 	{
 		for (int cRow = 0; cRow < ROOM_X; cRow++)
 		{
 			for (int gridColumn = 0; gridColumn <= GRID_Y; gridColumn++)
 			{
-				g_Console.writeToBuffer(c, "  ", 0x80);
-				c.X += (ROOM_Y << 1) + 2;
+				this->level[gridRow * ROOM_X + gridRow + cRow + 1] += "##";
+				if (gridColumn != GRID_Y)
+					for (int padding = 0; padding < ROOM_Y; padding++)
+						this->level[gridRow * ROOM_X + gridRow + cRow + 1] += "  ";
 			}
-			c.X = 1;
-			c.Y++;
 		}
 		for (int gridColumn = 0; gridColumn <= GRID_Y * (ROOM_Y + 1); gridColumn++)
 		{
-			g_Console.writeToBuffer(c, "  ", 0x80);
-			c.X += 2;
+			this->level[(gridRow + 1) * (ROOM_X + 1)] += "##";
 		}
-		c.X = 1;
-		c.Y++;
+	}
+
+	// -----Required Border Holes-----
+	// Set exit room, at least 2 rooms away from entry room
+	do
+	{
+		this->exitRoom.X = rand() / (RAND_MAX / 3);
+		this->exitRoom.Y = rand() / (RAND_MAX / 5);
+	} while (this->exitRoom.X >= this->playerStartRoom.X - 1 &&
+		this->exitRoom.X <= this->playerStartRoom.X + 1 &&
+		this->exitRoom.Y >= this->playerStartRoom.Y - 1 &&
+		this->exitRoom.Y <= this->playerStartRoom.Y + 1);
+	
+	// Generate a route to the end
+	std::vector<COORD> routeToEnd = { this->playerStartRoom };
+	routeToEnd = seekToEnd(routeToEnd);
+
+	// Create openings
+	for (std::vector<COORD>::iterator iter = routeToEnd.begin() + 1; iter != routeToEnd.end(); iter++)
+	{
+		int xDiff = (*(iter - 1)).X - (*iter).X;
+		int yDiff = (*(iter - 1)).Y - (*iter).Y;
+		COORD c;
+		switch ((xDiff < 0) ? (2) : (0) + (yDiff != 0) ? ((yDiff > 0) ? (3) : (1)) : (0))
+		{
+		case 0: // Up
+			c.X = ((*iter).X + 1) * (ROOM_X + 1);
+			c.Y = (*iter).Y * (ROOM_Y + 1) + (ROOM_Y >> 1) + 1;
+			break;
+		case 1: // Right
+			c.X = (*iter).X * (ROOM_X + 1) + (ROOM_X >> 1) + 1;
+			c.Y = (*iter).Y * (ROOM_Y + 1);
+			break;
+		case 2: // Down
+			c.X = ((*iter).X) * (ROOM_X + 1);
+			c.Y = (*iter).Y * (ROOM_Y + 1) + (ROOM_Y >> 1) + 1;
+			break;
+		case 3: // Left
+			c.X = (*iter).X * (ROOM_X + 1) + (ROOM_X >> 1) + 1;
+			c.Y = ((*iter).Y + 1) * (ROOM_Y + 1);
+			break;
+		}
+		this->modifyTile(c, "$$");
 	}
 }
 
-SEasyCoord::SEasyCoord(int X, int Y)
+std::vector<COORD> SLevel::seekToEnd(std::vector<COORD>& returned)
 {
-	c.X = X;
-	c.Y = Y;
+	std::vector<int> checkDirection = { 0, 1, 2, 3 };
+	std::random_shuffle(checkDirection.begin(), checkDirection.end());
+
+	for (auto direction : checkDirection)
+	{
+		COORD c = returned.back();
+		switch (direction)
+		{
+		case 0:
+			if (!(returned.back().X - 1 < 0))
+				c.X--;
+			break;
+		case 1:
+			if (!(returned.back().Y + 1 >= GRID_Y))
+				c.Y++;
+			break;
+		case 2:
+			if (!(returned.back().X + 1 >= GRID_X))
+				c.X++;
+			break;
+		case 3:
+			if (!(returned.back().Y - 1 < 0))
+				c.Y--;
+			break;
+		default:
+			throw std::invalid_argument("checkDirection out of range");
+		}
+		bool toContinue = false;
+		for (auto each : returned)
+		{
+			if (c.X == each.X && c.Y == each.Y)
+			{
+				toContinue = true;
+				break;
+			}
+		}
+		if (toContinue) continue;
+		returned.push_back(c);
+		if (returned.back().X == this->exitRoom.X && returned.back().Y == this->exitRoom.Y)
+			return returned;
+		else
+		{
+			std::vector<COORD> check = seekToEnd(returned);
+			if (check.back().X == this->exitRoom.X && check.back().Y == this->exitRoom.Y)
+				return returned;
+			else
+				continue;
+		}
+	}
+	returned.pop_back();
+	return returned;
 }
-void SEasyCoord::modifyX(int X)
+
+void SLevel::modifyTile(COORD c, std::string ch)
 {
-	c.X = X;
-}
-void SEasyCoord::modifyY(int Y)
-{
-	c.Y = Y;
-}
-void SEasyCoord::modifyAll(int X, int Y)
-{
-	c.X = X;
-	c.Y = Y;
+	this->level[c.X].replace(c.Y << 1, ch.length(), ch);
 }

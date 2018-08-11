@@ -209,7 +209,7 @@ void moveCharacter()
 
 	if (bSomethingHappened)
 	{
-		for (int i = 0; i < K_COUNT; i++)
+		for (int i = 0; i <= K_RIGHT; i++)
 		{
 			if (g_abKeyPressed[i]) g_adBounceTime[i] = g_dElapsedTime + 0.125;
 		}

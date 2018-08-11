@@ -84,7 +84,7 @@ struct SLevel
 void init        ( void );      // initialize your variables, allocate memory, etc
 void getInput    ( void );      // get input from player
 void update      ( CStopWatch * timer, double missedTime ); // update the game and the state of the game
-void render      ( void );      // renders the current state of the game to the console
+void render      ( CStopWatch * timer );      // renders the current state of the game to the console
 void shutdown    ( void );      // do clean up, free memory
 
 void splashScreenWait();    // waits for time to pass in splash screen

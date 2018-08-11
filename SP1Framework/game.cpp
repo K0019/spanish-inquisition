@@ -9,6 +9,7 @@
 
 double  g_dElapsedTime;
 double  g_dDeltaTime;
+int g_iCurrentFrameCount, g_iLastFrameCount, g_iLastMeasuredSecond;
 double	g_dAccurateElapsedTime;
 bool    g_abKeyPressed[K_COUNT];
 
@@ -35,6 +36,7 @@ void init( void )
 	srand((unsigned int)time(NULL));
     // Set precision for floating point output
     g_dElapsedTime = 0.0;
+	g_iCurrentFrameCount = g_iLastMeasuredSecond = 0;
 	g_adBounceTime[K_SHOOTUP] = 0.0;
     for (int i = 0; i < K_COUNT; i++) g_adBounceTime[i] = 0.0;
 
@@ -130,7 +132,7 @@ void update(CStopWatch * timer, double missedTime)
 // Input    : void
 // Output   : void
 //--------------------------------------------------------------
-void render()
+void render(CStopWatch * timer)
 {
     clearScreen();      // clears the current screen and draw from scratch 
     switch (g_eGameState)
@@ -142,6 +144,16 @@ void render()
     }
     renderFramerate();  // renders debug information, frame rate, elapsed time, etc
     renderToScreen();   // dump the contents of the buffer to the screen, one frame worth of game
+	
+	// Count average frames
+	g_iCurrentFrameCount++;
+	int currentSecond = (int)timer->accurateTotalTime();
+	if (currentSecond > g_iLastMeasuredSecond)
+	{
+		g_iLastFrameCount = g_iCurrentFrameCount;
+		g_iCurrentFrameCount = 0;
+		g_iLastMeasuredSecond = currentSecond;
+	}
 }
 
 void splashScreenWait()    // waits for time to pass in splash screen
@@ -278,6 +290,12 @@ void renderFramerate()
     c.X = g_Console.getConsoleSize().X - 9;
     c.Y = 0;
     g_Console.writeToBuffer(c, ss.str());
+
+	// displays average fps
+	ss.str("");
+	ss << g_iLastFrameCount << "avg";
+	c.Y++;
+	g_Console.writeToBuffer(c, ss.str());
 
     // displays the elapsed time
     ss.str("");
@@ -503,17 +521,17 @@ void SAllEntities::updatePellets()
 }
 void SAllEntities::checkHitPellets()
 {
-	int index = 0;
-	for (std::vector<SPellet>::iterator pellet = this->m_vPellets.begin(); pellet != this->m_vPellets.end(); pellet++, index++)
+	for (std::vector<SPellet>::iterator pellet = this->m_vPellets.begin(); pellet != this->m_vPellets.end(); )
 	{
 		if ((*pellet).m_bHit)
 		{
 			if ((*pellet).m_dTime >= 0.15)
-				this->m_vPellets.erase(pellet);
-			if (index != this->m_vPellets.size())
+			{
+				pellet = this->m_vPellets.erase(pellet);
 				continue;
-			else
-				return;
+			}
+			pellet++;
+			continue;
 		}
 
 		// Check collision with wall
@@ -535,6 +553,8 @@ void SAllEntities::checkHitPellets()
 				break;
 			}
 		}*/
+
+		pellet++;
 	}
 }
 

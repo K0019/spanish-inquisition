@@ -3,3 +3,9 @@
 ################################################################################
 
 /SP1Framework/Debug/SP1Framework.tlog
+/.vs/SP1Framework/v15
+/Debug
+/Release
+/SP1Framework/Release
+/SP1Framework/Debug
+*.user

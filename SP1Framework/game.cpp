@@ -18,6 +18,8 @@ EGAMESTATES g_eGameState = S_SPLASHSCREEN;
 SLevel		g_sLevel;
 double  g_adBounceTime[K_COUNT]; // this is to prevent key bouncing, so we won't trigger keypresses more than once
 
+bool g_bHasShot;
+
 // Console object
 Console g_Console(100, 25, "SP1 Framework");
 
@@ -33,13 +35,15 @@ void init( void )
 	srand((unsigned int)time(NULL));
     // Set precision for floating point output
     g_dElapsedTime = 0.0;
+	g_adBounceTime[K_SHOOTUP] = 0.0;
     for (int i = 0; i < K_COUNT; i++) g_adBounceTime[i] = 0.0;
 
     // sets the initial state for the game
     g_eGameState = S_SPLASHSCREEN;
 
-    g_sChar.m_cLocation.X = g_Console.getConsoleSize().X / 2 - 9;
-    g_sChar.m_cLocation.Y = g_Console.getConsoleSize().Y / 2 - 2;
+	g_bHasShot = false;
+    g_sChar.m_cLocation.X = 1 + (GRID_X >> 1) * (ROOM_X + 1) + (ROOM_X >> 1);
+    g_sChar.m_cLocation.Y = 1 + (GRID_Y >> 1) * (ROOM_Y + 1) + (ROOM_Y >> 1);
     g_sChar.m_bActive = true;
 	g_sLevel.playerStartRoom.X = 1;
 	g_sLevel.playerStartRoom.Y = 2;
@@ -76,10 +80,14 @@ void shutdown( void )
 //--------------------------------------------------------------
 void getInput( void )
 {    
-    g_abKeyPressed[K_UP]     = isKeyPressed(VK_UP);
-    g_abKeyPressed[K_DOWN]   = isKeyPressed(VK_DOWN);
-    g_abKeyPressed[K_LEFT]   = isKeyPressed(VK_LEFT);
-    g_abKeyPressed[K_RIGHT]  = isKeyPressed(VK_RIGHT);
+    g_abKeyPressed[K_UP]     = isKeyPressed(0x57);
+    g_abKeyPressed[K_DOWN]   = isKeyPressed(0x53);
+    g_abKeyPressed[K_LEFT]   = isKeyPressed(0x41);
+    g_abKeyPressed[K_RIGHT]  = isKeyPressed(0x44);
+	g_abKeyPressed[K_SHOOTUP] = isKeyPressed(VK_UP);
+	g_abKeyPressed[K_SHOOTRIGHT] = isKeyPressed(VK_RIGHT);
+	g_abKeyPressed[K_SHOOTDOWN] = isKeyPressed(VK_DOWN);
+	g_abKeyPressed[K_SHOOTLEFT] = isKeyPressed(VK_LEFT);
     g_abKeyPressed[K_SPACE]  = isKeyPressed(VK_SPACE);
     g_abKeyPressed[K_ESCAPE] = isKeyPressed(VK_ESCAPE);
 }
@@ -98,9 +106,9 @@ void getInput( void )
 // Input    : dt = deltatime
 // Output   : void
 //--------------------------------------------------------------
-void update(CStopWatch * timer)
+void update(CStopWatch * timer, double missedTime)
 {
-	double dt = timer->getElapsedTime();
+	double dt = timer->getElapsedTime() + missedTime;
     // get the delta time
     g_dElapsedTime += dt;
     g_dDeltaTime = dt;
@@ -146,6 +154,8 @@ void gameplay()            // gameplay logic
 {
     processUserInput(); // checks if you should change states or do something else with the game, e.g. pause, exit
     moveCharacter();    // moves the character, collision detection, physics, etc
+	playerShoot();
+	g_sLevel.g_sEntities.updatePellets();
                         // sound can be played here too.
 }
 
@@ -155,28 +165,28 @@ void moveCharacter()
 
     // Updating the location of the character based on the key press
     // providing a beep sound whenver we shift the character
-    if (g_abKeyPressed[K_UP] && g_sChar.m_cLocation.Y > 0 && g_adBounceTime[K_UP] < g_dElapsedTime)
+    if (g_abKeyPressed[K_UP] && g_sChar.m_cLocation.X > 0 && g_adBounceTime[K_UP] < g_dElapsedTime)
+    {
+        //Beep(1440, 30);
+        g_sChar.m_cLocation.X--;
+		bSomethingHappened = true;
+    }
+    if (g_abKeyPressed[K_LEFT] && g_sChar.m_cLocation.Y > 0 && g_adBounceTime[K_LEFT] < g_dElapsedTime)
     {
         //Beep(1440, 30);
         g_sChar.m_cLocation.Y--;
 		bSomethingHappened = true;
     }
-    if (g_abKeyPressed[K_LEFT] && g_sChar.m_cLocation.X > 0 && g_adBounceTime[K_LEFT] < g_dElapsedTime)
+    if (g_abKeyPressed[K_DOWN] && g_sChar.m_cLocation.X < g_Console.getConsoleSize().Y - 1 && g_adBounceTime[K_DOWN] < g_dElapsedTime)
     {
         //Beep(1440, 30);
-        g_sChar.m_cLocation.X -= 2;
+        g_sChar.m_cLocation.X++;
 		bSomethingHappened = true;
     }
-    if (g_abKeyPressed[K_DOWN] && g_sChar.m_cLocation.Y < g_Console.getConsoleSize().Y - 1 && g_adBounceTime[K_DOWN] < g_dElapsedTime)
+    if (g_abKeyPressed[K_RIGHT] && g_sChar.m_cLocation.Y < g_Console.getConsoleSize().X - 2 && g_adBounceTime[K_RIGHT] < g_dElapsedTime)
     {
         //Beep(1440, 30);
         g_sChar.m_cLocation.Y++;
-		bSomethingHappened = true;
-    }
-    if (g_abKeyPressed[K_RIGHT] && g_sChar.m_cLocation.X < g_Console.getConsoleSize().X - 2 && g_adBounceTime[K_RIGHT] < g_dElapsedTime)
-    {
-        //Beep(1440, 30);
-        g_sChar.m_cLocation.X += 2;
 		bSomethingHappened = true;
     }
     if (g_abKeyPressed[K_SPACE] && g_adBounceTime[K_SPACE] < g_dElapsedTime)
@@ -193,6 +203,7 @@ void moveCharacter()
 		}
 	}
 }
+
 void processUserInput()
 {
     // quits the game if player hits the escape key
@@ -223,8 +234,9 @@ void renderSplashScreen()  // renders the splash screen
 void renderGame()
 {
     //renderMap();        // renders the map to the buffer first
-	renderLevelBorders();
+	renderLevel();
     renderCharacter();  // renders the character into the buffer
+	renderPellets();
 }
 
 void renderMap()
@@ -253,10 +265,7 @@ void renderCharacter()
     {
         charColor = 0x0A;
     }
-	COORD charCoord = g_sChar.m_cLocation;
-    g_Console.writeToBuffer(charCoord, "@", charColor);
-	charCoord.X += 1;
-	g_Console.writeToBuffer(charCoord, "@", charColor);
+    g_Console.writeToBuffer(g_sChar.getRealCoords(), "@@", charColor);
 }
 
 void renderFramerate()
@@ -292,8 +301,97 @@ void renderToScreen()
 // *******************************************************
 // * Custom functions outside framework to go below here *
 // *******************************************************
+void playerShoot()
+{
+	if ((g_abKeyPressed[K_SHOOTDOWN] || g_abKeyPressed[K_SHOOTLEFT] || g_abKeyPressed[K_SHOOTRIGHT] || g_abKeyPressed[K_SHOOTUP]) && (g_adBounceTime[K_SHOOTUP] >= g_dElapsedTime + 0.225 || g_adBounceTime[K_SHOOTUP] < g_dElapsedTime))
+	{
+		g_bHasShot = false;
+		if (g_adBounceTime[K_SHOOTUP] < g_dElapsedTime) g_adBounceTime[K_SHOOTUP] = g_dElapsedTime + 0.250;
+	}
+	else if (!g_bHasShot && g_adBounceTime[K_SHOOTUP] >= g_dElapsedTime && g_adBounceTime[K_SHOOTUP] < g_dElapsedTime + 0.225)
+	{
+		if (g_abKeyPressed[K_SHOOTUP] && !g_abKeyPressed[K_SHOOTDOWN])
+		{
+			if (g_abKeyPressed[K_SHOOTLEFT] && !g_abKeyPressed[K_SHOOTRIGHT])
+			{
+				COORD c = g_sChar.m_cLocation;
+				c.X--;
+				c.Y--;
+				g_sLevel.g_sEntities.m_vPellets.push_back(SPellet(&c, 7));
+				g_bHasShot = true;
+				return;
+			}
+			else if (!g_abKeyPressed[K_SHOOTLEFT] && g_abKeyPressed[K_SHOOTRIGHT])
+			{
+				COORD c = g_sChar.m_cLocation;
+				c.X--;
+				c.Y++;
+				g_sLevel.g_sEntities.m_vPellets.push_back(SPellet(&c, 1));
+				g_bHasShot = true;
+				return;
+			}
+			else if (!g_abKeyPressed[K_SHOOTLEFT] && !g_abKeyPressed[K_SHOOTRIGHT])
+			{
+				COORD c = g_sChar.m_cLocation;
+				c.X--;
+				g_sLevel.g_sEntities.m_vPellets.push_back(SPellet(&c, 0));
+				g_bHasShot = true;
+				return;
+			}
+		}
+		else if (!g_abKeyPressed[K_SHOOTUP] && g_abKeyPressed[K_SHOOTDOWN])
+		{
+			if (g_abKeyPressed[K_SHOOTLEFT] && !g_abKeyPressed[K_SHOOTRIGHT])
+			{
+				COORD c = g_sChar.m_cLocation;
+				c.X++;
+				c.Y--;
+				g_sLevel.g_sEntities.m_vPellets.push_back(SPellet(&c, 5));
+				g_bHasShot = true;
+				return;
+			}
+			else if (!g_abKeyPressed[K_SHOOTLEFT] && g_abKeyPressed[K_SHOOTRIGHT])
+			{
+				COORD c = g_sChar.m_cLocation;
+				c.X++;
+				c.Y++;
+				g_sLevel.g_sEntities.m_vPellets.push_back(SPellet(&c, 3));
+				g_bHasShot = true;
+				return;
+			}
+			else if (!g_abKeyPressed[K_SHOOTLEFT] && !g_abKeyPressed[K_SHOOTRIGHT])
+			{
+				COORD c = g_sChar.m_cLocation;
+				c.X++;
+				g_sLevel.g_sEntities.m_vPellets.push_back(SPellet(&c, 4));
+				g_bHasShot = true;
+				return;
+			}
+		}
+		else if (!g_abKeyPressed[K_SHOOTUP] && !g_abKeyPressed[K_SHOOTDOWN])
+		{
+			if (g_abKeyPressed[K_SHOOTLEFT] && !g_abKeyPressed[K_SHOOTRIGHT])
+			{
+				COORD c = g_sChar.m_cLocation;
+				c.Y--;
+				g_sLevel.g_sEntities.m_vPellets.push_back(SPellet(&c, 6));
+				g_bHasShot = true;
+				return;
+			}
+			else if (!g_abKeyPressed[K_SHOOTLEFT] && g_abKeyPressed[K_SHOOTRIGHT])
+			{
+				COORD c = g_sChar.m_cLocation;
+				c.Y++;
+				g_sLevel.g_sEntities.m_vPellets.push_back(SPellet(&c, 2));
+				g_bHasShot = true;
+				return;
+			}
+		}
+		g_adBounceTime[K_SHOOTUP] = g_dElapsedTime;
+	}
+}
 
-void renderLevelBorders()
+void renderLevel()
 {
 	// Start from offset of 1,1
 	COORD c;
@@ -318,6 +416,125 @@ void renderLevelBorders()
 			}
 		}
 		c.Y++;
+	}
+}
+
+void renderPellets()
+{
+	for (auto& pellet : g_sLevel.g_sEntities.m_vPellets)
+	{
+		g_Console.writeToBuffer(pellet.getRealCoords(), "<>", 0x03);
+	}
+}
+
+SPellet::SPellet(COORD * c, short direction)
+{
+	this->m_dTime = 0.0;
+	this->m_cLocation = *c;
+	this->m_siDirection = direction;
+	this->m_bHit = false;
+	this->Timer.startTimer();
+}
+void SPellet::update()
+{
+	this->m_dTime += this->Timer.getElapsedTime();
+	if (this->m_bHit) return;
+	if (m_dTime >= 0.2)
+	{
+		switch (this->m_siDirection)
+		{
+		case 0:
+			this->m_cLocation.X--;
+			break;
+		case 1:
+			this->m_cLocation.X--;
+			this->m_cLocation.Y++;
+			break;
+		case 2:
+			this->m_cLocation.Y++;
+			break;
+		case 3:
+			this->m_cLocation.X++;
+			this->m_cLocation.Y++;
+			break;
+		case 4:
+			this->m_cLocation.X++;
+			break;
+		case 5:
+			this->m_cLocation.X++;
+			this->m_cLocation.Y--;
+			break;
+		case 6:
+			this->m_cLocation.Y--;
+			break;
+		case 7:
+			this->m_cLocation.X--;
+			this->m_cLocation.Y--;
+			break;
+		}
+		this->m_dTime -= 0.2;
+	}
+}
+COORD SPellet::getRealCoords()
+{
+	COORD c = this->m_cLocation;
+	std::swap(c.X, c.Y);
+	c.X = (c.X << 1) + 1;
+	c.Y += 1;
+	return c;
+}
+
+COORD SGameChar::getRealCoords()
+{
+	COORD c = this->m_cLocation;
+	std::swap(c.X, c.Y);
+	c.X = (c.X << 1) + 1;
+	c.Y += 1;
+	return c;
+}
+
+void SAllEntities::updatePellets()
+{
+	for (auto& pellet : this->m_vPellets)
+	{
+		pellet.update();
+	}
+	this->checkHitPellets();
+}
+void SAllEntities::checkHitPellets()
+{
+	int index = 0;
+	for (std::vector<SPellet>::iterator pellet = this->m_vPellets.begin(); pellet != this->m_vPellets.end(); pellet++, index++)
+	{
+		if ((*pellet).m_bHit)
+		{
+			if ((*pellet).m_dTime >= 0.15)
+				this->m_vPellets.erase(pellet);
+			if (index != this->m_vPellets.size())
+				continue;
+			else
+				return;
+		}
+
+		// Check collision with wall
+		if ((*pellet).m_cLocation.X % (ROOM_X + 1) == 0 || (*pellet).m_cLocation.Y % (ROOM_Y + 1) == 0)
+		{
+			(*pellet).m_bHit = true;
+			(*pellet).m_dTime = 0;
+			continue;
+		}
+
+		// Check hit with other pellets
+		/*if (pellet == this->m_vPellets.end()) break;
+		for (std::vector<SPellet>::iterator otherPellet = pellet + 1; otherPellet != this->m_vPellets.end(); otherPellet++)
+		{
+			if ((*otherPellet).m_cLocation.X == (*pellet).m_cLocation.X && (*otherPellet).m_cLocation.Y == (*pellet).m_cLocation.Y)
+			{
+				(*otherPellet).m_bHit = (*pellet).m_bHit = true;
+				(*otherPellet).m_dTime = (*pellet).m_dTime = 0;
+				break;
+			}
+		}*/
 	}
 }
 

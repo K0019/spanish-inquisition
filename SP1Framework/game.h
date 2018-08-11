@@ -24,6 +24,10 @@ enum EKEYS
     K_DOWN,
     K_LEFT,
     K_RIGHT,
+	K_SHOOTUP,
+	K_SHOOTRIGHT,
+	K_SHOOTDOWN,
+	K_SHOOTLEFT,
     K_ESCAPE,
     K_SPACE,
     K_COUNT
@@ -42,11 +46,34 @@ struct SGameChar
 {
     COORD m_cLocation;
     bool  m_bActive;
+
+	COORD getRealCoords();
+};
+
+struct SPellet
+{
+	CStopWatch Timer;
+	COORD m_cLocation;
+	short m_siDirection;
+	bool m_bFriendly, m_bHit;
+	double m_dTime;
+
+	SPellet(COORD * c, short direction);
+	void update();
+	COORD getRealCoords();
+};
+struct SAllEntities
+{
+	std::vector<SPellet> m_vPellets;
+
+	void updatePellets();
+	void checkHitPellets();
 };
 
 struct SLevel
 {
 	COORD playerStartRoom, exitRoom;
+	SAllEntities g_sEntities;
 	std::string level[1 + (ROOM_X + 1) * GRID_X]; // Includes borders
 
 	void generateLevel();
@@ -56,13 +83,14 @@ struct SLevel
 
 void init        ( void );      // initialize your variables, allocate memory, etc
 void getInput    ( void );      // get input from player
-void update      ( CStopWatch * timer ); // update the game and the state of the game
+void update      ( CStopWatch * timer, double missedTime ); // update the game and the state of the game
 void render      ( void );      // renders the current state of the game to the console
 void shutdown    ( void );      // do clean up, free memory
 
 void splashScreenWait();    // waits for time to pass in splash screen
 void gameplay();            // gameplay logic
 void moveCharacter();       // moves the character, collision detection, physics, etc
+void playerShoot();
 void processUserInput();    // checks if you should change states or do something else with the game, e.g. pause, exit
 void clearScreen();         // clears the current screen and draw from scratch 
 void renderSplashScreen();  // renders the splash screen
@@ -71,6 +99,7 @@ void renderMap();           // renders the map to the buffer first
 void renderCharacter();     // renders the character into the buffer
 void renderFramerate();     // renders debug information, frame rate, elapsed time, etc
 void renderToScreen();      // dump the contents of the buffer to the screen, one frame worth of game
-void renderLevelBorders();  // renders the borders of the rooms
+void renderLevel();  // renders the borders of the rooms
+void renderPellets();
 
 #endif // _GAME_H

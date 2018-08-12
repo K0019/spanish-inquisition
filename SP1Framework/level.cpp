@@ -2,6 +2,13 @@
 
 void SLevel::generateLevel()
 {
+	// TEMPORARY VARIABLES
+	bool * roomsHaveExit = new bool[GRID_X * GRID_Y];
+
+	// INSTANTIATE VARIABLES
+	for (int index = 0; index < GRID_X * GRID_Y; index++)
+		roomsHaveExit[index] = false;
+
 	// -----Borders and Padding-----
 	// Add the top border
 	for (int gridColumn = 0; gridColumn <= GRID_Y * (ROOM_Y + 1); gridColumn++)
@@ -41,35 +48,46 @@ void SLevel::generateLevel()
 
 	// Generate a route to the end
 	std::vector<COORD> routeToEnd = { this->playerStartRoom };
-	routeToEnd = seekToEnd(routeToEnd);
+	seekToEnd(routeToEnd);
 
-	// Create openings
+	// Flag rooms with openings already
+	for (auto& c : routeToEnd)
+	{
+		roomsHaveExit[c.X * GRID_Y + c.Y] = true;
+	}
+
+	// Create mandatory route openings
 	for (std::vector<COORD>::iterator iter = routeToEnd.begin() + 1; iter != routeToEnd.end(); iter++)
 	{
-		int xDiff = (*(iter - 1)).X - (*iter).X;
-		int yDiff = (*(iter - 1)).Y - (*iter).Y;
-		COORD c;
-		switch ((xDiff < 0) ? (2) : (0) + (yDiff != 0) ? ((yDiff > 0) ? (3) : (1)) : (0))
-		{
-		case 0: // Up
-			c.X = ((*iter).X + 1) * (ROOM_X + 1);
-			c.Y = (*iter).Y * (ROOM_Y + 1) + (ROOM_Y >> 1) + 1;
-			break;
-		case 1: // Right
-			c.X = (*iter).X * (ROOM_X + 1) + (ROOM_X >> 1) + 1;
-			c.Y = (*iter).Y * (ROOM_Y + 1);
-			break;
-		case 2: // Down
-			c.X = ((*iter).X) * (ROOM_X + 1);
-			c.Y = (*iter).Y * (ROOM_Y + 1) + (ROOM_Y >> 1) + 1;
-			break;
-		case 3: // Left
-			c.X = (*iter).X * (ROOM_X + 1) + (ROOM_X >> 1) + 1;
-			c.Y = ((*iter).Y + 1) * (ROOM_Y + 1);
-			break;
-		}
+		int xDiff = (iter - 1)->X - iter->X;
+		int yDiff = (iter - 1)->Y - iter->Y;
+		COORD c = this->getCoordinatesForDoor(iter->X, iter->Y, (xDiff < 0) ? (2) : (0) + (yDiff != 0) ? ((yDiff > 0) ? (3) : (1)) : (0));
 		this->modifyTile(c, "$");
 	}
+
+	// Add an opening for rooms with no entrances
+	{
+		std::vector<int> direction = { 0, 1, 2, 3 };
+		for (int index = 0; index < GRID_X * GRID_Y; index++)
+		{
+			if (roomsHaveExit[index]) continue;
+
+			std::random_shuffle(direction.begin(), direction.end());
+			for (const auto& dir : direction)
+			{
+				COORD c = this->getCoordinatesForDoor(index / GRID_Y, index % GRID_Y, dir);
+
+				if (this->getTile(c) == '$') continue;
+				if (c.X == 0 || c.X == GRID_X * (ROOM_X + 1) || c.Y == 0 || c.Y == GRID_Y * (ROOM_Y + 1)) continue;
+				
+				this->modifyTile(c, "$");
+				break;
+			}
+		}
+	}
+
+	// DELETE ALLOCATED STORAGE
+	delete[] roomsHaveExit;
 }
 
 std::vector<COORD> SLevel::seekToEnd(std::vector<COORD>& returned)
@@ -98,8 +116,6 @@ std::vector<COORD> SLevel::seekToEnd(std::vector<COORD>& returned)
 			if (!(returned.back().Y - 1 < 0))
 				c.Y--;
 			break;
-		default:
-			throw std::invalid_argument("checkDirection out of range");
 		}
 		bool toContinue = false;
 		for (auto each : returned)
@@ -135,4 +151,29 @@ void SLevel::modifyTile(COORD c, std::string ch)
 char SLevel::getTile(COORD c)
 {
 	return this->level[c.X][c.Y];
+}
+
+COORD SLevel::getCoordinatesForDoor(const SHORT& X, const SHORT& Y, const int& direction)
+{
+	COORD c;
+	switch (direction)
+	{
+	case 0: // Up
+		c.X = (X + 1) * (ROOM_X + 1);
+		c.Y = Y * (ROOM_Y + 1) + (ROOM_Y >> 1) + 1;
+		break;
+	case 1: // Right
+		c.X = X * (ROOM_X + 1) + (ROOM_X >> 1) + 1;
+		c.Y = Y * (ROOM_Y + 1);
+		break;
+	case 2: // Down
+		c.X = X * (ROOM_X + 1);
+		c.Y = Y * (ROOM_Y + 1) + (ROOM_Y >> 1) + 1;
+		break;
+	case 3: // Left
+		c.X = X * (ROOM_X + 1) + (ROOM_X >> 1) + 1;
+		c.Y = (Y + 1) * (ROOM_Y + 1);
+		break;
+	}
+	return c;
 }

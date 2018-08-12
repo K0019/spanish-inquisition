@@ -46,8 +46,8 @@ void init( void )
     g_sChar.m_cLocation.X = 1 + (GRID_X >> 1) * (ROOM_X + 1) + (ROOM_X >> 1);
     g_sChar.m_cLocation.Y = 1 + (GRID_Y >> 1) * (ROOM_Y + 1) + (ROOM_Y >> 1);
     g_sChar.m_bActive = true;
-	g_sLevel.playerStartRoom.X = 1;
-	g_sLevel.playerStartRoom.Y = 2;
+	g_sLevel.playerStartRoom.X = GRID_X >> 1;
+	g_sLevel.playerStartRoom.Y = GRID_Y >> 1;
 	g_sLevel.generateLevel();
     // sets the width, height and the font name to use in the console
     g_Console.setConsoleFont(0, 16, L"Consolas");
@@ -180,25 +180,53 @@ void moveCharacter()
     {
         //Beep(1440, 30);
         g_sChar.m_cLocation.X--;
-		bSomethingHappened = true;
+		if (g_sLevel.getTile(g_sChar.m_cLocation) == '#')
+		{
+			g_sChar.m_cLocation.X++;
+		}
+		else
+		{
+			bSomethingHappened = true;
+		}
     }
     if (g_abKeyPressed[K_LEFT] && g_sChar.m_cLocation.Y > 0 && g_adBounceTime[K_LEFT] < g_dElapsedTime)
     {
         //Beep(1440, 30);
         g_sChar.m_cLocation.Y--;
-		bSomethingHappened = true;
+		if (g_sLevel.getTile(g_sChar.m_cLocation) == '#')
+		{
+			g_sChar.m_cLocation.Y++;
+		}
+		else
+		{
+			bSomethingHappened = true;
+		}
     }
     if (g_abKeyPressed[K_DOWN] && g_sChar.m_cLocation.X < g_Console.getConsoleSize().Y - 1 && g_adBounceTime[K_DOWN] < g_dElapsedTime)
     {
         //Beep(1440, 30);
         g_sChar.m_cLocation.X++;
-		bSomethingHappened = true;
+		if (g_sLevel.getTile(g_sChar.m_cLocation) == '#')
+		{
+			g_sChar.m_cLocation.X--;
+		}
+		else
+		{
+			bSomethingHappened = true;
+		}
     }
     if (g_abKeyPressed[K_RIGHT] && g_sChar.m_cLocation.Y < g_Console.getConsoleSize().X - 2 && g_adBounceTime[K_RIGHT] < g_dElapsedTime)
     {
         //Beep(1440, 30);
         g_sChar.m_cLocation.Y++;
-		bSomethingHappened = true;
+		if (g_sLevel.getTile(g_sChar.m_cLocation) == '#')
+		{
+			g_sChar.m_cLocation.Y--;
+		}
+		else
+		{
+			bSomethingHappened = true;
+		}
     }
     if (g_abKeyPressed[K_SPACE] && g_adBounceTime[K_SPACE] < g_dElapsedTime)
     {
@@ -423,12 +451,12 @@ void renderLevel()
 			switch (g_sLevel.level[row][column])
 			{
 			case '#':
-				c.X = 1 + column;
-				g_Console.writeToBuffer(c, " ", 0x80);
+				c.X = 1 + (column << 1);
+				g_Console.writeToBuffer(c, "  ", 0x80);
 				break;
 			case '$':
-				c.X = 1 + column;
-				g_Console.writeToBuffer(c, " ", 0x40);
+				c.X = 1 + (column << 1);
+				g_Console.writeToBuffer(c, "  ", 0x40);
 				break;
 			}
 		}

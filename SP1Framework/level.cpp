@@ -6,7 +6,7 @@ void SLevel::generateLevel()
 	// Add the top border
 	for (int gridColumn = 0; gridColumn <= GRID_Y * (ROOM_Y + 1); gridColumn++)
 	{
-		this->level[0] += "##";
+		this->level[0] += "#";
 	}
 
 	// Add the rest w/ padding
@@ -16,15 +16,15 @@ void SLevel::generateLevel()
 		{
 			for (int gridColumn = 0; gridColumn <= GRID_Y; gridColumn++)
 			{
-				this->level[gridRow * ROOM_X + gridRow + cRow + 1] += "##";
+				this->level[gridRow * ROOM_X + gridRow + cRow + 1] += "#";
 				if (gridColumn != GRID_Y)
 					for (int padding = 0; padding < ROOM_Y; padding++)
-						this->level[gridRow * ROOM_X + gridRow + cRow + 1] += "  ";
+						this->level[gridRow * ROOM_X + gridRow + cRow + 1] += " ";
 			}
 		}
 		for (int gridColumn = 0; gridColumn <= GRID_Y * (ROOM_Y + 1); gridColumn++)
 		{
-			this->level[(gridRow + 1) * (ROOM_X + 1)] += "##";
+			this->level[(gridRow + 1) * (ROOM_X + 1)] += "#";
 		}
 	}
 
@@ -32,8 +32,8 @@ void SLevel::generateLevel()
 	// Set exit room, at least 2 rooms away from entry room
 	do
 	{
-		this->exitRoom.X = rand() / (RAND_MAX / 3);
-		this->exitRoom.Y = rand() / (RAND_MAX / 5);
+		this->exitRoom.X = rand() / (RAND_MAX / GRID_X);
+		this->exitRoom.Y = rand() / (RAND_MAX / GRID_Y);
 	} while (this->exitRoom.X >= this->playerStartRoom.X - 1 &&
 		this->exitRoom.X <= this->playerStartRoom.X + 1 &&
 		this->exitRoom.Y >= this->playerStartRoom.Y - 1 &&
@@ -68,7 +68,7 @@ void SLevel::generateLevel()
 			c.Y = ((*iter).Y + 1) * (ROOM_Y + 1);
 			break;
 		}
-		this->modifyTile(c, "$$");
+		this->modifyTile(c, "$");
 	}
 }
 
@@ -129,5 +129,10 @@ std::vector<COORD> SLevel::seekToEnd(std::vector<COORD>& returned)
 
 void SLevel::modifyTile(COORD c, std::string ch)
 {
-	this->level[c.X].replace(c.Y << 1, ch.length(), ch);
+	this->level[c.X].replace(c.Y, ch.length(), ch);
+}
+
+char SLevel::getTile(COORD c)
+{
+	return this->level[c.X][c.Y];
 }

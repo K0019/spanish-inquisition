@@ -15,6 +15,7 @@ struct SLevel
 	void generateLevel();
 	std::vector<COORD> seekToEnd(std::vector<COORD>& returned);
 	void modifyTile(COORD c, std::string ch);
+	char getTile(COORD c);
 };
 
 

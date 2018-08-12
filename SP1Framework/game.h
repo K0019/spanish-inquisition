@@ -2,17 +2,13 @@
 
 #ifndef _GAME_H
 #define _GAME_H
-#define DEBUG true
-#define GRID_X 3
-#define GRID_Y 5
-#define ROOM_X 5
-#define ROOM_Y 7
 
 #include "Framework\timer.h"
+#include "level.h"
+#include "definitions.h"
 #include <string>
 #include <cstdlib>
 #include <vector>
-#include <algorithm>
 
 extern CStopWatch g_swTimer;
 extern bool g_bQuitGame;
@@ -48,37 +44,6 @@ struct SGameChar
     bool  m_bActive;
 
 	COORD getRealCoords();
-};
-
-struct SPellet
-{
-	CStopWatch Timer;
-	COORD m_cLocation;
-	short m_siDirection;
-	bool m_bFriendly, m_bHit;
-	double m_dTime;
-
-	SPellet(COORD * c, short direction);
-	void update();
-	COORD getRealCoords();
-};
-struct SAllEntities
-{
-	std::vector<SPellet> m_vPellets;
-
-	void updatePellets();
-	void checkHitPellets();
-};
-
-struct SLevel
-{
-	COORD playerStartRoom, exitRoom;
-	SAllEntities g_sEntities;
-	std::string level[1 + (ROOM_X + 1) * GRID_X]; // Includes borders
-
-	void generateLevel();
-	std::vector<COORD> seekToEnd(std::vector<COORD>& returned);
-	void modifyTile(COORD c, std::string ch);
 };
 
 void init        ( void );      // initialize your variables, allocate memory, etc

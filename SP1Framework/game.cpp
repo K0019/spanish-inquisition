@@ -120,6 +120,8 @@ void update(CStopWatch * timer, double missedTime)
     {
         case S_SPLASHSCREEN : splashScreenWait(); // game logic for the splash screen
             break;
+		case S_MENU: mainMenu();
+			break;
         case S_GAME: gameplay(); // gameplay logic when we are in the game
             break;
     }
@@ -139,6 +141,8 @@ void render(CStopWatch * timer)
     {
         case S_SPLASHSCREEN: renderSplashScreen();
             break;
+		case S_MENU: renderMainMenu();
+			break;
         case S_GAME: renderGame();
             break;
     }
@@ -158,8 +162,16 @@ void render(CStopWatch * timer)
 
 void splashScreenWait()    // waits for time to pass in splash screen
 {
+    processUserInput(); // checks if you should change states or do something else with the game, e.g. pause, exit
     if (g_dAccurateElapsedTime > 3.0) // wait for 3 seconds to switch to game mode, else do nothing
-        g_eGameState = S_GAME;
+        g_eGameState = S_MENU;
+}
+
+void mainMenu()
+{
+    processUserInput(); // checks if you should change states or do something else with the game, e.g. pause, exit
+	if (g_dAccurateElapsedTime > 6.0) // wait for 3 seconds to switch to game mode, else do nothing
+		g_eGameState = S_GAME;
 }
 
 void gameplay()            // gameplay logic
@@ -248,7 +260,7 @@ void processUserInput()
 {
     // quits the game if player hits the escape key
     if (g_abKeyPressed[K_ESCAPE])
-        g_bQuitGame = true;    
+        g_bQuitGame = true;
 }
 
 void clearScreen()
@@ -259,25 +271,44 @@ void clearScreen()
 
 void renderSplashScreen()  // renders the splash screen
 {
-    COORD c = g_Console.getConsoleSize();
-    c.Y /= 3;
-    c.X = c.X / 2 - 9;
-    g_Console.writeToBuffer(c, "A game in 3 seconds", 0x03);
-    c.Y += 1;
-    c.X = g_Console.getConsoleSize().X / 2 - 20;
-    g_Console.writeToBuffer(c, "Press <Space> to change character colour", 0x09);
-    c.Y += 1;
-    c.X = g_Console.getConsoleSize().X / 2 - 9;
-    g_Console.writeToBuffer(c, "Press 'Esc' to quit", 0x09);
+	COORD c = g_Console.getConsoleSize();
+	c.Y /= 3;
+	c.X = g_Console.getConsoleSize().X / 2 - 20;
+	g_Console.writeToBuffer(c, "A game in 3 seconds", 0x03);
+	c.Y += 1;
+	g_Console.writeToBuffer(c, "Press WASD to move the character", 0x09);
+	c.Y += 1;
+	g_Console.writeToBuffer(c, "Press Arrow keys to shoot", 0x09);
+	c.Y += 1;
+	g_Console.writeToBuffer(c, "Press 'Esc' to quit", 0x09);
+}
+
+void renderMainMenu()
+{
+	renderScore();
 }
 
 void renderGame()
 {
     //renderMap();        // renders the map to the buffer first
 	renderLevel();
-    renderCharacter();  // renders the character into the buffer
+    renderCharacter();    // renders the character into the buffer
 	renderPellets();
 	renderStat();
+	//renderEnemy();
+}
+
+void renderScore() 
+{
+	unsigned int score;
+	score = 456;
+	std::string sScore;
+	sScore = std::to_string(score);
+	load("saves.txt", &sScore);
+	COORD c = g_Console.getConsoleSize();
+	c.X /= 2;
+	c.Y /= 2;
+	g_Console.writeToBuffer(c, sScore, 0x0f);
 }
 
 void renderMap()
@@ -472,6 +503,11 @@ void renderPellets()
 	{
 		g_Console.writeToBuffer(pellet.getRealCoords(), "<>", 0x03);
 	}
+}
+
+void renderEnemy()
+{
+
 }
 
 COORD SGameChar::getRealCoords()

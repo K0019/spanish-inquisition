@@ -9,3 +9,6 @@
 /SP1Framework/Release
 /SP1Framework/Debug
 *.user
+*.db
+.vs/SP1Framework/v14/.suo
+SP1Framework.VC.VC.opendb

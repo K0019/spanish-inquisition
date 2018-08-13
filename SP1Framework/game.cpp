@@ -277,6 +277,7 @@ void renderGame()
 	renderLevel();
     renderCharacter();  // renders the character into the buffer
 	renderPellets();
+	renderStat();
 }
 
 void renderMap()
@@ -480,4 +481,32 @@ COORD SGameChar::getRealCoords()
 	c.X = (c.X << 1) + 1;
 	c.Y += 1;
 	return c;
+}
+
+SGameChar::SGameChar()
+{
+}
+
+void renderStat()
+{
+	//Rendering player's HP
+	COORD c;
+	std::ostringstream ss;
+	ss.str("");
+	ss << "HP: " << g_sChar.m_iPlayerHealth;
+	c.X = g_Console.getConsoleSize().X - 9;
+	c.Y = 2;
+	g_Console.writeToBuffer(c, ss.str());
+
+	//Rendering player's score
+	ss.str("");
+	ss << "Damage: " << g_sChar.m_iPlayerDamage;
+	c.Y = 3;
+	g_Console.writeToBuffer(c, ss.str());
+
+	//Rendering player's score
+	ss.str("");
+	ss << "Score: " << g_sChar.m_iPlayerScore;
+	c.Y = 4;
+	g_Console.writeToBuffer(c, ss.str());
 }

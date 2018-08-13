@@ -42,8 +42,13 @@ struct SGameChar
 {
     COORD m_cLocation;
     bool  m_bActive;
+	int m_iPlayerHealth = 10;
+	int	m_iPlayerDamage = 3;
+	int	m_iPlayerScore = 0;
 
 	COORD getRealCoords();
+	SGameChar();
+	SGameChar(COORD location, bool active, int playerHealth, int playerDamage, int playerScore);
 };
 
 void init        ( void );      // initialize your variables, allocate memory, etc
@@ -64,6 +69,7 @@ void renderMap();           // renders the map to the buffer first
 void renderCharacter();     // renders the character into the buffer
 void renderFramerate();     // renders debug information, frame rate, elapsed time, etc
 void renderToScreen();      // dump the contents of the buffer to the screen, one frame worth of game
+void renderStat();   //renders the player stats on the right side of the console
 void renderLevel();  // renders the borders of the rooms
 void renderPellets();
 

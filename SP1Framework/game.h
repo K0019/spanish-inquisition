@@ -43,6 +43,7 @@ enum EGAMESTATES
 struct SGameChar
 {
     COORD m_cLocation;
+	COORD m_cRoom; // Room coordinates that the player is in
     bool  m_bActive;
 	int m_iPlayerHealth = 10;
 	int	m_iPlayerDamage = 3;

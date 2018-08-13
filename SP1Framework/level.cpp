@@ -14,29 +14,46 @@ void SLevel::generateLevel()
 
 	// -----Borders and Padding-----
 	// Add the top border
-	for (int gridColumn = 0; gridColumn <= GRID_Y * (ROOM_Y + 1); gridColumn++)
+	for (int i = 0; i < 2; i++)
 	{
-		this->level[0] += "#";
+		for (int gridColumn = 0; gridColumn <= GRID_Y * (ROOM_Y + 1) + GRID_Y + 1; gridColumn++)
+		{
+			this->level[i] += "#";
+		}
 	}
 
-	// Add the rest w/ padding
+	// Add the middle w/ padding
 	for (int gridRow = 0; gridRow < GRID_X; gridRow++)
 	{
 		for (int cRow = 0; cRow < ROOM_X; cRow++)
 		{
 			for (int gridColumn = 0; gridColumn <= GRID_Y; gridColumn++)
 			{
-				this->level[gridRow * ROOM_X + gridRow + cRow + 1] += "#";
+				this->level[gridRow * ROOM_X + (gridRow << 1) + cRow + 2] += "##";
 				if (gridColumn != GRID_Y)
 					for (int padding = 0; padding < ROOM_Y; padding++)
-						this->level[gridRow * ROOM_X + gridRow + cRow + 1] += " ";
+						this->level[gridRow * ROOM_X + (gridRow << 1) + cRow + 2] += " ";
 			}
 		}
-		for (int gridColumn = 0; gridColumn <= GRID_Y * (ROOM_Y + 1); gridColumn++)
+		if (gridRow == GRID_X - 1) break;
+		for (int i = 0; i < 2; i++)
 		{
-			this->level[(gridRow + 1) * (ROOM_X + 1)] += "#";
+			for (int gridColumn = 0; gridColumn <= GRID_Y * (ROOM_Y + 1) + GRID_Y + 1; gridColumn++)
+			{
+				this->level[(gridRow + 1) * (ROOM_X + 1) + i + gridRow + 1] += "#";
+			}
 		}
 	}
+
+	// Add the bottom border
+	for (int i = 0; i < 2; i++)
+	{
+		for (int gridColumn = 0; gridColumn <= GRID_Y * (ROOM_Y + 1) + GRID_Y + 1; gridColumn++)
+		{
+			this->level[GRID_X + (ROOM_X + 1) * GRID_X + i] += "#";
+		}
+	}
+
 
 	// -----Required Border Holes-----
 	// Set exit room, at least 2 rooms away from entry room
@@ -64,8 +81,9 @@ void SLevel::generateLevel()
 	{
 		int xDiff = (iter - 1)->X - iter->X;
 		int yDiff = (iter - 1)->Y - iter->Y;
-		COORD c = this->getCoordinatesForDoor(iter->X, iter->Y, (xDiff < 0) ? (2) : (0) + (yDiff != 0) ? ((yDiff > 0) ? (3) : (1)) : (0));
-		this->modifyTile(c, "$");
+		COORD * c = this->getCoordinatesForDoor(iter->X, iter->Y, (xDiff < 0) ? (2) : (0) + (yDiff != 0) ? ((yDiff > 0) ? (3) : (1)) : (0));
+		this->modifyTile(c[0], "$");
+		this->modifyTile(c[1], "$");
 	}
 
 	// Add an opening for rooms with no entrances
@@ -139,33 +157,42 @@ void SLevel::uncoverAll(COORD room, bool * roomsHaveExit)
 	for (auto& dir : direction)
 	{
 		COORD c = room;
+		COORD * cPointer;
 		switch (dir)
 		{
 		case 0:
 			if (room.X - 1 < 0) continue;
 			if (roomsHaveExit[(room.X - 1) * GRID_Y + room.Y]) continue;
-			this->modifyTile(this->getCoordinatesForDoor(--c.X, c.Y, 0), "$");
+			cPointer = this->getCoordinatesForDoor(--c.X, c.Y, 0);
+			this->modifyTile(cPointer[0], "$");
+			this->modifyTile(cPointer[1], "$");
 			roomsHaveExit[c.X * GRID_Y + c.Y] = true;
 			this->uncoverAll(c, roomsHaveExit);
 			break;
 		case 1:
 			if (room.Y + 1 >= GRID_Y) continue;
 			if (roomsHaveExit[room.X * GRID_Y + room.Y + 1]) continue;
-			this->modifyTile(this->getCoordinatesForDoor(c.X, ++c.Y, 1), "$");
+			cPointer = this->getCoordinatesForDoor(c.X, ++c.Y, 1);
+			this->modifyTile(cPointer[0], "$");
+			this->modifyTile(cPointer[1], "$");
 			roomsHaveExit[c.X * GRID_Y + c.Y] = true;
 			this->uncoverAll(c, roomsHaveExit);
 			break;
 		case 2:
 			if (room.X + 1 >= GRID_X) continue;
 			if (roomsHaveExit[(room.X + 1) * GRID_Y + room.Y]) continue;
-			this->modifyTile(this->getCoordinatesForDoor(++c.X, c.Y, 2), "$");
+			cPointer = this->getCoordinatesForDoor(++c.X, c.Y, 2);
+			this->modifyTile(cPointer[0], "$");
+			this->modifyTile(cPointer[1], "$");
 			roomsHaveExit[c.X * GRID_Y + c.Y] = true;
 			this->uncoverAll(c, roomsHaveExit);
 			break;
 		case 3:
 			if (room.Y - 1 < 0) continue;
 			if (roomsHaveExit[room.X * GRID_Y + room.Y - 1]) continue;
-			this->modifyTile(this->getCoordinatesForDoor(c.X, --c.Y, 3), "$");
+			cPointer = this->getCoordinatesForDoor(c.X, --c.Y, 3);
+			this->modifyTile(cPointer[0], "$");
+			this->modifyTile(cPointer[1], "$");
 			roomsHaveExit[c.X * GRID_Y + c.Y] = true;
 			this->uncoverAll(c, roomsHaveExit);
 			break;
@@ -183,26 +210,34 @@ char SLevel::getTile(COORD c)
 	return this->level[c.X][c.Y];
 }
 
-COORD SLevel::getCoordinatesForDoor(const SHORT& X, const SHORT& Y, const int& direction)
+COORD * SLevel::getCoordinatesForDoor(const SHORT& X, const SHORT& Y, const int& direction)
 {
-	COORD c;
+	static COORD c[2];
 	switch (direction)
 	{
 	case 0: // Up
-		c.X = (X + 1) * (ROOM_X + 1);
-		c.Y = Y * (ROOM_Y + 1) + (ROOM_Y >> 1) + 1;
+		c[0].X = (X + 1) * (ROOM_X + 2);
+		c[0].Y = Y * (ROOM_Y + 2) + (ROOM_Y >> 1) + 2;
+		c[1] = c[0];
+		c[1].X++;
 		break;
 	case 1: // Right
-		c.X = X * (ROOM_X + 1) + (ROOM_X >> 1) + 1;
-		c.Y = Y * (ROOM_Y + 1);
+		c[0].X = X * (ROOM_X + 2) + (ROOM_X >> 1) + 2;
+		c[0].Y = Y * (ROOM_Y + 2);
+		c[1] = c[0];
+		c[1].Y++;
 		break;
 	case 2: // Down
-		c.X = X * (ROOM_X + 1);
-		c.Y = Y * (ROOM_Y + 1) + (ROOM_Y >> 1) + 1;
+		c[0].X = X * (ROOM_X + 2);
+		c[0].Y = Y * (ROOM_Y + 2) + (ROOM_Y >> 1) + 2;
+		c[1] = c[0];
+		c[1].X++;
 		break;
 	case 3: // Left
-		c.X = X * (ROOM_X + 1) + (ROOM_X >> 1) + 1;
-		c.Y = (Y + 1) * (ROOM_Y + 1);
+		c[0].X = X * (ROOM_X + 2) + (ROOM_X >> 1) + 2;
+		c[0].Y = (Y + 1) * (ROOM_Y + 2);
+		c[1] = c[0];
+		c[1].Y++;
 		break;
 	}
 	return c;

@@ -11,6 +11,9 @@ double  g_dDeltaTime;
 int g_iCurrentFrameCount, g_iLastFrameCount, g_iLastMeasuredSecond;
 double	g_dAccurateElapsedTime;
 bool    g_abKeyPressed[K_COUNT];
+COORD r_cRenderOffset; // To be used for level rendering, tile coordinates
+int r_iMoveDirection;
+double r_dMoveTime;
 
 // Game specific variables here
 SGameChar   g_sChar;
@@ -44,11 +47,14 @@ void init( void )
 	if (DEBUG) g_eGameState = S_GAME;
 
 	g_bHasShot = false;
-    g_sChar.m_cLocation.X = 1 + (GRID_X >> 1) * (ROOM_X + 1) + (ROOM_X >> 1);
-    g_sChar.m_cLocation.Y = 1 + (GRID_Y >> 1) * (ROOM_Y + 1) + (ROOM_Y >> 1);
+    g_sChar.m_cLocation.X = 2 + (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
+    g_sChar.m_cLocation.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
     g_sChar.m_bActive = true;
 	g_sLevel.playerStartRoom.X = GRID_X >> 1;
 	g_sLevel.playerStartRoom.Y = GRID_Y >> 1;
+	g_sChar.m_cRoom = g_sLevel.playerStartRoom;
+	r_cRenderOffset.X = 1 + g_sChar.m_cRoom.X * (ROOM_X + 2);
+	r_cRenderOffset.Y = 1 + g_sChar.m_cRoom.Y * (ROOM_Y + 2);
 	g_sLevel.generateLevel();
     // sets the width, height and the font name to use in the console
     g_Console.setConsoleFont(0, 16, L"Consolas");
@@ -188,6 +194,10 @@ void moveCharacter()
 		else
 		{
 			bSomethingHappened = true;
+			if (g_sChar.m_cLocation.X < r_cRenderOffset.X)
+			{
+				r_cRenderOffset.X -= (ROOM_X + 2);
+			}
 		}
     }
     if (g_abKeyPressed[K_LEFT] && g_sChar.m_cLocation.Y > 0 && g_adBounceTime[K_LEFT] < g_dElapsedTime)
@@ -201,9 +211,13 @@ void moveCharacter()
 		else
 		{
 			bSomethingHappened = true;
+			if (g_sChar.m_cLocation.Y < r_cRenderOffset.Y)
+			{
+				r_cRenderOffset.Y -= (ROOM_Y + 2);
+			}
 		}
     }
-    if (g_abKeyPressed[K_DOWN] && g_sChar.m_cLocation.X < g_Console.getConsoleSize().Y - 1 && g_adBounceTime[K_DOWN] < g_dElapsedTime)
+    if (g_abKeyPressed[K_DOWN] && g_adBounceTime[K_DOWN] < g_dElapsedTime)
     {
         //Beep(1440, 30);
         g_sChar.m_cLocation.X++;
@@ -214,9 +228,13 @@ void moveCharacter()
 		else
 		{
 			bSomethingHappened = true;
+			if (g_sChar.m_cLocation.X >= r_cRenderOffset.X + ROOM_X + 2)
+			{
+				r_cRenderOffset.X += (ROOM_X + 2);
+			}
 		}
     }
-    if (g_abKeyPressed[K_RIGHT] && g_sChar.m_cLocation.Y < g_Console.getConsoleSize().X - 2 && g_adBounceTime[K_RIGHT] < g_dElapsedTime)
+    if (g_abKeyPressed[K_RIGHT] && g_adBounceTime[K_RIGHT] < g_dElapsedTime)
     {
         //Beep(1440, 30);
         g_sChar.m_cLocation.Y++;
@@ -227,6 +245,10 @@ void moveCharacter()
 		else
 		{
 			bSomethingHappened = true;
+			if (g_sChar.m_cLocation.Y >= r_cRenderOffset.Y + ROOM_Y + 2)
+			{
+				r_cRenderOffset.Y += (ROOM_Y + 2);
+			}
 		}
     }
     if (g_abKeyPressed[K_SPACE] && g_adBounceTime[K_SPACE] < g_dElapsedTime)
@@ -444,24 +466,48 @@ void renderLevel()
 	c.X = 1;
 	c.Y = 1;
 
-	// Go through each character inside level and print its respective character
-	for (unsigned int row = 0; row < 1 + (ROOM_X + 1) * GRID_X; row++)
+	if (DEBUG)
 	{
-		for (unsigned int column = 0; column < g_sLevel.level[row].length(); column++)
+		for (int row = r_cRenderOffset.X; row < r_cRenderOffset.X + ROOM_X + 2; row++)
 		{
-			switch (g_sLevel.level[row][column])
+			for (int column = r_cRenderOffset.Y; column < r_cRenderOffset.Y + ROOM_Y + 2; column++)
 			{
-			case '#':
-				c.X = 1 + (column << 1);
-				g_Console.writeToBuffer(c, "  ", 0x80);
-				break;
-			case '$':
-				c.X = 1 + (column << 1);
-				g_Console.writeToBuffer(c, "  ", 0x40);
-				break;
+				switch (g_sLevel.level[row][column])
+				{
+				case '#':
+					c.X = 1 + ((column - r_cRenderOffset.Y) << 1);
+					g_Console.writeToBuffer(c, "  ", 0x80);
+					break;
+				case '$':
+					c.X = 1 + ((column - r_cRenderOffset.Y) << 1);
+					g_Console.writeToBuffer(c, "  ", 0x40);
+					break;
+				}
 			}
+			c.Y++;
 		}
-		c.Y++;
+	}
+	else
+	{
+		// Go through each character inside level and print its respective character
+		for (unsigned int row = 0; row < 1 + (ROOM_X + 1) * GRID_X; row++)
+		{
+			for (unsigned int column = 0; column < g_sLevel.level[row].length(); column++)
+			{
+				switch (g_sLevel.level[row][column])
+				{
+				case '#':
+					c.X = 1 + (column << 1);
+					g_Console.writeToBuffer(c, "  ", 0x80);
+					break;
+				case '$':
+					c.X = 1 + (column << 1);
+					g_Console.writeToBuffer(c, "  ", 0x40);
+					break;
+				}
+			}
+			c.Y++;
+		}
 	}
 }
 
@@ -476,8 +522,11 @@ void renderPellets()
 COORD SGameChar::getRealCoords()
 {
 	COORD c = this->m_cLocation;
+	while (c.X > ROOM_X + 2)
+		c.X -= (ROOM_X + 2);
+	while (c.Y > ROOM_Y + 2)
+		c.Y -= (ROOM_Y + 2);
 	std::swap(c.X, c.Y);
-	c.X = (c.X << 1) + 1;
-	c.Y += 1;
+	c.X = (c.X << 1) - 1;
 	return c;
 }

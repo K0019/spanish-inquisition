@@ -12,6 +12,7 @@ void SAllEntities::checkHitPellets()
 {
 	for (std::vector<SPellet>::iterator pellet = this->m_vPellets.begin(); pellet != this->m_vPellets.end(); )
 	{
+		// Check for erasal
 		if ((*pellet).m_bHit)
 		{
 			if ((*pellet).m_dTime >= 0.15)
@@ -24,10 +25,12 @@ void SAllEntities::checkHitPellets()
 		}
 
 		// Check collision with wall
-		if ((*pellet).m_cLocation.X % (ROOM_X + 1) == 0 || (*pellet).m_cLocation.Y % (ROOM_Y + 1) == 0)
+		if (((*pellet).m_cLocation.X - 1) % (ROOM_X + 2) == 0 ||
+			(*pellet).m_cLocation.X % (ROOM_X + 2) == 0 ||
+			((*pellet).m_cLocation.Y - 1) % (ROOM_Y + 2) == 0 ||
+			(*pellet).m_cLocation.Y % (ROOM_Y + 2) == 0)
 		{
 			(*pellet).m_bHit = true;
-			(*pellet).m_dTime = 0;
 			continue;
 		}
 

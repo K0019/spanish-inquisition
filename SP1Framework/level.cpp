@@ -12,6 +12,12 @@ void SLevel::generateLevel()
 	for (int index = 0; index < GRID_X * GRID_Y; index++)
 		roomsHaveExit[index] = false;
 
+	// -----Clear Level-----
+	for (auto& line : this->level)
+	{
+		line = "";
+	}
+
 	// -----Borders and Padding-----
 	// Add the top border
 	for (int i = 0; i < 2; i++)
@@ -91,6 +97,15 @@ void SLevel::generateLevel()
 	for (auto& room : routeToEnd)
 	{
 		this->uncoverAll(room, roomsHaveExit);
+	}
+
+	// -----Stairs Down-----
+
+	{
+		COORD c;
+		c.X = 2 + (ROOM_X >> 1) + this->exitRoom.X * (ROOM_X + 2);
+		c.Y = 2 + (ROOM_Y >> 1) + this->exitRoom.Y * (ROOM_Y + 2);
+		this->modifyTile(c, "&");
 	}
 
 	// DELETE ALLOCATED STORAGE

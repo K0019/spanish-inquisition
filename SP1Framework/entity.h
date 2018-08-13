@@ -14,6 +14,7 @@ struct SAllEntities
 	std::vector<SPellet> m_vPellets;
 	void updatePellets();
 	void checkHitPellets();
+	void clearPellets();
 
 	/*ENEMY RELATED*/
 	std::vector<Enemy> m_vEnemy;

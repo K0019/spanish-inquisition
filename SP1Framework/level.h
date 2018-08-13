@@ -12,6 +12,7 @@ struct SLevel
 	COORD playerStartRoom, exitRoom; // Stored in grid coordinates
 	SAllEntities g_sEntities; // Hold all entities in the level
 	std::string level[GRID_X + (ROOM_X + 1) * GRID_X + 2]; // Includes borders
+	int floor;
 
 	void generateLevel(); // Create a new level
 	std::vector<COORD> seekToEnd(std::vector<COORD>& returned); // Find a path from playerStartRoom to exitRoom

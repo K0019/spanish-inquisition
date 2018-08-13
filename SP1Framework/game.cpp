@@ -49,13 +49,13 @@ void init( void )
 	g_bHasShot = false;
     g_sChar.m_cLocation.X = 2 + (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
     g_sChar.m_cLocation.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
-    g_sChar.m_bActive = true;
 	g_sLevel.playerStartRoom.X = GRID_X >> 1;
 	g_sLevel.playerStartRoom.Y = GRID_Y >> 1;
 	g_sChar.m_cRoom = g_sLevel.playerStartRoom;
 	r_cRenderOffset.X = 1 + g_sChar.m_cRoom.X * (ROOM_X + 2);
 	r_cRenderOffset.Y = 1 + g_sChar.m_cRoom.Y * (ROOM_Y + 2);
 	g_sLevel.generateLevel();
+	g_sLevel.floor = 1;
     // sets the width, height and the font name to use in the console
     g_Console.setConsoleFont(0, 16, L"Consolas");
 }
@@ -209,6 +209,7 @@ void moveCharacter()
 			if (g_sChar.m_cLocation.X < r_cRenderOffset.X)
 			{
 				r_cRenderOffset.X -= (ROOM_X + 2);
+				g_sLevel.g_sEntities.clearPellets();
 			}
 		}
     }
@@ -226,6 +227,7 @@ void moveCharacter()
 			if (g_sChar.m_cLocation.Y < r_cRenderOffset.Y)
 			{
 				r_cRenderOffset.Y -= (ROOM_Y + 2);
+				g_sLevel.g_sEntities.clearPellets();
 			}
 		}
     }
@@ -243,6 +245,7 @@ void moveCharacter()
 			if (g_sChar.m_cLocation.X >= r_cRenderOffset.X + ROOM_X + 2)
 			{
 				r_cRenderOffset.X += (ROOM_X + 2);
+				g_sLevel.g_sEntities.clearPellets();
 			}
 		}
     }
@@ -260,13 +263,17 @@ void moveCharacter()
 			if (g_sChar.m_cLocation.Y >= r_cRenderOffset.Y + ROOM_Y + 2)
 			{
 				r_cRenderOffset.Y += (ROOM_Y + 2);
+				g_sLevel.g_sEntities.clearPellets();
 			}
 		}
     }
     if (g_abKeyPressed[K_SPACE] && g_adBounceTime[K_SPACE] < g_dElapsedTime)
     {
-        g_sChar.m_bActive = !g_sChar.m_bActive;
-		bSomethingHappened = true;
+		if (g_sLevel.getTile(g_sChar.m_cLocation) == '&')
+		{
+			resetLevel(++g_sLevel.floor);
+			bSomethingHappened = true;
+		}
     }
 
 	if (bSomethingHappened)
@@ -275,6 +282,7 @@ void moveCharacter()
 		{
 			if (g_abKeyPressed[i]) g_adBounceTime[i] = g_dElapsedTime + 0.125;
 		}
+		if (g_abKeyPressed[K_SPACE]) g_adBounceTime[K_SPACE] = g_dElapsedTime + 0.125;
 	}
 }
 
@@ -354,11 +362,7 @@ void renderMap()
 void renderCharacter()
 {
     // Draw the location of the character
-    WORD charColor = 0x0C;
-    if (g_sChar.m_bActive)
-    {
-        charColor = 0x0A;
-    }
+    WORD charColor = 0x0A;
     g_Console.writeToBuffer(g_sChar.getRealCoords(), "@@", charColor);
 }
 
@@ -514,6 +518,10 @@ void renderLevel()
 					c.X = 1 + ((column - r_cRenderOffset.Y) << 1);
 					g_Console.writeToBuffer(c, "  ", 0x40);
 					break;
+				case '&':
+					c.X = 1 + ((column - r_cRenderOffset.Y) << 1);
+					g_Console.writeToBuffer(c, "&_", 0x09);
+					break;
 				}
 			}
 			c.Y++;
@@ -556,22 +564,6 @@ void renderEnemy()
 
 }
 
-COORD SGameChar::getRealCoords()
-{
-	COORD c = this->m_cLocation;
-	while (c.X > ROOM_X + 2)
-		c.X -= (ROOM_X + 2);
-	while (c.Y > ROOM_Y + 2)
-		c.Y -= (ROOM_Y + 2);
-	std::swap(c.X, c.Y);
-	c.X = (c.X << 1) - 1;
-	return c;
-}
-
-SGameChar::SGameChar()
-{
-}
-
 void renderStat()
 {
 	//Rendering player's HP
@@ -594,4 +586,32 @@ void renderStat()
 	ss << "Score: " << g_sChar.m_iPlayerScore;
 	c.Y = 4;
 	g_Console.writeToBuffer(c, ss.str());
+
+	//Rendering floor level
+	ss.str("");
+	ss << "Floor: " << g_sLevel.floor;
+	c.Y = 5;
+	g_Console.writeToBuffer(c, ss.str());
+}
+
+void resetLevel(int floor)
+{
+	g_sLevel.playerStartRoom = g_sLevel.exitRoom;
+	g_sLevel.generateLevel();
+}
+
+COORD SGameChar::getRealCoords()
+{
+	COORD c = this->m_cLocation;
+	while (c.X > ROOM_X + 2)
+		c.X -= (ROOM_X + 2);
+	while (c.Y > ROOM_Y + 2)
+		c.Y -= (ROOM_Y + 2);
+	std::swap(c.X, c.Y);
+	c.X = (c.X << 1) - 1;
+	return c;
+}
+
+SGameChar::SGameChar()
+{
 }

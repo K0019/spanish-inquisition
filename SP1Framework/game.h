@@ -44,7 +44,6 @@ struct SGameChar
 {
     COORD m_cLocation;
 	COORD m_cRoom; // Room coordinates that the player is in
-    bool  m_bActive;
 	int m_iPlayerHealth = 10;
 	int	m_iPlayerDamage = 3;
 	int	m_iPlayerScore = 0;
@@ -66,6 +65,7 @@ void mainMenu();			// main menu logic
 void gameplay();			// gameplay logic
 void moveCharacter();		// moves the character, collision detection, physics, etc
 void playerShoot();			// allows the player to shoot
+void resetLevel(int floor); // Generate a new map, with input floor for what to put inside the rooms
 void processUserInput();	// checks if you should change states or do something else with the game, e.g. pause, exit
 void clearScreen();			// clears the current screen and draw from scratch 
 void renderSplashScreen();	// renders the splash screen

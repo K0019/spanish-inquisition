@@ -49,3 +49,8 @@ void SAllEntities::checkHitPellets()
 		pellet++;
 	}
 }
+
+void SAllEntities::clearPellets()
+{
+	this->m_vPellets.clear();
+}

@@ -41,6 +41,7 @@ void init( void )
 
     // sets the initial state for the game
     g_eGameState = S_SPLASHSCREEN;
+	if (DEBUG) g_eGameState = S_GAME;
 
 	g_bHasShot = false;
     g_sChar.m_cLocation.X = 1 + (GRID_X >> 1) * (ROOM_X + 1) + (ROOM_X >> 1);

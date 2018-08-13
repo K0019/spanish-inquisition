@@ -1,4 +1,7 @@
 #include "level.h"
+#include "Framework/console.h"
+
+extern Console g_Console;
 
 void SLevel::generateLevel()
 {
@@ -66,24 +69,10 @@ void SLevel::generateLevel()
 	}
 
 	// Add an opening for rooms with no entrances
+
+	for (auto& room : routeToEnd)
 	{
-		std::vector<int> direction = { 0, 1, 2, 3 };
-		for (int index = 0; index < GRID_X * GRID_Y; index++)
-		{
-			if (roomsHaveExit[index]) continue;
-
-			std::random_shuffle(direction.begin(), direction.end());
-			for (const auto& dir : direction)
-			{
-				COORD c = this->getCoordinatesForDoor(index / GRID_Y, index % GRID_Y, dir);
-
-				if (this->getTile(c) == '$') continue;
-				if (c.X == 0 || c.X == GRID_X * (ROOM_X + 1) || c.Y == 0 || c.Y == GRID_Y * (ROOM_Y + 1)) continue;
-				
-				this->modifyTile(c, "$");
-				break;
-			}
-		}
+		this->uncoverAll(room, roomsHaveExit);
 	}
 
 	// DELETE ALLOCATED STORAGE
@@ -100,19 +89,19 @@ std::vector<COORD> SLevel::seekToEnd(std::vector<COORD>& returned)
 		COORD c = returned.back();
 		switch (direction)
 		{
-		case 0:
+		case 0: // Go Up
 			if (!(returned.back().X - 1 < 0))
 				c.X--;
 			break;
-		case 1:
+		case 1: // Go Right
 			if (!(returned.back().Y + 1 >= GRID_Y))
 				c.Y++;
 			break;
-		case 2:
+		case 2: // Go Down
 			if (!(returned.back().X + 1 >= GRID_X))
 				c.X++;
 			break;
-		case 3:
+		case 3: // Go Left
 			if (!(returned.back().Y - 1 < 0))
 				c.Y--;
 			break;
@@ -141,6 +130,47 @@ std::vector<COORD> SLevel::seekToEnd(std::vector<COORD>& returned)
 	}
 	returned.pop_back();
 	return returned;
+}
+
+void SLevel::uncoverAll(COORD room, bool * roomsHaveExit)
+{
+	std::vector<int> direction = { 0, 1, 2, 3 };
+	std::random_shuffle(direction.begin(), direction.end());
+	for (auto& dir : direction)
+	{
+		COORD c = room;
+		switch (dir)
+		{
+		case 0:
+			if (room.X - 1 < 0) continue;
+			if (roomsHaveExit[(room.X - 1) * GRID_Y + room.Y]) continue;
+			this->modifyTile(this->getCoordinatesForDoor(--c.X, c.Y, 0), "$");
+			roomsHaveExit[c.X * GRID_Y + c.Y] = true;
+			this->uncoverAll(c, roomsHaveExit);
+			break;
+		case 1:
+			if (room.Y + 1 >= GRID_Y) continue;
+			if (roomsHaveExit[room.X * GRID_Y + room.Y + 1]) continue;
+			this->modifyTile(this->getCoordinatesForDoor(c.X, ++c.Y, 1), "$");
+			roomsHaveExit[c.X * GRID_Y + c.Y] = true;
+			this->uncoverAll(c, roomsHaveExit);
+			break;
+		case 2:
+			if (room.X + 1 >= GRID_X) continue;
+			if (roomsHaveExit[(room.X + 1) * GRID_Y + room.Y]) continue;
+			this->modifyTile(this->getCoordinatesForDoor(++c.X, c.Y, 2), "$");
+			roomsHaveExit[c.X * GRID_Y + c.Y] = true;
+			this->uncoverAll(c, roomsHaveExit);
+			break;
+		case 3:
+			if (room.Y - 1 < 0) continue;
+			if (roomsHaveExit[room.X * GRID_Y + room.Y - 1]) continue;
+			this->modifyTile(this->getCoordinatesForDoor(c.X, --c.Y, 3), "$");
+			roomsHaveExit[c.X * GRID_Y + c.Y] = true;
+			this->uncoverAll(c, roomsHaveExit);
+			break;
+		}
+	}
 }
 
 void SLevel::modifyTile(COORD c, std::string ch)

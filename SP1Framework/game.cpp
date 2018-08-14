@@ -59,6 +59,7 @@ void init( void )
 	g_sLevel.g_sEntities.m_vEnemy.push_back(Enemy("Test", 't', (WORD)0x09, 10, 0.4, 0.3, 0.1, 0.3));
     // sets the width, height and the font name to use in the console
     g_Console.setConsoleFont(0, 16, L"Consolas");
+	LoadSave(savef.SaveVar);
 }
 
 //--------------------------------------------------------------

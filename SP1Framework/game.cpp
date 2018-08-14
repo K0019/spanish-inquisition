@@ -22,6 +22,7 @@ SLevel		g_sLevel;
 double  g_adBounceTime[K_COUNT]; // this is to prevent key bouncing, so we won't trigger keypresses more than once
 
 bool g_bHasShot;
+bool g_bHasWeapon;
 
 // Console object
 Console g_Console(100, 25, "SP1 Framework");
@@ -273,6 +274,10 @@ void moveCharacter()
 		{
 			resetLevel(++g_sLevel.floor);
 			bSomethingHappened = true;
+		}
+		if (g_sLevel.getTile(g_sChar.m_cLocation) == '%')
+		{
+			//HasItem(true);
 		}
     }
 
@@ -614,4 +619,9 @@ COORD SGameChar::getRealCoords()
 
 SGameChar::SGameChar()
 {
+}
+
+void HasItem(bool g_bHasWeapon)
+{
+
 }

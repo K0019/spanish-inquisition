@@ -4,24 +4,31 @@
 #define ITEMHEAD
 
 #include "pellet.h"
-#include "game.h"
+#include <random>
+#include <ctime>
+#include <vector>
 
-struct SAllItems
+struct SItem
 {
+	std::string m_sName;
+	int m_iWeaponIndex;
 	int m_iWeaponDamage;
 	int m_iWeaponHealthGiven;
 	float m_iWeaponAttackSpeed;
 	float m_iWeaponVelocity;
+	bool m_bHasWeapon;
 
-	SAllItems(int damage, int healthGiven, float attackSpeed, float velocity);
+	SItem(std::string name, int index, int damage, int healthGiven, float attackSpeed, float velocity, bool HasWeapon);
 };
 
-struct SAllItems HeavenCracker(0, 0, 0, 0);
-struct SAllItems EnchantedSword(2, 0, 0, 0);
-struct SAllItems HealthPotion(0, 2, 0, 0);
-struct SAllItems ClownFiesta(0, 0, 0, 0);
-struct SAllItems Antenna(0, 0, 0, 0);
-struct SAllItems Bonus(0, 0, 0, 0);
 
+struct SAllItems
+{
+	std::vector<SItem> m_vItemsList;
+	std::vector<bool> m_vItemsObtained;
+
+	SAllItems();
+	void addItem(SItem item);
+};
 
 #endif

@@ -22,3 +22,9 @@ COORD SGameChar::getRealCoords()
 	c.X = (c.X << 1) - 1;
 	return c;
 }
+
+void SGameChar::AddItem(bool g_bHasWeapon)
+{
+	SGameChar * player;
+	this->m_sPlayerItems.hasItem(g_bHasWeapon, player);
+}

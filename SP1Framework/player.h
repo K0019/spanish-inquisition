@@ -3,6 +3,8 @@
 #ifndef PLAYERHEAD
 #define PLAYERHEAD
 #include <Windows.h>
+#include "definitions.h"
+#include <algorithm>
 
 // struct for the game character
 struct SGameChar

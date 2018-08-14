@@ -604,22 +604,6 @@ void resetLevel(int floor)
 	g_sLevel.generateLevel();
 }
 
-COORD SGameChar::getRealCoords()
-{
-	COORD c = this->m_cLocation;
-	while (c.X > ROOM_X + 2)
-		c.X -= (ROOM_X + 2);
-	while (c.Y > ROOM_Y + 2)
-		c.Y -= (ROOM_Y + 2);
-	std::swap(c.X, c.Y);
-	c.X = (c.X << 1) - 1;
-	return c;
-}
-
-SGameChar::SGameChar()
-{
-}
-
 void HasItem(bool g_bHasWeapon)
 {
 

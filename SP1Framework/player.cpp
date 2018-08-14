@@ -25,6 +25,80 @@ COORD SGameChar::getRealCoords()
 
 void SGameChar::AddItem(bool g_bHasWeapon)
 {
-	SGameChar * player;
-	this->m_sPlayerItems.hasItem(g_bHasWeapon, player);
+	this->hasItem(g_bHasWeapon);
+}
+
+void SGameChar::hasItem(bool g_bHasWeapon)
+{
+	int itemIndex;
+
+	srand(time(NULL)); //Seed RNG before using
+	itemIndex = rand() % 6 + 1; //Choosing a random number between 1 and 7
+								//for (int i = 0; i < 6; i++)
+								//{
+								//	bool check;
+								//	int storedIndex;
+								//	do
+								//	{
+								//		storedIndex = rand() % 6 + 1;
+								//		check = true; //Check if number is already used to prevent repeats
+								//		for (int j = 0; j < i; j++)
+								//		{
+								//			if (storedIndex == itemIndex[j]) //If number is already used
+								//			{
+								//				check = false; //Set check to false
+								//				break;
+								//			}
+								//		}
+								//	} while (!check);
+								//	itemIndex[i] = storedIndex;
+								//	break;
+								//}
+
+	if ((itemIndex == this->m_sPlayerItems.m_vItemsList[0].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[0].m_bHasWeapon == false)) //Checking if randomized weaponIndex gives the Heaven Cracker
+	{
+		this->m_iPlayerHealth += this->m_sPlayerItems.m_vItemsList[0].m_iWeaponHealthGiven;
+		this->m_iPlayerDamage += this->m_sPlayerItems.m_vItemsList[0].m_iWeaponDamage;
+		this->m_sPlayerItems.m_vItemsList[0].m_bHasWeapon = true;
+	}
+	else if ((itemIndex == this->m_sPlayerItems.m_vItemsList[1].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[1].m_bHasWeapon == false)) //Checking if randomized weaponIndex gives the Enchanted Sword
+	{
+		this->m_iPlayerHealth += this->m_sPlayerItems.m_vItemsList[1].m_iWeaponHealthGiven;
+		this->m_iPlayerDamage += this->m_sPlayerItems.m_vItemsList[1].m_iWeaponDamage;
+		this->m_sPlayerItems.m_vItemsList[1].m_bHasWeapon = true;
+	}
+	else if ((itemIndex == this->m_sPlayerItems.m_vItemsList[2].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[2].m_bHasWeapon == false)) //Checking if randomized weaponIndex gives the Health Potion
+	{
+		this->m_iPlayerHealth += this->m_sPlayerItems.m_vItemsList[2].m_iWeaponHealthGiven;
+		this->m_iPlayerDamage += this->m_sPlayerItems.m_vItemsList[2].m_iWeaponDamage;
+		this->m_sPlayerItems.m_vItemsList[2].m_bHasWeapon = true;
+	}
+	else if ((itemIndex == this->m_sPlayerItems.m_vItemsList[3].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[3].m_bHasWeapon == false)) //Checking if randomized weaponIndex gives the Clown Fiesta
+	{
+		this->m_iPlayerHealth += this->m_sPlayerItems.m_vItemsList[3].m_iWeaponHealthGiven;
+		this->m_iPlayerDamage += this->m_sPlayerItems.m_vItemsList[3].m_iWeaponDamage;
+		this->m_sPlayerItems.m_vItemsList[3].m_bHasWeapon = true;
+	}
+	else if ((itemIndex == this->m_sPlayerItems.m_vItemsList[4].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[4].m_bHasWeapon == false)) //Checking if randomized weaponIndex gives the Antenna
+	{
+		this->m_iPlayerHealth += this->m_sPlayerItems.m_vItemsList[4].m_iWeaponHealthGiven;
+		this->m_iPlayerDamage += this->m_sPlayerItems.m_vItemsList[4].m_iWeaponDamage;
+		this->m_sPlayerItems.m_vItemsList[4].m_bHasWeapon = true;
+	}
+	else if ((itemIndex == this->m_sPlayerItems.m_vItemsList[5].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[5].m_bHasWeapon == false)) //Checking if randomized weaponIndex gives the Bonus!
+	{
+		this->m_iPlayerHealth += this->m_sPlayerItems.m_vItemsList[5].m_iWeaponHealthGiven;
+		this->m_iPlayerDamage += this->m_sPlayerItems.m_vItemsList[5].m_iWeaponDamage;
+		this->m_sPlayerItems.m_vItemsList[5].m_bHasWeapon = true;
+	}
+	else if ((itemIndex == this->m_sPlayerItems.m_vItemsList[6].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[6].m_bHasWeapon == false)) //Checking if randomized weaponIndex gives the Blue Feather!
+	{
+		this->m_iPlayerHealth += this->m_sPlayerItems.m_vItemsList[6].m_iWeaponHealthGiven;
+		this->m_iPlayerDamage += this->m_sPlayerItems.m_vItemsList[6].m_iWeaponDamage;
+		this->m_sPlayerItems.m_vItemsList[6].m_bHasWeapon = true;
+
+	}
+	else //Do nothing if this already has all items
+	{
+	}
 }

@@ -7,7 +7,6 @@
 #include <random>
 #include <ctime>
 #include <vector>
-#include "player.h"
 
 struct SItem
 {
@@ -30,7 +29,6 @@ struct SAllItems
 
 	SAllItems();
 	void addItem(SItem item);
-	void hasItem(bool g_bHasWeapon, SGameChar * player);
 };
 
 #endif

@@ -23,19 +23,19 @@ void Enemy::update(SGameChar * player)
 {
 	double dt = this->Timer.getElapsedTime();
 
-	if (this->isDead)
+	if (this->isDead())
 	{
 		this->m_dDeadTime += dt;
 		return;
 	}
 
-	if (this->isHit)
+	if (this->m_bHit)
 	{
 		this->m_dStunTime -= dt;
 		if (this->m_dStunTime <= 0.0)
 		{
-			this->isHit = false;
-			this->isFlashingHit = false;
+			this->m_bHit = false;
+			this->m_bFlashHit = false;
 			if (this->m_dAttackTime > this->m_dAttackTimeThreshold)
 			{
 				this->m_dAttackTime = this->m_dLengthOfAttack;
@@ -179,14 +179,14 @@ void Enemy::checkAttackDelayExpire()
 {
 	if (this->m_dAttackTime <= 0.0)
 	{
-		this->isFlashingAttacking = false;
+		this->m_bFlashAttacking = false;
 		this->m_dAttackTime = 0.0;
 	}
 }
 
 bool Enemy::checkFlashHitState()
 {
-	this->m_bFlashHit = ((LONGLONG)((this->m_dStunDuration - this->m_dStunTime) / 50) % 2) ? (false) : (true);
+	return this->m_bFlashHit = ((LONGLONG)((this->m_dStunDuration - this->m_dStunTime) / 50) % 2) ? (false) : (true);
 }
 
 char Enemy::getIdentifier()
@@ -229,7 +229,7 @@ WORD Enemy::getFlashColorAttacking()
 }
 bool Enemy::isDead()
 {
-	return (this->getHP <= 0) ? (true) : (false);
+	return (this->getHP() <= 0) ? (true) : (false);
 }
 
 COORD Enemy::getRealLocation()

@@ -56,6 +56,7 @@ void init( void )
 	r_cRenderOffset.Y = 1 + g_sLevel.g_sEntities.g_sChar.m_cRoom.Y * (ROOM_Y + 2);
 	g_sLevel.generateLevel();
 	g_sLevel.floor = 1;
+	g_sLevel.g_sEntities.m_vEnemy.push_back(Enemy("Test", 't', (WORD)0x09, 10, 0.4, 0.3, 0.1, 0.3));
     // sets the width, height and the font name to use in the console
     g_Console.setConsoleFont(0, 16, L"Consolas");
 }
@@ -274,7 +275,7 @@ void moveCharacter()
 			resetLevel(++g_sLevel.floor);
 			bSomethingHappened = true;
 		}
-		if (g_sLevel.getTile(g_sChar.m_cLocation) == '%')
+		if (g_sLevel.getTile(g_sLevel.g_sEntities.g_sChar.m_cLocation) == '%')
 		{
 			//HasItem(true);
 		}
@@ -328,6 +329,7 @@ void renderGame()
 	renderLevel();
     renderCharacter();    // renders the character into the buffer
 	renderPellets();
+	renderEnemy();
 	renderStat();
 	//renderEnemy();
 }
@@ -565,7 +567,10 @@ void renderPellets()
 
 void renderEnemy()
 {
-
+	for (auto& enemy : g_sLevel.g_sEntities.m_vEnemy)
+	{
+		g_Console.writeToBuffer(enemy.getRealLocation(), enemy.getIdentifier(), enemy.getColor());
+	}
 }
 
 void renderStat()

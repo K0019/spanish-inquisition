@@ -115,12 +115,6 @@ void EnemyMelee::update(SGameChar * player)
 		return;
 	}
 
-	if (this->m_dAttackTime > 0.0)
-	{
-		this->m_dAttackTime -= dt;
-		this->m_dLastMoveTime -= this->checkAttackDelayExpire();
-	}
-
 	if (this->m_bHit)
 	{
 		this->m_dStunTime -= dt;
@@ -132,11 +126,11 @@ void EnemyMelee::update(SGameChar * player)
 			{
 				this->m_dAttackTime = this->m_dLengthOfAttack;
 			}
-			else if (this->m_dAttackTime > 0)
+			/*else if (this->m_dAttackTime > 0)
 			{
 				this->m_dAttackTime += this->m_dStunTime;
 				this->m_dLastMoveTime -= this->checkAttackDelayExpire();
-			}
+			}*/
 			this->m_dStunTime = 0.0;
 		}
 		else
@@ -145,13 +139,27 @@ void EnemyMelee::update(SGameChar * player)
 		}
 	}
 
+	if (this->m_dAttackTime > 0.0)
+	{
+		this->m_dAttackTime -= dt;
+		this->m_dLastMoveTime -= this->checkAttackDelayExpire();
+	}
+
+	if (this->updateMovement(player))
+	{
+		this->m_dAttackTime = this->m_dLengthOfAttack;
+		// TODO: Logic for attack
+	}
+}
+
+bool EnemyMelee::updateMovement(SGameChar * player)
+{
 	if (!this->isHit() && this->m_dAttackTime <= 0.0)
 	{
 		if (((this->m_cLocation.X == player->m_cLocation.X + 1 || this->m_cLocation.X == player->m_cLocation.X - 1) && this->m_cLocation.Y == player->m_cLocation.Y) ||
 			((this->m_cLocation.Y == player->m_cLocation.Y + 1 || this->m_cLocation.Y == player->m_cLocation.Y - 1) && this->m_cLocation.X == player->m_cLocation.X))
 		{
-			this->m_dAttackTime = this->m_dLengthOfAttack;
-			// TODO: Logic for damage
+			return true;
 		}
 		else if (this->m_dLastMoveTime + this->m_iMoveDuration < this->Timer.accurateTotalTime())
 		{
@@ -287,13 +295,89 @@ void EnemyMelee::update(SGameChar * player)
 			this->m_dLastMoveTime = this->Timer.accurateTotalTime();
 		}
 	}
+	return false;
 }
 
 // ---------------------------------------
 // CLASS DEFINITION: EnemyRanged
 // ---------------------------------------
 
+EnemyRanged::EnemyRanged(std::string name, std::string indicator, WORD color, int HP, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration, bool isMobile)
+	: Enemy(name, indicator, color, HP, moveDuration, lengthOfAttack, attackTimeThreshold, stunDuration)
+{
+	this->m_bMobile = isMobile;
+}
+
 void EnemyRanged::update(SGameChar * player)
 {
+	double dt = this->Timer.getElapsedTime();
 
+	if (this->isDead())
+	{
+		this->m_dDeadTime += dt;
+		return;
+	}
+
+	if (this->m_dAttackTime > 0.0)
+	{
+		this->m_dAttackTime -= dt;
+		this->m_dLastMoveTime -= this->checkAttackDelayExpire();
+	}
+
+	if (this->m_bHit)
+	{
+		this->m_dStunTime -= dt;
+		if (this->m_dStunTime <= 0.0)
+		{
+			this->m_bHit = false;
+			this->m_bFlashHit = false;
+			if (this->m_dAttackTime > this->m_dAttackTimeThreshold)
+			{
+				this->m_dAttackTime = this->m_dLengthOfAttack;
+			}
+			else if (this->m_dAttackTime > 0)
+			{
+				this->m_dAttackTime += this->m_dStunTime;
+				this->m_dLastMoveTime -= this->checkAttackDelayExpire();
+			}
+			this->m_dStunTime = 0.0;
+		}
+		else
+		{
+			this->updateFlashHitState();
+		}
+	}
+
+	this->updateMovement(player);
+}
+
+bool EnemyRanged::updateMovement(SGameChar * player)
+{
+	if (!this->m_bHit && (this->m_bMobile || this->m_dAttackTime <= 0.0))
+	{
+		if (!this->m_bMobile && this->m_dAttackTime <= 0.0)
+		{
+
+		}
+		
+		if (this->m_dLastMoveTime + this->m_iMoveDuration < this->Timer.accurateTotalTime())
+		{
+			if (this->m_cLocation.X == player->m_cLocation.X)
+			{
+				if (abs(this->m_cLocation.Y - player->m_cLocation.Y) <= 2)
+				{
+					if (this->m_cLocation.Y - player->m_cLocation.Y < 0)
+					{
+
+					}
+				}
+			}
+		}
+
+		if (this->m_bMobile)
+		{
+
+		}
+	}
+	return 0;
 }

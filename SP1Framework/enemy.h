@@ -35,6 +35,7 @@ public:
 	Enemy(std::string name, std::string indicator, WORD color, int HP, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration); // Constructor
 
 	virtual void update(SGameChar * player) =0; // Update everything about enemy
+	virtual bool updateMovement(SGameChar * player) =0;
 	double checkAttackDelayExpire(); // Update attack timings
 	void updateFlashHitState(); // Get true or false depending on duration of FlashHitTime and StunDuration
 	std::string getIdentifier(); // Get the char identifier of the enemy
@@ -54,17 +55,23 @@ class EnemyMelee : public Enemy
 {
 public:
 	EnemyMelee(std::string name, std::string indicator, WORD color, int HP, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration);
+
 	void update(SGameChar * player);
+	bool updateMovement(SGameChar * player); // Updates enemy movement, returns true or false depending on whether the enemy should attack or not
 };
 
 class EnemyRanged : public Enemy
 {
 protected:
+	bool m_bMobile; // Ability to shoot while moving
 	short m_siTimesBackedUp;
 
 public:
+	EnemyRanged(std::string name, std::string indicator, WORD color, int HP, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration, bool isMobile);
+
 	void update(SGameChar * player);
-	bool updateShooting();
+	bool updateMovement(SGameChar * player);
+	bool updateShooting(SGameChar * player);
 };
 
 #endif

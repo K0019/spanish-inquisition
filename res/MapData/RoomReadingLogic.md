@@ -26,4 +26,8 @@ abc | ab | c
 
 ## Explanation
 
-This method of storage means that we can easily access
+This method of storage means that we can **easily access the row number of any room**. This is essential since we're trying to read from the file and add to a string from the file. As a **trade-off**, however, it means that we will **have to handle a lot of files.** The files can also use 1 through z, since we're not using hexadecimal numbers to label the file names, which can be helpful since it means that there are lots of maps that we can store.
+
+## Procedure
+
+To begin this arduous method of storing, first come up with a room design. After that, make a text file for each of the rows. This method can be painful, but can be eased with a macro or program of sorts. Then, dump the `.txt` files into the MapData folder.

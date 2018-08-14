@@ -16,7 +16,6 @@ int r_iMoveDirection;
 double r_dMoveTime;
 
 // Game specific variables here
-SGameChar   g_sChar;
 EGAMESTATES g_eGameState = S_SPLASHSCREEN;
 SLevel		g_sLevel;
 double  g_adBounceTime[K_COUNT]; // this is to prevent key bouncing, so we won't trigger keypresses more than once
@@ -48,13 +47,13 @@ void init( void )
 	if (DEBUG) g_eGameState = S_GAME;
 
 	g_bHasShot = false;
-    g_sChar.m_cLocation.X = 2 + (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
-    g_sChar.m_cLocation.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
+    g_sLevel.g_sEntities.g_sChar.m_cLocation.X = 2 + (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
+	g_sLevel.g_sEntities.g_sChar.m_cLocation.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
 	g_sLevel.playerStartRoom.X = GRID_X >> 1;
 	g_sLevel.playerStartRoom.Y = GRID_Y >> 1;
-	g_sChar.m_cRoom = g_sLevel.playerStartRoom;
-	r_cRenderOffset.X = 1 + g_sChar.m_cRoom.X * (ROOM_X + 2);
-	r_cRenderOffset.Y = 1 + g_sChar.m_cRoom.Y * (ROOM_Y + 2);
+	g_sLevel.g_sEntities.g_sChar.m_cRoom = g_sLevel.playerStartRoom;
+	r_cRenderOffset.X = 1 + g_sLevel.g_sEntities.g_sChar.m_cRoom.X * (ROOM_X + 2);
+	r_cRenderOffset.Y = 1 + g_sLevel.g_sEntities.g_sChar.m_cRoom.Y * (ROOM_Y + 2);
 	g_sLevel.generateLevel();
 	g_sLevel.floor = 1;
     // sets the width, height and the font name to use in the console
@@ -196,36 +195,36 @@ void moveCharacter()
 
     // Updating the location of the character based on the key press
     // providing a beep sound whenver we shift the character
-    if (g_abKeyPressed[K_UP] && g_sChar.m_cLocation.X > 0 && g_adBounceTime[K_UP] < g_dElapsedTime)
+    if (g_abKeyPressed[K_UP] && g_sLevel.g_sEntities.g_sChar.m_cLocation.X > 0 && g_adBounceTime[K_UP] < g_dElapsedTime)
     {
         //Beep(1440, 30);
-        g_sChar.m_cLocation.X--;
-		if (g_sLevel.getTile(g_sChar.m_cLocation) == '#')
+		g_sLevel.g_sEntities.g_sChar.m_cLocation.X--;
+		if (g_sLevel.getTile(g_sLevel.g_sEntities.g_sChar.m_cLocation) == '#')
 		{
-			g_sChar.m_cLocation.X++;
+			g_sLevel.g_sEntities.g_sChar.m_cLocation.X++;
 		}
 		else
 		{
 			bSomethingHappened = true;
-			if (g_sChar.m_cLocation.X < r_cRenderOffset.X)
+			if (g_sLevel.g_sEntities.g_sChar.m_cLocation.X < r_cRenderOffset.X)
 			{
 				r_cRenderOffset.X -= (ROOM_X + 2);
 				g_sLevel.g_sEntities.clearPellets();
 			}
 		}
     }
-    if (g_abKeyPressed[K_LEFT] && g_sChar.m_cLocation.Y > 0 && g_adBounceTime[K_LEFT] < g_dElapsedTime)
+    if (g_abKeyPressed[K_LEFT] && g_sLevel.g_sEntities.g_sChar.m_cLocation.Y > 0 && g_adBounceTime[K_LEFT] < g_dElapsedTime)
     {
         //Beep(1440, 30);
-        g_sChar.m_cLocation.Y--;
-		if (g_sLevel.getTile(g_sChar.m_cLocation) == '#')
+		g_sLevel.g_sEntities.g_sChar.m_cLocation.Y--;
+		if (g_sLevel.getTile(g_sLevel.g_sEntities.g_sChar.m_cLocation) == '#')
 		{
-			g_sChar.m_cLocation.Y++;
+			g_sLevel.g_sEntities.g_sChar.m_cLocation.Y++;
 		}
 		else
 		{
 			bSomethingHappened = true;
-			if (g_sChar.m_cLocation.Y < r_cRenderOffset.Y)
+			if (g_sLevel.g_sEntities.g_sChar.m_cLocation.Y < r_cRenderOffset.Y)
 			{
 				r_cRenderOffset.Y -= (ROOM_Y + 2);
 				g_sLevel.g_sEntities.clearPellets();
@@ -235,15 +234,15 @@ void moveCharacter()
     if (g_abKeyPressed[K_DOWN] && g_adBounceTime[K_DOWN] < g_dElapsedTime)
     {
         //Beep(1440, 30);
-        g_sChar.m_cLocation.X++;
-		if (g_sLevel.getTile(g_sChar.m_cLocation) == '#')
+		g_sLevel.g_sEntities.g_sChar.m_cLocation.X++;
+		if (g_sLevel.getTile(g_sLevel.g_sEntities.g_sChar.m_cLocation) == '#')
 		{
-			g_sChar.m_cLocation.X--;
+			g_sLevel.g_sEntities.g_sChar.m_cLocation.X--;
 		}
 		else
 		{
 			bSomethingHappened = true;
-			if (g_sChar.m_cLocation.X >= r_cRenderOffset.X + ROOM_X + 2)
+			if (g_sLevel.g_sEntities.g_sChar.m_cLocation.X >= r_cRenderOffset.X + ROOM_X + 2)
 			{
 				r_cRenderOffset.X += (ROOM_X + 2);
 				g_sLevel.g_sEntities.clearPellets();
@@ -253,15 +252,15 @@ void moveCharacter()
     if (g_abKeyPressed[K_RIGHT] && g_adBounceTime[K_RIGHT] < g_dElapsedTime)
     {
         //Beep(1440, 30);
-        g_sChar.m_cLocation.Y++;
-		if (g_sLevel.getTile(g_sChar.m_cLocation) == '#')
+		g_sLevel.g_sEntities.g_sChar.m_cLocation.Y++;
+		if (g_sLevel.getTile(g_sLevel.g_sEntities.g_sChar.m_cLocation) == '#')
 		{
-			g_sChar.m_cLocation.Y--;
+			g_sLevel.g_sEntities.g_sChar.m_cLocation.Y--;
 		}
 		else
 		{
 			bSomethingHappened = true;
-			if (g_sChar.m_cLocation.Y >= r_cRenderOffset.Y + ROOM_Y + 2)
+			if (g_sLevel.g_sEntities.g_sChar.m_cLocation.Y >= r_cRenderOffset.Y + ROOM_Y + 2)
 			{
 				r_cRenderOffset.Y += (ROOM_Y + 2);
 				g_sLevel.g_sEntities.clearPellets();
@@ -270,7 +269,7 @@ void moveCharacter()
     }
     if (g_abKeyPressed[K_SPACE] && g_adBounceTime[K_SPACE] < g_dElapsedTime)
     {
-		if (g_sLevel.getTile(g_sChar.m_cLocation) == '&')
+		if (g_sLevel.getTile(g_sLevel.g_sEntities.g_sChar.m_cLocation) == '&')
 		{
 			resetLevel(++g_sLevel.floor);
 			bSomethingHappened = true;
@@ -368,7 +367,7 @@ void renderCharacter()
 {
     // Draw the location of the character
     WORD charColor = 0x0A;
-    g_Console.writeToBuffer(g_sChar.getRealCoords(), "@@", charColor);
+    g_Console.writeToBuffer(g_sLevel.g_sEntities.g_sChar.getRealCoords(), "@@", charColor);
 }
 
 void renderFramerate()
@@ -423,7 +422,7 @@ void playerShoot()
 		{
 			if (g_abKeyPressed[K_SHOOTLEFT] && !g_abKeyPressed[K_SHOOTRIGHT])
 			{
-				COORD c = g_sChar.m_cLocation;
+				COORD c = g_sLevel.g_sEntities.g_sChar.m_cLocation;
 				c.X--;
 				c.Y--;
 				g_sLevel.g_sEntities.m_vPellets.push_back(SPellet(&c, 7));
@@ -432,7 +431,7 @@ void playerShoot()
 			}
 			else if (!g_abKeyPressed[K_SHOOTLEFT] && g_abKeyPressed[K_SHOOTRIGHT])
 			{
-				COORD c = g_sChar.m_cLocation;
+				COORD c = g_sLevel.g_sEntities.g_sChar.m_cLocation;
 				c.X--;
 				c.Y++;
 				g_sLevel.g_sEntities.m_vPellets.push_back(SPellet(&c, 1));
@@ -441,7 +440,7 @@ void playerShoot()
 			}
 			else if (!g_abKeyPressed[K_SHOOTLEFT] && !g_abKeyPressed[K_SHOOTRIGHT])
 			{
-				COORD c = g_sChar.m_cLocation;
+				COORD c = g_sLevel.g_sEntities.g_sChar.m_cLocation;
 				c.X--;
 				g_sLevel.g_sEntities.m_vPellets.push_back(SPellet(&c, 0));
 				g_bHasShot = true;
@@ -452,7 +451,7 @@ void playerShoot()
 		{
 			if (g_abKeyPressed[K_SHOOTLEFT] && !g_abKeyPressed[K_SHOOTRIGHT])
 			{
-				COORD c = g_sChar.m_cLocation;
+				COORD c = g_sLevel.g_sEntities.g_sChar.m_cLocation;
 				c.X++;
 				c.Y--;
 				g_sLevel.g_sEntities.m_vPellets.push_back(SPellet(&c, 5));
@@ -461,7 +460,7 @@ void playerShoot()
 			}
 			else if (!g_abKeyPressed[K_SHOOTLEFT] && g_abKeyPressed[K_SHOOTRIGHT])
 			{
-				COORD c = g_sChar.m_cLocation;
+				COORD c = g_sLevel.g_sEntities.g_sChar.m_cLocation;
 				c.X++;
 				c.Y++;
 				g_sLevel.g_sEntities.m_vPellets.push_back(SPellet(&c, 3));
@@ -470,7 +469,7 @@ void playerShoot()
 			}
 			else if (!g_abKeyPressed[K_SHOOTLEFT] && !g_abKeyPressed[K_SHOOTRIGHT])
 			{
-				COORD c = g_sChar.m_cLocation;
+				COORD c = g_sLevel.g_sEntities.g_sChar.m_cLocation;
 				c.X++;
 				g_sLevel.g_sEntities.m_vPellets.push_back(SPellet(&c, 4));
 				g_bHasShot = true;
@@ -481,7 +480,7 @@ void playerShoot()
 		{
 			if (g_abKeyPressed[K_SHOOTLEFT] && !g_abKeyPressed[K_SHOOTRIGHT])
 			{
-				COORD c = g_sChar.m_cLocation;
+				COORD c = g_sLevel.g_sEntities.g_sChar.m_cLocation;
 				c.Y--;
 				g_sLevel.g_sEntities.m_vPellets.push_back(SPellet(&c, 6));
 				g_bHasShot = true;
@@ -489,7 +488,7 @@ void playerShoot()
 			}
 			else if (!g_abKeyPressed[K_SHOOTLEFT] && g_abKeyPressed[K_SHOOTRIGHT])
 			{
-				COORD c = g_sChar.m_cLocation;
+				COORD c = g_sLevel.g_sEntities.g_sChar.m_cLocation;
 				c.Y++;
 				g_sLevel.g_sEntities.m_vPellets.push_back(SPellet(&c, 2));
 				g_bHasShot = true;
@@ -575,20 +574,20 @@ void renderStat()
 	COORD c;
 	std::ostringstream ss;
 	ss.str("");
-	ss << "HP: " << g_sChar.m_iPlayerHealth;
+	ss << "HP: " << g_sLevel.g_sEntities.g_sChar.m_iPlayerHealth;
 	c.X = g_Console.getConsoleSize().X - 9;
 	c.Y = 2;
 	g_Console.writeToBuffer(c, ss.str());
 
 	//Rendering player's score
 	ss.str("");
-	ss << "Damage: " << g_sChar.m_iPlayerDamage;
+	ss << "Damage: " << g_sLevel.g_sEntities.g_sChar.m_iPlayerDamage;
 	c.Y = 3;
 	g_Console.writeToBuffer(c, ss.str());
 
 	//Rendering player's score
 	ss.str("");
-	ss << "Score: " << g_sChar.m_iPlayerScore;
+	ss << "Score: " << g_sLevel.g_sEntities.g_sChar.m_iPlayerScore;
 	c.Y = 4;
 	g_Console.writeToBuffer(c, ss.str());
 

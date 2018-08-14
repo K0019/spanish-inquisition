@@ -39,20 +39,6 @@ enum EGAMESTATES
     S_COUNT
 };
 
-// struct for the game character
-struct SGameChar
-{
-    COORD m_cLocation;
-	COORD m_cRoom; // Room coordinates that the player is in
-	int m_iPlayerHealth = 10;
-	int	m_iPlayerDamage = 3;
-	int	m_iPlayerScore = 0;
-
-	COORD getRealCoords();
-	SGameChar();
-	SGameChar(COORD location, bool active, int playerHealth, int playerDamage, int playerScore);
-};
-
 void init        ( void );      // initialize your variables, allocate memory, etc
 void getInput    ( void );      // get input from player
 void update      ( CStopWatch * timer, double missedTime ); // update the game and the state of the game

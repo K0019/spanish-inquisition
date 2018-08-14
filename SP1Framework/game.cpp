@@ -340,7 +340,6 @@ void renderScore()
 	score = 456;
 	std::string sScore;
 	sScore = std::to_string(score);
-	load("saves.txt", &sScore);
 	COORD c = g_Console.getConsoleSize();
 	c.X /= 2;
 	c.Y /= 2;

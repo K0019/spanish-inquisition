@@ -5,7 +5,11 @@
 #include <fstream>
 #include <string>
 
-void load(std::string fileName, std::string *variable);
-void save(std::string fileName, std::string *variable);
+void LoadSave(std::string *SaveFile);
+void SaveSave(std::string *SaveFile);
+
+struct SaveStorage {
+	std::string SaveVar[7];
+}savef;
 
 #endif

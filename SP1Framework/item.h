@@ -7,6 +7,7 @@
 #include <random>
 #include <ctime>
 #include <vector>
+#include "player.h"
 
 struct SItem
 {
@@ -14,13 +15,13 @@ struct SItem
 	int m_iWeaponIndex;
 	int m_iWeaponDamage;
 	int m_iWeaponHealthGiven;
-	float m_iWeaponAttackSpeed;
-	float m_iWeaponVelocity;
+	float m_fWeaponAttackSpeed;
+	float m_fWeaponVelocity;
+	float m_fweaponMovementSpeed;
 	bool m_bHasWeapon;
 
-	SItem(std::string name, int index, int damage, int healthGiven, float attackSpeed, float velocity, bool HasWeapon);
+	SItem(std::string name, int index, int damage, int healthGiven, float attackSpeed, float velocity, float moveSpeed, bool HasWeapon);
 };
-
 
 struct SAllItems
 {
@@ -29,6 +30,7 @@ struct SAllItems
 
 	SAllItems();
 	void addItem(SItem item);
+	void hasItem(bool g_bHasWeapon, SGameChar * player);
 };
 
 #endif

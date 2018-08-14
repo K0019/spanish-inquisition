@@ -275,9 +275,9 @@ void moveCharacter()
 			resetLevel(++g_sLevel.floor);
 			bSomethingHappened = true;
 		}
-		if (g_sLevel.getTile(g_sLevel.g_sEntities.g_sChar.m_cLocation) == '%')
+		if (g_sLevel.getTile(g_sLevel.g_sEntities.g_sChar.m_cLocation) == '%') //When spacebar is pressed when on top of item
 		{
-			//HasItem(true);
+			g_sLevel.g_sEntities.g_sChar.AddItem(true);
 		}
     }
 
@@ -584,7 +584,7 @@ void renderStat()
 	c.Y = 2;
 	g_Console.writeToBuffer(c, ss.str());
 
-	//Rendering player's score
+	//Rendering player's damage
 	ss.str("");
 	ss << "Damage: " << g_sLevel.g_sEntities.g_sChar.m_iPlayerDamage;
 	c.Y = 3;
@@ -607,9 +607,4 @@ void resetLevel(int floor)
 {
 	g_sLevel.playerStartRoom = g_sLevel.exitRoom;
 	g_sLevel.generateLevel();
-}
-
-void HasItem(bool g_bHasWeapon)
-{
-
 }

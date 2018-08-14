@@ -53,7 +53,7 @@ double CStopWatch::LiToSecs( LARGE_INTEGER & liInput) {
 void CStopWatch::startTimer( void )
 {
     QueryPerformanceCounter(&m_liPrevTime) ;
-	m_liStartTime = m_liPrevTime;
+	m_liCurrTime = m_liStartTime = m_liPrevTime;
 }
  
 //--------------------------------------------------------------

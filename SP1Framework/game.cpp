@@ -56,7 +56,7 @@ void init( void )
 	r_cRenderOffset.Y = 1 + g_sLevel.g_sEntities.g_sChar.m_cRoom.Y * (ROOM_Y + 2);
 	g_sLevel.generateLevel();
 	g_sLevel.floor = 1;
-	g_sLevel.g_sEntities.m_vEnemy.push_back(Enemy("Test", 't', (WORD)0x09, 10, 0.4, 0.3, 0.1, 0.3));
+	g_sLevel.g_sEntities.m_vEnemy.push_back(Enemy("Test", "tt", (WORD)0x09, 10, 0.4, 0.3, 0.1, 0.3));
     // sets the width, height and the font name to use in the console
     g_Console.setConsoleFont(0, 16, L"Consolas");
 }
@@ -187,6 +187,7 @@ void gameplay()            // gameplay logic
     moveCharacter();    // moves the character, collision detection, physics, etc
 	playerShoot();
 	g_sLevel.g_sEntities.updatePellets();
+	g_sLevel.g_sEntities.updateEnemies();
                         // sound can be played here too.
 }
 

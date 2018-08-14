@@ -1,6 +1,6 @@
 #include "enemy.h"
 
-Enemy::Enemy(std::string name,  char identifier, WORD color, int HP, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration)
+Enemy::Enemy(std::string name, std::string identifier, WORD color, int HP, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration)
 	: m_iMoveDuration(moveDuration), m_sName(name), m_dLengthOfAttack(lengthOfAttack), m_dAttackTimeThreshold(attackTimeThreshold), m_dStunDuration(stunDuration)
 {
 	this->Timer.startTimer();
@@ -29,6 +29,12 @@ void Enemy::update(SGameChar * player)
 		return;
 	}
 
+	if (this->m_dAttackTime > 0.0)
+	{
+		this->m_dAttackTime -= dt;
+		this->m_dLastMoveTime -= this->checkAttackDelayExpire();
+	}
+
 	if (this->m_bHit)
 	{
 		this->m_dStunTime -= dt;
@@ -43,7 +49,7 @@ void Enemy::update(SGameChar * player)
 			else if (this->m_dAttackTime > 0)
 			{
 				this->m_dAttackTime += this->m_dStunTime;
-				this->checkAttackDelayExpire();
+				this->m_dLastMoveTime -= this->checkAttackDelayExpire();
 			}
 			this->m_dStunTime = 0.0;
 		}
@@ -89,58 +95,80 @@ void Enemy::update(SGameChar * player)
 			{
 				if (abs(this->m_cLocation.X - player->m_cLocation.X) == abs(this->m_cLocation.Y - player->m_cLocation.Y)) // Exactly diagonal
 				{
-					short dir = rand() / (RAND_MAX / 2);
-					if (this->m_cLocation.X - player->m_cLocation.X > 0)
+					if (abs(this->m_cLocation.X - player->m_cLocation.X) == 1 && abs(this->m_cLocation.Y - player->m_cLocation.Y) == 1)
 					{
-						if (this->m_cLocation.Y - player->m_cLocation.Y > 0)
+						short dir = rand() / (RAND_MAX / 2);
+						if (this->m_cLocation.X - player->m_cLocation.X > 0)
 						{
-							switch (dir)
+							if (this->m_cLocation.Y - player->m_cLocation.Y > 0)
 							{
-							case 0:
-								this->m_cLocation.Y--;
-								break;
-							case 1:
-								this->m_cLocation.X--;
-								break;
+								switch (dir)
+								{
+								case 0:
+									this->m_cLocation.Y--;
+									break;
+								case 1:
+									this->m_cLocation.X--;
+									break;
+								}
+							}
+							else
+							{
+								switch (dir)
+								{
+								case 0:
+									this->m_cLocation.X--;
+									break;
+								case 1:
+									this->m_cLocation.Y++;
+									break;
+								}
 							}
 						}
 						else
 						{
-							switch (dir)
+							if (this->m_cLocation.Y - player->m_cLocation.Y > 0)
 							{
-							case 0:
-								this->m_cLocation.X--;
-								break;
-							case 1:
-								this->m_cLocation.Y++;
-								break;
+								switch (dir)
+								{
+								case 0:
+									this->m_cLocation.X++;
+									break;
+								case 1:
+									this->m_cLocation.Y--;
+								}
+							}
+							else
+							{
+								switch (dir)
+								{
+								case 0:
+									this->m_cLocation.Y++;
+									break;
+								case 1:
+									this->m_cLocation.X++;
+									break;
+								}
 							}
 						}
 					}
 					else
 					{
-						if (this->m_cLocation.Y - player->m_cLocation.Y > 0)
+						if (this->m_cLocation.X - player->m_cLocation.X > 0)
 						{
-							switch (dir)
-							{
-							case 0:
-								this->m_cLocation.X++;
-								break;
-							case 1:
-								this->m_cLocation.Y--;
-							}
+							this->m_cLocation.X--;
 						}
 						else
 						{
-							switch (dir)
-							{
-							case 0:
-								this->m_cLocation.Y++;
-								break;
-							case 1:
-								this->m_cLocation.X++;
-								break;
-							}
+							this->m_cLocation.X++;
+						}
+						if (this->m_cLocation.Y - player->m_cLocation.Y > 0)
+						{
+							this->m_cLocation.Y--;
+						}
+						else
+						{
+							this->m_cLocation.Y++;
 						}
 					}
 				}
@@ -175,13 +203,16 @@ void Enemy::update(SGameChar * player)
 	}
 }
 
-void Enemy::checkAttackDelayExpire()
+double Enemy::checkAttackDelayExpire()
 {
+	double remainderTime = 0.0;
 	if (this->m_dAttackTime <= 0.0)
 	{
+		remainderTime = abs(this->m_dAttackTime);
 		this->m_bFlashAttacking = false;
 		this->m_dAttackTime = 0.0;
 	}
+	return remainderTime;
 }
 
 bool Enemy::checkFlashHitState()
@@ -189,7 +220,7 @@ bool Enemy::checkFlashHitState()
 	return this->m_bFlashHit = ((LONGLONG)((this->m_dStunDuration - this->m_dStunTime) / 50) % 2) ? (false) : (true);
 }
 
-char Enemy::getIdentifier()
+std::string Enemy::getIdentifier()
 {
 	return this->m_cIdentifier;
 }

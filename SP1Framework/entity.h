@@ -20,6 +20,7 @@ struct SAllEntities
 
 	/*ENEMY RELATED*/
 	std::vector<Enemy> m_vEnemy;
+	void updateEnemies();
 };
 
 #endif // !ENTITYHEAD

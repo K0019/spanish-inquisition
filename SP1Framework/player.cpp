@@ -32,7 +32,6 @@ void SGameChar::hasItem(bool g_bHasWeapon)
 {
 	int itemIndex;
 
-	srand(time(NULL)); //Seed RNG before using
 	itemIndex = rand() % 6 + 1; //Choosing a random number between 1 and 7
 								//for (int i = 0; i < 6; i++)
 								//{

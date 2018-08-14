@@ -54,3 +54,11 @@ void SAllEntities::clearPellets()
 {
 	this->m_vPellets.clear();
 }
+
+void SAllEntities::updateEnemies()
+{
+	for (auto& enemy : this->m_vEnemy)
+	{
+		enemy.update(&this->g_sChar);
+	}
+}

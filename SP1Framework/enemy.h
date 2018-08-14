@@ -15,7 +15,7 @@ class Enemy
 	double m_dStunTime; // Time to delay all updates by, when hit, supersedes m_dAttackTime
 	double m_dAttackTime; // Time to delay all updates by, when attacking
 	double m_dDeadTime; // Time to track when to delete this enemy when dead
-	char m_cIdentifier; // Identifier for rendering
+	std::string m_cIdentifier; // Identifier for rendering
 	WORD m_cColor; // Color of enemy for rendering
 	COORD m_cLocation; // Location of enemy on map, tile coordinates
 	int m_iHP; // HP of enemy
@@ -31,12 +31,12 @@ class Enemy
 	const double m_iMoveDuration; // Duration this enemy should be delayed by before moving again
 
 public:
-	Enemy(std::string name, char indicator, WORD color, int HP, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration); // Constructor
+	Enemy(std::string name, std::string indicator, WORD color, int HP, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration); // Constructor
 
 	void update(SGameChar * player); // Update everything about enemy
-	void checkAttackDelayExpire(); // Update attack timings
+	double checkAttackDelayExpire(); // Update attack timings
 	bool checkFlashHitState(); // Get true or false depending on duration of FlashHitTime and StunDuration
-	char getIdentifier(); // Get the char identifier of the enemy
+	std::string getIdentifier(); // Get the char identifier of the enemy
 	COORD getLocation(); // Get tile coordinates of where enemy is
 	WORD getColor(); // Get normal color of enemy
 	int getHP(); // Get current health of enemy

@@ -10,6 +10,7 @@
 
 class Enemy
 {
+protected:
 	CStopWatch Timer; // To keep track of time
 	double m_dLastMoveTime; // Time when it last moved, in accurateTime
 	double m_dStunTime; // Time to delay all updates by, when hit, supersedes m_dAttackTime
@@ -33,9 +34,9 @@ class Enemy
 public:
 	Enemy(std::string name, std::string indicator, WORD color, int HP, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration); // Constructor
 
-	void update(SGameChar * player); // Update everything about enemy
+	virtual void update(SGameChar * player) =0; // Update everything about enemy
 	double checkAttackDelayExpire(); // Update attack timings
-	bool checkFlashHitState(); // Get true or false depending on duration of FlashHitTime and StunDuration
+	void updateFlashHitState(); // Get true or false depending on duration of FlashHitTime and StunDuration
 	std::string getIdentifier(); // Get the char identifier of the enemy
 	COORD getLocation(); // Get tile coordinates of where enemy is
 	WORD getColor(); // Get normal color of enemy
@@ -49,12 +50,20 @@ public:
 	COORD getRealLocation(); // Get console coordinates of where enemy is
 };
 
+class EnemyMelee : public Enemy
+{
+public:
+	EnemyMelee(std::string name, std::string indicator, WORD color, int HP, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration);
+	void update(SGameChar * player);
+};
+
 class EnemyRanged : public Enemy
 {
+protected:
 	short m_siTimesBackedUp;
 
 public:
-	void update();
+	void update(SGameChar * player);
 	bool updateShooting();
 };
 

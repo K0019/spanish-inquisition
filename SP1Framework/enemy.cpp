@@ -1,5 +1,9 @@
 #include "enemy.h"
 
+// ---------------------------------------
+// CLASS DEFINITION: Enemy [ABSTRACT]
+// ---------------------------------------
+
 Enemy::Enemy(std::string name, std::string identifier, WORD color, int HP, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration)
 	: m_iMoveDuration(moveDuration), m_sName(name), m_dLengthOfAttack(lengthOfAttack), m_dAttackTimeThreshold(attackTimeThreshold), m_dStunDuration(stunDuration)
 {
@@ -19,7 +23,89 @@ Enemy::Enemy(std::string name, std::string identifier, WORD color, int HP, doubl
 	this->m_dStunTime = 0.0;
 }
 
-void Enemy::update(SGameChar * player)
+double Enemy::checkAttackDelayExpire()
+{
+	double remainderTime = 0.0;
+	if (this->m_dAttackTime <= 0.0)
+	{
+		remainderTime = abs(this->m_dAttackTime);
+		this->m_bFlashAttacking = false;
+		this->m_dAttackTime = 0.0;
+	}
+	return remainderTime;
+}
+
+void Enemy::updateFlashHitState()
+{
+	this->m_bFlashHit = ((LONGLONG)((this->m_dStunDuration - this->m_dStunTime) / 50) % 2) ? (false) : (true);
+}
+
+std::string Enemy::getIdentifier()
+{
+	return this->m_cIdentifier;
+}
+COORD Enemy::getLocation()
+{
+	return this->m_cLocation;
+}
+WORD Enemy::getColor()
+{
+	return this->m_cColor;
+}
+int Enemy::getHP()
+{
+	return this->m_iHP;
+}
+bool Enemy::isHit()
+{
+	return this->m_bHit;
+}
+bool Enemy::isFlashingHit()
+{
+	return this->m_bFlashHit;
+}
+WORD Enemy::getFlashColorHit()
+{
+	byte color = (byte)((~this->m_cColor) >> 8) << 8;
+	return color;
+}
+bool Enemy::isFlashingAttacking()
+{
+	return this->m_bFlashAttacking;
+}
+WORD Enemy::getFlashColorAttacking()
+{
+	byte color = (byte)(~this->m_cColor);
+	return color;
+}
+bool Enemy::isDead()
+{
+	return (this->getHP() <= 0) ? (true) : (false);
+}
+
+COORD Enemy::getRealLocation()
+{
+	COORD c = this->m_cLocation;
+	while (c.X > ROOM_X + 2)
+		c.X -= (ROOM_X + 2);
+	while (c.Y > ROOM_Y + 2)
+		c.Y -= (ROOM_Y + 2);
+	std::swap(c.X, c.Y);
+	c.X = (c.X << 1) - 1;
+	return c;
+}
+
+// ---------------------------------------
+// CLASS DEFINITION: EnemyMelee
+// ---------------------------------------
+
+EnemyMelee::EnemyMelee(std::string name, std::string indicator, WORD color, int HP, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration)
+	: Enemy(name, indicator, color, HP, moveDuration, lengthOfAttack, attackTimeThreshold, stunDuration)
+{
+
+}
+
+void EnemyMelee::update(SGameChar * player)
 {
 	double dt = this->Timer.getElapsedTime();
 
@@ -55,10 +141,10 @@ void Enemy::update(SGameChar * player)
 		}
 		else
 		{
-			checkFlashHitState();
+			this->updateFlashHitState();
 		}
 	}
-	
+
 	if (!this->isHit() && this->m_dAttackTime <= 0.0)
 	{
 		if (((this->m_cLocation.X == player->m_cLocation.X + 1 || this->m_cLocation.X == player->m_cLocation.X - 1) && this->m_cLocation.Y == player->m_cLocation.Y) ||
@@ -203,74 +289,11 @@ void Enemy::update(SGameChar * player)
 	}
 }
 
-double Enemy::checkAttackDelayExpire()
-{
-	double remainderTime = 0.0;
-	if (this->m_dAttackTime <= 0.0)
-	{
-		remainderTime = abs(this->m_dAttackTime);
-		this->m_bFlashAttacking = false;
-		this->m_dAttackTime = 0.0;
-	}
-	return remainderTime;
-}
+// ---------------------------------------
+// CLASS DEFINITION: EnemyRanged
+// ---------------------------------------
 
-bool Enemy::checkFlashHitState()
+void EnemyRanged::update(SGameChar * player)
 {
-	return this->m_bFlashHit = ((LONGLONG)((this->m_dStunDuration - this->m_dStunTime) / 50) % 2) ? (false) : (true);
-}
 
-std::string Enemy::getIdentifier()
-{
-	return this->m_cIdentifier;
-}
-COORD Enemy::getLocation()
-{
-	return this->m_cLocation;
-}
-WORD Enemy::getColor()
-{
-	return this->m_cColor;
-}
-int Enemy::getHP()
-{
-	return this->m_iHP;
-}
-bool Enemy::isHit()
-{
-	return this->m_bHit;
-}
-bool Enemy::isFlashingHit()
-{
-	return this->m_bFlashHit;
-}
-WORD Enemy::getFlashColorHit()
-{
-	byte color = (byte)((~this->m_cColor) >> 8) << 8;
-	return color;
-}
-bool Enemy::isFlashingAttacking()
-{
-	return this->m_bFlashAttacking;
-}
-WORD Enemy::getFlashColorAttacking()
-{
-	byte color = (byte)(~this->m_cColor);
-	return color;
-}
-bool Enemy::isDead()
-{
-	return (this->getHP() <= 0) ? (true) : (false);
-}
-
-COORD Enemy::getRealLocation()
-{
-	COORD c = this->m_cLocation;
-	while (c.X > ROOM_X + 2)
-		c.X -= (ROOM_X + 2);
-	while (c.Y > ROOM_Y + 2)
-		c.Y -= (ROOM_Y + 2);
-	std::swap(c.X, c.Y);
-	c.X = (c.X << 1) - 1;
-	return c;
 }

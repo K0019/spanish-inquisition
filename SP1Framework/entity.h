@@ -8,6 +8,7 @@
 #include "player.h"
 #include "definitions.h"
 #include <vector>
+#include <memory>
 
 struct SAllEntities
 {
@@ -19,7 +20,7 @@ struct SAllEntities
 	void clearPellets();
 
 	/*ENEMY RELATED*/
-	std::vector<Enemy> m_vEnemy;
+	std::vector<std::unique_ptr<Enemy>> m_vEnemy;
 	void updateEnemies();
 };
 

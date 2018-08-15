@@ -15,7 +15,7 @@ struct SGameChar
 	COORD m_cRoom; // Room coordinates that the player is in
 	int m_iPlayerHealth = 10;
 	int	m_iPlayerDamage = 3;
-	int m_iPlayerScore = 0;
+	unsigned int m_iPlayerScore = 0;
 	SAllItems m_sPlayerItems;
 
 	COORD getRealCoords();

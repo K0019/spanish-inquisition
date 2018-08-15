@@ -224,9 +224,19 @@ void SGameChar::hasItem(bool g_bHasWeapon)
 
 void SGameChar::minimumScore(int playerScore) //To make sure the minimum score is 0, it should not go to the negatives
 {
-	m_iPlayerScore = playerScore;
-	if (m_iPlayerScore < 0)
+	if (playerScore < 0)
 	{
-		m_iPlayerScore = 0;
+		if (m_iPlayerScore > abs(playerScore))
+		{
+			m_iPlayerScore += playerScore;
+		}
+		else
+		{
+			m_iPlayerScore = 0;
+		}
+	}
+	else
+	{
+		m_iPlayerScore += playerScore;
 	}
 }

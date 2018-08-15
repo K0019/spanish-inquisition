@@ -15,8 +15,9 @@ struct SPellet
 	bool m_bFriendly; // UNUSED | If pellet is shot by player or enemy
 	bool m_bHit; // If pellet has hit something. Used to decide if the pellet should be erased
 	double m_dTime; // Length of time that the pellet has not updated
+	double m_dVelocity; // Delay to when pellet will move
 
-	SPellet(COORD * c, short direction, bool friendly); // Constructor
+	SPellet(COORD * c, short direction, double velocity, bool friendly); // Constructor
 	void update(); // Update position of pellet
 	COORD getRealCoords(); // Get console coordinates of pellet. Used for rendering
 };

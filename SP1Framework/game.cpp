@@ -58,7 +58,7 @@ void init( void )
 	r_cRenderOffset.Y = 1 + g_sEntities.g_sChar.m_cRoom.Y * (ROOM_Y + 2);
 	g_sLevel.generateLevel();
 	g_sLevel.floor = 1;
-	g_sEntities.m_vEnemy.push_back(std::move(std::unique_ptr<EnemyRanged> (new EnemyRanged("Test", "tt", (WORD)0x09, 10, 0.4, 0.3, 0.1, 0.3, true))));
+	g_sEntities.m_vEnemy.push_back(std::move(std::unique_ptr<EnemyMelee> (new EnemyMelee("Test", "tt", (WORD)0x09, 10, 0.4, 0.3, 0.1, 0.3))));
     // sets the width, height and the font name to use in the console
     g_Console.setConsoleFont(0, 16, L"Consolas");
 	g_LoadFromSave(saveDataStorage.g_iSaveData);
@@ -562,7 +562,12 @@ void renderPellets()
 {
 	for (auto& pellet : g_sEntities.m_vPellets)
 	{
-		g_Console.writeToBuffer(pellet.getRealCoords(), "<>", (pellet.m_bFriendly) ? (0x03) : (0x0C));
+		if (!pellet.m_bFriendly) continue;
+		g_Console.writeToBuffer(pellet.getRealCoords(), "<>", 0x03);
+	}
+	for (auto& pellet : g_sEntities.m_vPellets)
+	{
+		g_Console.writeToBuffer(pellet.getRealCoords(), "<>", 0x0C);
 	}
 }
 

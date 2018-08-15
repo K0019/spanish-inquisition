@@ -10,5 +10,6 @@
 #define ROOM_Y 15
 #define SHOOTSPEED 0.350
 #define SHOOTVELOCITY 0.25
+#define ENEMY_DYING_LENGTH 1.0
 
 #endif // !DEFINITIONSHEAD

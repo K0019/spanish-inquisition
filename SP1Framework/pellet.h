@@ -28,8 +28,9 @@ struct SPellet
 	int m_bHitReason; // What the pellet hit
 	double m_dTime; // Length of time that the pellet has not updated
 	double m_dVelocity; // Delay to when pellet will move
+	int m_iDamage; // Damage pellet deals to entity hit
 
-	SPellet(COORD * c, int direction, double velocity, bool friendly); // Constructor
+	SPellet(COORD * c, int direction, int damage, double velocity, bool friendly); // Constructor
 	void update(); // Update position of pellet
 	COORD getRealCoords(); // Get console coordinates of pellet. Used for rendering
 };

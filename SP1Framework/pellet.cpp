@@ -1,10 +1,11 @@
 #include "pellet.h"
 
-SPellet::SPellet(COORD * c, int direction, double velocity, bool friendly)
+SPellet::SPellet(COORD * c, int direction, int damage, double velocity, bool friendly)
 {
 	this->m_dTime = 0.0;
 	this->m_cLocation = *c;
 	this->m_siDirection = direction;
+	this->m_iDamage = damage;
 	this->m_dVelocity = velocity;
 	this->m_bFriendly = friendly;
 	this->m_bHit = false;

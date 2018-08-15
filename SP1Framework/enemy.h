@@ -25,6 +25,7 @@ protected:
 	bool m_bFlashAttacking; // If enemy is already flashing because it is attacking
 	double m_dFlashAttackingTime; // Time to determine whether to change flash or not
 	bool m_bHit; // If enemy has been hit and m_dStunTime has not expired
+	int m_iStrength; // Damage enemy deals to player
 
 	const std::string m_sName; // Name of enemy
 	const double m_dLengthOfAttack; // Length of time of attack
@@ -33,7 +34,7 @@ protected:
 	const double m_iMoveDuration; // Duration this enemy should be delayed by before moving again
 
 public:
-	Enemy(std::string name, std::string indicator, COORD location, WORD color,  int HP, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration); // Constructor
+	Enemy(std::string name, std::string indicator, COORD location, WORD color,  int HP, int damage, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration); // Constructor
 
 	virtual void update(SGameChar * player) =0; // Update everything about enemy
 	virtual bool updateMovement(SGameChar * player) =0;
@@ -48,14 +49,16 @@ public:
 	WORD getFlashColorHit(); // Get flash color of enemy if hit
 	bool isFlashingAttacking(); // Get flash status of enemy if attacking
 	WORD getFlashColorAttacking(); // Get flash color of enemy if attacking
+	bool isDying(); // Get dying status of enemy
 	bool isDead(); // Get dead status of enemy
 	COORD getRealLocation(); // Get console coordinates of where enemy is
+	void takeDamage(int amount); // Deal damage to this enemy
 };
 
 class EnemyMelee : public Enemy
 {
 public:
-	EnemyMelee(std::string name, std::string indicator, COORD location, WORD color, int HP, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration);
+	EnemyMelee(std::string name, std::string indicator, COORD location, WORD color, int HP, int damage, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration);
 
 	void update(SGameChar * player);
 	bool updateMovement(SGameChar * player); // Updates enemy movement, returns true or false depending on whether the enemy should attack or not
@@ -69,7 +72,7 @@ protected:
 	std::vector<SPellet> * m_vPelletList; // Pointer to the list of pellets, to add pellets of the enemy's
 
 public:
-	EnemyRanged(std::vector<SPellet> * pellets, std::string name, std::string indicator, COORD location, WORD color, int HP, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration, bool isMobile, double pelletVelocity);
+	EnemyRanged(std::vector<SPellet> * pellets, std::string name, std::string indicator, COORD location, WORD color, int HP, int damage, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration, bool isMobile, double pelletVelocity);
 
 	void update(SGameChar * player);
 	bool updateMovement(SGameChar * player);

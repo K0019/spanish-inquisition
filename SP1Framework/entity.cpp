@@ -20,8 +20,15 @@ void SAllEntities::clearEnemies()
 
 void SAllEntities::updateEnemies()
 {
-	for (auto& enemy : this->m_vEnemy)
+	for (std::vector<std::unique_ptr<Enemy>>::iterator enemy = this->m_vEnemy.begin(); enemy != this->m_vEnemy.end(); )
 	{
-		enemy->update(&this->g_sChar);
+		(*enemy)->update(&this->g_sChar);
+		
+		if ((*enemy)->isDead())
+		{
+			enemy = this->m_vEnemy.erase(enemy);
+			continue;
+		}
+		enemy++;
 	}
 }

@@ -16,7 +16,7 @@ struct SPellet
 	bool m_bHit; // If pellet has hit something. Used to decide if the pellet should be erased
 	double m_dTime; // Length of time that the pellet has not updated
 
-	SPellet(COORD * c, short direction); // Constructor
+	SPellet(COORD * c, short direction, bool friendly); // Constructor
 	void update(); // Update position of pellet
 	COORD getRealCoords(); // Get console coordinates of pellet. Used for rendering
 };

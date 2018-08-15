@@ -128,7 +128,7 @@ void Console::initConsole(COORD consoleSize, LPCSTR lpConsoleTitle)
 
 	m_hScreenBuffer = CreateConsoleScreenBuffer( 
 		GENERIC_READ |           // read/write access 
-		ENERIC_WRITE, 
+		GENERIC_WRITE,
 		FILE_SHARE_READ | 
 		FILE_SHARE_WRITE,        // shared 
 		NULL,                    // default security attributes 

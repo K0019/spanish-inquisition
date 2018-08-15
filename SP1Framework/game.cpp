@@ -429,7 +429,7 @@ void playerShoot()
 
 	if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_bHasWeapon)
 	{
-		switch (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_iWeaponLevel) // Index 7 (Magic Potion): Decrease attack delay by 10/20/30/40%
+		switch (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_iWeaponLevel) // Index 5 (Magic Potion): Decrease attack delay by 10/20/30/40%
 		{
 		case 1:
 			{

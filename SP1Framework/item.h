@@ -8,7 +8,7 @@
 #include <ctime>
 #include <vector>
 
-struct SItem
+struct SItem //Struct that holds item information
 {
 	std::string m_sName;
 	int m_iWeaponIndex;
@@ -18,14 +18,16 @@ struct SItem
 	float m_fWeaponVelocity;
 	float m_fweaponMovementSpeed;
 	bool m_bHasWeapon;
+	int m_iWeaponLevel;
 
-	SItem(std::string name, int index, int damage, int healthGiven, float attackSpeed, float velocity, float moveSpeed, bool HasWeapon);
+	SItem(std::string name, int index, int damage, int healthGiven, float attackSpeed, float velocity, float moveSpeed, bool hasWeapon, int weaponLevel);
 };
 
-struct SAllItems
+struct SAllItems //Struct that holds all items 
 {
 	std::vector<SItem> m_vItemsList;
 	std::vector<bool> m_vItemsObtained;
+	int ItemCount;
 
 	SAllItems();
 	void addItem(SItem item);

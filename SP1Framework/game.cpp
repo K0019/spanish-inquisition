@@ -287,9 +287,38 @@ void moveCharacter()
 	{
 		for (int i = 0; i <= K_RIGHT; i++)
 		{
-			if (g_abKeyPressed[i]) g_adBounceTime[i] = g_dElapsedTime + 0.125;
+			if (g_abKeyPressed[i])
+			{
+				g_adBounceTime[i] = g_dElapsedTime + 0.225;
+				if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_bHasWeapon) // Index 7 (Blue Feather): Decrease movement delay by 10/20/30/40%
+				{
+					switch (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_iWeaponLevel)
+					{
+					case 1:
+						{
+							g_adBounceTime[i] *= g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed;
+							break;
+						}
+					case 2:
+						{
+							g_adBounceTime[i] *= (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.1);
+							break;
+						}
+					case 3:
+						{
+							g_adBounceTime[i] *= (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.2);
+							break;
+						}
+					case 4:
+						{
+							g_adBounceTime[i] *= (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.3);
+							break;
+						}
+					}
+				}
+			}
 		}
-		if (g_abKeyPressed[K_SPACE]) g_adBounceTime[K_SPACE] = g_dElapsedTime + 0.125;
+		if (g_abKeyPressed[K_SPACE]) g_adBounceTime[K_SPACE] = g_dElapsedTime + 0.225;
 	}
 }
 
@@ -415,12 +444,49 @@ void renderToScreen()
 // *******************************************************
 void playerShoot()
 {
-	if ((g_abKeyPressed[K_SHOOTDOWN] || g_abKeyPressed[K_SHOOTLEFT] || g_abKeyPressed[K_SHOOTRIGHT] || g_abKeyPressed[K_SHOOTUP]) && (g_adBounceTime[K_SHOOTUP] >= g_dElapsedTime + 0.225 || g_adBounceTime[K_SHOOTUP] < g_dElapsedTime))
+	double delay;
+
+	if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_bHasWeapon)
+	{
+		switch (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_iWeaponLevel) // Index 7 (Magic Potion): Decrease attack delay by 10/20/30/40%
+		{
+		case 1:
+			{
+				delay = SHOOTSPEED * 0.90;
+				break;
+			}
+		case 2:
+			{
+				delay = SHOOTSPEED * 0.80;
+				break;
+			}
+		case 3:
+			{
+				delay = SHOOTSPEED * 0.70;
+				break;
+			}
+		case 4:
+			{
+				delay = SHOOTSPEED * 0.60;
+				break;
+			}
+		}
+	}
+	else
+	{
+		delay = SHOOTSPEED;
+	}
+
+	if ((g_abKeyPressed[K_SHOOTDOWN] || g_abKeyPressed[K_SHOOTLEFT] || g_abKeyPressed[K_SHOOTRIGHT] || g_abKeyPressed[K_SHOOTUP]) && (g_adBounceTime[K_SHOOTUP] >= g_dElapsedTime + (delay - 0.025) || g_adBounceTime[K_SHOOTUP] < g_dElapsedTime))
 	{
 		g_bHasShot = false;
-		if (g_adBounceTime[K_SHOOTUP] < g_dElapsedTime) g_adBounceTime[K_SHOOTUP] = g_dElapsedTime + 0.250;
+		if (g_adBounceTime[K_SHOOTUP] < g_dElapsedTime)
+		{
+			g_adBounceTime[K_SHOOTUP] = g_dElapsedTime + delay;
+			
+		}
 	}
-	else if (!g_bHasShot && g_adBounceTime[K_SHOOTUP] >= g_dElapsedTime && g_adBounceTime[K_SHOOTUP] < g_dElapsedTime + 0.225)
+	else if (!g_bHasShot && g_adBounceTime[K_SHOOTUP] >= g_dElapsedTime && g_adBounceTime[K_SHOOTUP] < g_dElapsedTime + (delay - 0.025))
 	{
 		if (g_abKeyPressed[K_SHOOTUP] && !g_abKeyPressed[K_SHOOTDOWN])
 		{
@@ -429,7 +495,7 @@ void playerShoot()
 				COORD c = g_sEntities.g_sChar.m_cLocation;
 				c.X--;
 				c.Y--;
-				g_sEntities.m_vPellets.push_back(SPellet(&c, 7, true));
+				g_sEntities.m_vPellets.push_back(SPellet(&c, 7, SHOOTVELOCITY, true));
 				g_bHasShot = true;
 				return;
 			}
@@ -438,7 +504,7 @@ void playerShoot()
 				COORD c = g_sEntities.g_sChar.m_cLocation;
 				c.X--;
 				c.Y++;
-				g_sEntities.m_vPellets.push_back(SPellet(&c, 1, true));
+				g_sEntities.m_vPellets.push_back(SPellet(&c, 1, SHOOTVELOCITY, true));
 				g_bHasShot = true;
 				return;
 			}
@@ -446,7 +512,7 @@ void playerShoot()
 			{
 				COORD c = g_sEntities.g_sChar.m_cLocation;
 				c.X--;
-				g_sEntities.m_vPellets.push_back(SPellet(&c, 0, true));
+				g_sEntities.m_vPellets.push_back(SPellet(&c, 0, SHOOTVELOCITY, true));
 				g_bHasShot = true;
 				return;
 			}
@@ -458,7 +524,7 @@ void playerShoot()
 				COORD c = g_sEntities.g_sChar.m_cLocation;
 				c.X++;
 				c.Y--;
-				g_sEntities.m_vPellets.push_back(SPellet(&c, 5, true));
+				g_sEntities.m_vPellets.push_back(SPellet(&c, 5, SHOOTVELOCITY, true));
 				g_bHasShot = true;
 				return;
 			}
@@ -467,7 +533,7 @@ void playerShoot()
 				COORD c = g_sEntities.g_sChar.m_cLocation;
 				c.X++;
 				c.Y++;
-				g_sEntities.m_vPellets.push_back(SPellet(&c, 3, true));
+				g_sEntities.m_vPellets.push_back(SPellet(&c, 3, SHOOTVELOCITY, true));
 				g_bHasShot = true;
 				return;
 			}
@@ -475,7 +541,7 @@ void playerShoot()
 			{
 				COORD c = g_sEntities.g_sChar.m_cLocation;
 				c.X++;
-				g_sEntities.m_vPellets.push_back(SPellet(&c, 4, true));
+				g_sEntities.m_vPellets.push_back(SPellet(&c, 4, SHOOTVELOCITY, true));
 				g_bHasShot = true;
 				return;
 			}
@@ -486,7 +552,7 @@ void playerShoot()
 			{
 				COORD c = g_sEntities.g_sChar.m_cLocation;
 				c.Y--;
-				g_sEntities.m_vPellets.push_back(SPellet(&c, 6, true));
+				g_sEntities.m_vPellets.push_back(SPellet(&c, 6, SHOOTVELOCITY, true));
 				g_bHasShot = true;
 				return;
 			}
@@ -494,7 +560,7 @@ void playerShoot()
 			{
 				COORD c = g_sEntities.g_sChar.m_cLocation;
 				c.Y++;
-				g_sEntities.m_vPellets.push_back(SPellet(&c, 2, true));
+				g_sEntities.m_vPellets.push_back(SPellet(&c, 2, SHOOTVELOCITY, true));
 				g_bHasShot = true;
 				return;
 			}
@@ -592,16 +658,22 @@ void renderStat()
 	c.Y = 3;
 	g_Console.writeToBuffer(c, ss.str());
 
+	//Rendering player's damage
+	ss.str("");
+	ss << "Items: " << g_sEntities.g_sChar.m_sPlayerItems.ItemCount;
+	c.Y = 4;
+	g_Console.writeToBuffer(c, ss.str());
+
 	//Rendering player's score
 	ss.str("");
 	ss << "Score: " << g_sEntities.g_sChar.m_iPlayerScore;
-	c.Y = 4;
+	c.Y = 5;
 	g_Console.writeToBuffer(c, ss.str());
 
 	//Rendering floor level
 	ss.str("");
 	ss << "Floor: " << g_sLevel.floor;
-	c.Y = 5;
+	c.Y = 6;
 	g_Console.writeToBuffer(c, ss.str());
 }
 

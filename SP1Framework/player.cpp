@@ -30,9 +30,9 @@ void SGameChar::AddItem(bool g_bHasWeapon)
 
 void SGameChar::hasItem(bool g_bHasWeapon)
 {
-	int itemIndex;
+	int weaponIndex;
 
-	itemIndex = rand() % 6 + 1; //Choosing a random number between 1 and 7
+	weaponIndex = rand() % 6 + 1; //Choosing a random number between 1 and 7
 								//for (int i = 0; i < 6; i++)
 								//{
 								//	bool check;
@@ -43,61 +43,137 @@ void SGameChar::hasItem(bool g_bHasWeapon)
 								//		check = true; //Check if number is already used to prevent repeats
 								//		for (int j = 0; j < i; j++)
 								//		{
-								//			if (storedIndex == itemIndex[j]) //If number is already used
+								//			if (storedIndex == weaponIndex[j]) //If number is already used
 								//			{
 								//				check = false; //Set check to false
 								//				break;
 								//			}
 								//		}
 								//	} while (!check);
-								//	itemIndex[i] = storedIndex;
+								//	weaponIndex[i] = storedIndex;
 								//	break;
 								//}
 
-	if ((itemIndex == this->m_sPlayerItems.m_vItemsList[0].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[0].m_bHasWeapon == false)) //Checking if randomized weaponIndex gives the Heaven Cracker
+	if ((weaponIndex == this->m_sPlayerItems.m_vItemsList[0].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[0].m_bHasWeapon == false)) //Checking if randomized weaponIndex gives the Heaven Cracker
 	{
-		this->m_iPlayerHealth += this->m_sPlayerItems.m_vItemsList[0].m_iWeaponHealthGiven;
-		this->m_iPlayerDamage += this->m_sPlayerItems.m_vItemsList[0].m_iWeaponDamage;
-		this->m_sPlayerItems.m_vItemsList[0].m_bHasWeapon = true;
+		switch (this->m_sPlayerItems.m_vItemsList[0].m_iWeaponLevel)
+		{
+		case 1:
+			{
+				this->m_iPlayerDamage += this->m_sPlayerItems.m_vItemsList[0].m_iWeaponDamage;
+				this->m_sPlayerItems.m_vItemsList[0].m_bHasWeapon = true;
+				this->m_sPlayerItems.ItemCount++;
+			}
+		case 2:
+			{
+				this->m_iPlayerDamage += (this->m_sPlayerItems.m_vItemsList[0].m_iWeaponDamage + 1);
+				this->m_sPlayerItems.m_vItemsList[0].m_bHasWeapon = true;
+				this->m_sPlayerItems.ItemCount++;
+			}
+		case 3:
+			{
+				this->m_iPlayerDamage += (this->m_sPlayerItems.m_vItemsList[0].m_iWeaponDamage + 2);
+				this->m_sPlayerItems.m_vItemsList[0].m_bHasWeapon = true;
+				this->m_sPlayerItems.ItemCount++;
+			}
+		case 4:
+			{
+				this->m_iPlayerDamage += (this->m_sPlayerItems.m_vItemsList[0].m_iWeaponDamage + 3);
+				this->m_sPlayerItems.m_vItemsList[0].m_bHasWeapon = true;
+				this->m_sPlayerItems.ItemCount++;
+			}
+		}
 	}
-	else if ((itemIndex == this->m_sPlayerItems.m_vItemsList[1].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[1].m_bHasWeapon == false)) //Checking if randomized weaponIndex gives the Enchanted Sword
+	else if ((weaponIndex == this->m_sPlayerItems.m_vItemsList[1].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[1].m_bHasWeapon == false)) //Checking if randomized weaponIndex gives the Enchanted Sword
 	{
-		this->m_iPlayerHealth += this->m_sPlayerItems.m_vItemsList[1].m_iWeaponHealthGiven;
-		this->m_iPlayerDamage += this->m_sPlayerItems.m_vItemsList[1].m_iWeaponDamage;
-		this->m_sPlayerItems.m_vItemsList[1].m_bHasWeapon = true;
+		switch (this->m_sPlayerItems.m_vItemsList[1].m_iWeaponLevel)
+		{
+		case 1: //Enchanted Sword level 1
+			{
+				this->m_iPlayerHealth += this->m_sPlayerItems.m_vItemsList[1].m_iWeaponHealthGiven;
+				this->m_iPlayerDamage += this->m_sPlayerItems.m_vItemsList[1].m_iWeaponDamage;
+				this->m_sPlayerItems.m_vItemsList[1].m_bHasWeapon = true;
+				this->m_sPlayerItems.ItemCount++;
+				break;
+			}
+		case 2: //Enchanted Sword level 2
+			{
+				this->m_iPlayerHealth += (this->m_sPlayerItems.m_vItemsList[1].m_iWeaponHealthGiven + 1);
+				this->m_iPlayerDamage += (this->m_sPlayerItems.m_vItemsList[1].m_iWeaponDamage + 1);
+				this->m_sPlayerItems.m_vItemsList[1].m_bHasWeapon = true;
+				this->m_sPlayerItems.ItemCount++;
+				break;
+			}
+		case 3: //Enchanted Sword level 3
+			{
+				this->m_iPlayerHealth += (this->m_sPlayerItems.m_vItemsList[1].m_iWeaponHealthGiven + 2);
+				this->m_iPlayerDamage += (this->m_sPlayerItems.m_vItemsList[1].m_iWeaponDamage + 2);
+				this->m_sPlayerItems.m_vItemsList[1].m_bHasWeapon = true;
+				this->m_sPlayerItems.ItemCount++;
+				break;
+			}
+		case 4: //Enchanted Sword level 4
+			{
+				this->m_iPlayerHealth += (this->m_sPlayerItems.m_vItemsList[1].m_iWeaponHealthGiven + 2);
+				this->m_iPlayerDamage += (this->m_sPlayerItems.m_vItemsList[1].m_iWeaponDamage + 2);
+				this->m_sPlayerItems.m_vItemsList[1].m_bHasWeapon = true;
+				this->m_sPlayerItems.ItemCount++;
+				break;
+			}
+		}
 	}
-	else if ((itemIndex == this->m_sPlayerItems.m_vItemsList[2].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[2].m_bHasWeapon == false)) //Checking if randomized weaponIndex gives the Health Potion
+	else if ((weaponIndex == this->m_sPlayerItems.m_vItemsList[2].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[2].m_bHasWeapon == false)) //Checking if randomized weaponIndex gives the Health Potion
 	{
-		this->m_iPlayerHealth += this->m_sPlayerItems.m_vItemsList[2].m_iWeaponHealthGiven;
-		this->m_iPlayerDamage += this->m_sPlayerItems.m_vItemsList[2].m_iWeaponDamage;
-		this->m_sPlayerItems.m_vItemsList[2].m_bHasWeapon = true;
+		switch (this->m_sPlayerItems.m_vItemsList[2].m_iWeaponLevel)
+		{
+		case 1: //Health Potion level 1
+			{
+				this->m_iPlayerHealth += this->m_sPlayerItems.m_vItemsList[2].m_iWeaponHealthGiven;
+				this->m_sPlayerItems.m_vItemsList[2].m_bHasWeapon = true;
+				this->m_sPlayerItems.ItemCount++;
+				break;
+			}
+		case 2: //Health Potion level 2
+			{
+				this->m_iPlayerHealth += (this->m_sPlayerItems.m_vItemsList[2].m_iWeaponHealthGiven + 2);
+				this->m_sPlayerItems.m_vItemsList[2].m_bHasWeapon = true;
+				this->m_sPlayerItems.ItemCount++;
+				break;
+			}
+		case 3: //Health Potion level 3
+			{
+				this->m_iPlayerHealth += (this->m_sPlayerItems.m_vItemsList[2].m_iWeaponHealthGiven + 4);
+				this->m_sPlayerItems.m_vItemsList[2].m_bHasWeapon = true;
+				this->m_sPlayerItems.ItemCount++;
+				break;
+			}
+		case 4: //Health Potion level 4
+			{
+				this->m_iPlayerHealth += (this->m_sPlayerItems.m_vItemsList[2].m_iWeaponHealthGiven + 6);
+				this->m_sPlayerItems.m_vItemsList[2].m_bHasWeapon = true;
+				this->m_sPlayerItems.ItemCount++;
+				break;
+			}
+		}
 	}
-	else if ((itemIndex == this->m_sPlayerItems.m_vItemsList[3].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[3].m_bHasWeapon == false)) //Checking if randomized weaponIndex gives the Clown Fiesta
+	else if ((weaponIndex == this->m_sPlayerItems.m_vItemsList[3].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[3].m_bHasWeapon == false)) //Checking if randomized weaponIndex gives the Clown Fiesta
 	{
-		this->m_iPlayerHealth += this->m_sPlayerItems.m_vItemsList[3].m_iWeaponHealthGiven;
-		this->m_iPlayerDamage += this->m_sPlayerItems.m_vItemsList[3].m_iWeaponDamage;
 		this->m_sPlayerItems.m_vItemsList[3].m_bHasWeapon = true;
+		this->m_sPlayerItems.ItemCount++;
 	}
-	else if ((itemIndex == this->m_sPlayerItems.m_vItemsList[4].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[4].m_bHasWeapon == false)) //Checking if randomized weaponIndex gives the Antenna
+	else if ((weaponIndex == this->m_sPlayerItems.m_vItemsList[4].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[4].m_bHasWeapon == false)) //Checking if randomized weaponIndex gives the Magic Potion
 	{
-		this->m_iPlayerHealth += this->m_sPlayerItems.m_vItemsList[4].m_iWeaponHealthGiven;
-		this->m_iPlayerDamage += this->m_sPlayerItems.m_vItemsList[4].m_iWeaponDamage;
 		this->m_sPlayerItems.m_vItemsList[4].m_bHasWeapon = true;
+		this->m_sPlayerItems.ItemCount++;
 	}
-	else if ((itemIndex == this->m_sPlayerItems.m_vItemsList[5].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[5].m_bHasWeapon == false)) //Checking if randomized weaponIndex gives the Bonus!
+	else if ((weaponIndex == this->m_sPlayerItems.m_vItemsList[5].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[5].m_bHasWeapon == false)) //Checking if randomized weaponIndex gives the Bonus!
 	{
-		this->m_iPlayerHealth += this->m_sPlayerItems.m_vItemsList[5].m_iWeaponHealthGiven;
-		this->m_iPlayerDamage += this->m_sPlayerItems.m_vItemsList[5].m_iWeaponDamage;
 		this->m_sPlayerItems.m_vItemsList[5].m_bHasWeapon = true;
+		this->m_sPlayerItems.ItemCount++;
 	}
-	else if ((itemIndex == this->m_sPlayerItems.m_vItemsList[6].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[6].m_bHasWeapon == false)) //Checking if randomized weaponIndex gives the Blue Feather!
+	else if ((weaponIndex == this->m_sPlayerItems.m_vItemsList[6].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[6].m_bHasWeapon == false)) //Checking if randomized weaponIndex gives the Blue Feather
 	{
-		this->m_iPlayerHealth += this->m_sPlayerItems.m_vItemsList[6].m_iWeaponHealthGiven;
-		this->m_iPlayerDamage += this->m_sPlayerItems.m_vItemsList[6].m_iWeaponDamage;
 		this->m_sPlayerItems.m_vItemsList[6].m_bHasWeapon = true;
-
-	}
-	else //Do nothing if this already has all items
-	{
+		this->m_sPlayerItems.ItemCount++;
 	}
 }

@@ -1,10 +1,11 @@
 #include "pellet.h"
 
-SPellet::SPellet(COORD * c, short direction, bool friendly)
+SPellet::SPellet(COORD * c, short direction, double velocity, bool friendly)
 {
 	this->m_dTime = 0.0;
 	this->m_cLocation = *c;
 	this->m_siDirection = direction;
+	this->m_dVelocity = velocity;
 	this->m_bFriendly = friendly;
 	this->m_bHit = false;
 	this->Timer.startTimer();
@@ -13,7 +14,7 @@ void SPellet::update()
 {
 	this->m_dTime += this->Timer.getElapsedTime();
 	if (this->m_bHit) return;
-	if (m_dTime >= 0.2)
+	if (this->m_dTime >= this->m_dVelocity)
 	{
 		switch (this->m_siDirection)
 		{
@@ -46,7 +47,7 @@ void SPellet::update()
 			this->m_cLocation.Y--;
 			break;
 		}
-		this->m_dTime -= 0.2;
+		this->m_dTime -= this->m_dVelocity;
 	}
 }
 COORD SPellet::getRealCoords()

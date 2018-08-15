@@ -27,7 +27,7 @@ bool g_bHasShot;
 bool g_bHasWeapon;
 
 // Console object
-Console g_Console(100, 25, "SP1 Framework");
+Console g_Console(100, 25, "The Great Escapade");
 
 //--------------------------------------------------------------
 // Purpose  : Initialisation function
@@ -186,7 +186,7 @@ void mainMenu()
 {
 	processUserInput(); // checks if you should change states or do something else with the game, e.g. pause, exit
 	menuNavigate();
-	//g_eGameState = S_GAME;
+	g_eGameState = S_GAME;
 }
 
 void gameplay()            // gameplay logic

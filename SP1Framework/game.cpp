@@ -64,7 +64,7 @@ void init( void )
 	COORD c;
 	c.X = (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
 	c.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
-	g_sEntities.m_vEnemy.push_back(std::move(std::unique_ptr<EnemyRanged> (new EnemyRanged(&g_sEntities.m_vPellets, "Test", "tt", c, (WORD)0x09, 10, 0.4, 0.3, 0.1, 0.3, false, 0.25))));
+	g_sEntities.m_vEnemy.push_back(std::move(std::unique_ptr<EnemyRanged> (new EnemyRanged(&g_sEntities.m_vPellets, "Test", "tt", c, (WORD)0x09, 10, 3, 0.4, 0.3, 0.1, 0.3, false, 0.25))));
     // sets the width, height and the font name to use in the console
     g_Console.setConsoleFont(0, 16, L"Consolas");
 	g_LoadFromSave(saveDataStorage.g_iSaveData);
@@ -193,10 +193,10 @@ void gameplay()            // gameplay logic
 {
 	processUserInput();	// checks if you should change states or do something else with the game, e.g. pause, exit
 	controlPlayer();	// moves the character, collision detection, physics, etc
-	playerShoot();
-	g_sEntities.updatePellets();
-	checkHitPellets();
-	g_sEntities.updateEnemies();
+	playerShoot(); // checks if the player should shoot
+	g_sEntities.updatePellets(); // update locations of pellets
+	checkHitPellets(); // checks if the pellets have hit anything, and update stats accordingly
+	g_sEntities.updateEnemies(); // update locations of enemies and add pellets of the enemies'
 					// sound can be played here too.
 }
 
@@ -530,7 +530,7 @@ void playerShoot()
 				COORD c = g_sEntities.g_sChar.m_cLocation;
 				c.X--;
 				c.Y--;
-				g_sEntities.m_vPellets.push_back(SPellet(&c, 7, SHOOTVELOCITY, true));
+				g_sEntities.m_vPellets.push_back(SPellet(&c, 7, g_sEntities.g_sChar.m_iPlayerDamage ,SHOOTVELOCITY, true));
 				g_bHasShot = true;
 				return;
 			}
@@ -539,7 +539,7 @@ void playerShoot()
 				COORD c = g_sEntities.g_sChar.m_cLocation;
 				c.X--;
 				c.Y++;
-				g_sEntities.m_vPellets.push_back(SPellet(&c, 1, SHOOTVELOCITY, true));
+				g_sEntities.m_vPellets.push_back(SPellet(&c, 1, g_sEntities.g_sChar.m_iPlayerDamage, SHOOTVELOCITY, true));
 				g_bHasShot = true;
 				return;
 			}
@@ -547,7 +547,7 @@ void playerShoot()
 			{
 				COORD c = g_sEntities.g_sChar.m_cLocation;
 				c.X--;
-				g_sEntities.m_vPellets.push_back(SPellet(&c, 0, SHOOTVELOCITY, true));
+				g_sEntities.m_vPellets.push_back(SPellet(&c, 0, g_sEntities.g_sChar.m_iPlayerDamage, SHOOTVELOCITY, true));
 				g_bHasShot = true;
 				return;
 			}
@@ -559,7 +559,7 @@ void playerShoot()
 				COORD c = g_sEntities.g_sChar.m_cLocation;
 				c.X++;
 				c.Y--;
-				g_sEntities.m_vPellets.push_back(SPellet(&c, 5, SHOOTVELOCITY, true));
+				g_sEntities.m_vPellets.push_back(SPellet(&c, 5, g_sEntities.g_sChar.m_iPlayerDamage, SHOOTVELOCITY, true));
 				g_bHasShot = true;
 				return;
 			}
@@ -568,7 +568,7 @@ void playerShoot()
 				COORD c = g_sEntities.g_sChar.m_cLocation;
 				c.X++;
 				c.Y++;
-				g_sEntities.m_vPellets.push_back(SPellet(&c, 3, SHOOTVELOCITY, true));
+				g_sEntities.m_vPellets.push_back(SPellet(&c, 3, g_sEntities.g_sChar.m_iPlayerDamage, SHOOTVELOCITY, true));
 				g_bHasShot = true;
 				return;
 			}
@@ -576,7 +576,7 @@ void playerShoot()
 			{
 				COORD c = g_sEntities.g_sChar.m_cLocation;
 				c.X++;
-				g_sEntities.m_vPellets.push_back(SPellet(&c, 4, SHOOTVELOCITY, true));
+				g_sEntities.m_vPellets.push_back(SPellet(&c, 4, g_sEntities.g_sChar.m_iPlayerDamage, SHOOTVELOCITY, true));
 				g_bHasShot = true;
 				return;
 			}
@@ -587,7 +587,7 @@ void playerShoot()
 			{
 				COORD c = g_sEntities.g_sChar.m_cLocation;
 				c.Y--;
-				g_sEntities.m_vPellets.push_back(SPellet(&c, 6, SHOOTVELOCITY, true));
+				g_sEntities.m_vPellets.push_back(SPellet(&c, 6, g_sEntities.g_sChar.m_iPlayerDamage, SHOOTVELOCITY, true));
 				g_bHasShot = true;
 				return;
 			}
@@ -595,7 +595,7 @@ void playerShoot()
 			{
 				COORD c = g_sEntities.g_sChar.m_cLocation;
 				c.Y++;
-				g_sEntities.m_vPellets.push_back(SPellet(&c, 2, SHOOTVELOCITY, true));
+				g_sEntities.m_vPellets.push_back(SPellet(&c, 2, g_sEntities.g_sChar.m_iPlayerDamage, SHOOTVELOCITY, true));
 				g_bHasShot = true;
 				return;
 			}
@@ -671,6 +671,10 @@ void renderPellets()
 				break;
 			case pellet::P_DOOR:
 				g_Console.writeToBuffer(pellet.getRealCoords(), "><", 0x49);
+				break;
+			case pellet::P_ENEMY:
+				g_Console.writeToBuffer(pellet.getRealCoords(), "><", 0x09);
+				break;
 			}
 		}
 		else
@@ -690,6 +694,9 @@ void renderPellets()
 				break;
 			case pellet::P_DOOR:
 				g_Console.writeToBuffer(pellet.getRealCoords(), "><", 0x44);
+				break;
+			case pellet::P_PLAYER:
+				g_Console.writeToBuffer(pellet.getRealCoords(), "><", 0x04);
 				break;
 			}
 		}
@@ -775,7 +782,38 @@ void checkHitPellets()
 			{
 				pellet->m_bHitReason = pellet::P_WALL;
 			}
+			pellet++;
 			continue;
+		}
+
+		// Check collision with player, if enemy pellet
+		if (!pellet->m_bFriendly && pellet->m_cLocation.X == g_sEntities.g_sChar.m_cLocation.X && pellet->m_cLocation.Y == g_sEntities.g_sChar.m_cLocation.Y)
+		{
+			pellet->m_bHit = true;
+			pellet->m_bHitReason = pellet::P_PLAYER;
+			
+			g_sEntities.g_sChar.m_iPlayerHealth -= pellet->m_iDamage;
+			// TODO: Check for death
+
+			pellet++;
+			continue;
+		}
+
+		// Check collision with enemy, if player pellet
+		if (pellet->m_bFriendly)
+		{
+			for (auto& enemy : g_sEntities.m_vEnemy)
+			{
+				if (pellet->m_cLocation.X == enemy->getLocation().X && pellet->m_cLocation.Y == enemy->getLocation().Y)
+				{
+					pellet->m_bHit = true;
+					pellet->m_bHitReason = pellet::P_ENEMY;
+
+					enemy->takeDamage(pellet->m_iDamage);
+
+					break;
+				}
+			}
 		}
 
 		pellet++;

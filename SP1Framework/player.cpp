@@ -226,7 +226,7 @@ void SGameChar::minimumScore(int playerScore) //To make sure the minimum score i
 {
 	if (playerScore < 0)
 	{
-		if (m_iPlayerScore > abs(playerScore))
+		if (m_iPlayerScore > (unsigned int) abs(playerScore))
 		{
 			m_iPlayerScore += playerScore;
 		}

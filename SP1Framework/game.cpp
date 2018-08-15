@@ -686,7 +686,14 @@ void renderPellets()
 				g_Console.writeToBuffer(pellet.getRealCoords(), "><", 0x89);
 				break;
 			case pellet::P_DOOR:
-				g_Console.writeToBuffer(pellet.getRealCoords(), "><", 0x49);
+				if (g_sEntities.g_sChar.m_bInBattle)
+				{
+					g_Console.writeToBuffer(pellet.getRealCoords(), "><", 0x49);
+				}
+				else
+				{
+					g_Console.writeToBuffer(pellet.getRealCoords(), "><", 0x99);
+				}
 				break;
 			case pellet::P_ENEMY:
 				g_Console.writeToBuffer(pellet.getRealCoords(), "><", 0x09);
@@ -709,7 +716,14 @@ void renderPellets()
 				g_Console.writeToBuffer(pellet.getRealCoords(), "><", 0x84);
 				break;
 			case pellet::P_DOOR:
-				g_Console.writeToBuffer(pellet.getRealCoords(), "><", 0x44);
+				if (g_sEntities.g_sChar.m_bInBattle)
+				{
+					g_Console.writeToBuffer(pellet.getRealCoords(), "><", 0x44);
+				}
+				else
+				{
+					g_Console.writeToBuffer(pellet.getRealCoords(), "><", 0x94);
+				}
 				break;
 			case pellet::P_PLAYER:
 				g_Console.writeToBuffer(pellet.getRealCoords(), "><", 0x04);

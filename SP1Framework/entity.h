@@ -9,6 +9,7 @@
 #include "definitions.h"
 #include <vector>
 #include <memory>
+#include "level.h"
 
 struct SAllEntities
 {
@@ -16,8 +17,8 @@ struct SAllEntities
 	std::vector<SPellet> m_vPellets;
 	SGameChar g_sChar;
 	void updatePellets();
-	void checkHitPellets();
 	void clearPellets();
+	void clearEnemies();
 
 	/*ENEMY RELATED*/
 	std::vector<std::unique_ptr<Enemy>> m_vEnemy;

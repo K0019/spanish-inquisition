@@ -193,6 +193,7 @@ void gameplay()            // gameplay logic
 	moveCharacter();	// moves the character, collision detection, physics, etc
 	playerShoot();
 	g_sEntities.updatePellets();
+	checkHitPellets();
 	g_sEntities.updateEnemies();
 					// sound can be played here too.
 }
@@ -218,6 +219,7 @@ void moveCharacter()
 			{
 				r_cRenderOffset.X -= (ROOM_X + 2);
 				g_sEntities.clearPellets();
+				g_sEntities.clearEnemies();
 			}
 		}
     }
@@ -236,6 +238,7 @@ void moveCharacter()
 			{
 				r_cRenderOffset.Y -= (ROOM_Y + 2);
 				g_sEntities.clearPellets();
+				g_sEntities.clearEnemies();
 			}
 		}
     }
@@ -254,6 +257,7 @@ void moveCharacter()
 			{
 				r_cRenderOffset.X += (ROOM_X + 2);
 				g_sEntities.clearPellets();
+				g_sEntities.clearEnemies();
 			}
 		}
     }
@@ -272,6 +276,7 @@ void moveCharacter()
 			{
 				r_cRenderOffset.Y += (ROOM_Y + 2);
 				g_sEntities.clearPellets();
+				g_sEntities.clearEnemies();
 			}
 		}
     }
@@ -560,53 +565,50 @@ void renderLevel()
 	c.X = 1;
 	c.Y = 1;
 
-	if (DEBUG)
+	for (int row = r_cRenderOffset.X; row < r_cRenderOffset.X + ROOM_X + 2; row++)
 	{
-		for (int row = r_cRenderOffset.X; row < r_cRenderOffset.X + ROOM_X + 2; row++)
+		for (int column = r_cRenderOffset.Y; column < r_cRenderOffset.Y + ROOM_Y + 2; column++)
 		{
-			for (int column = r_cRenderOffset.Y; column < r_cRenderOffset.Y + ROOM_Y + 2; column++)
+			switch (g_sLevel.level[row][column])
 			{
-				switch (g_sLevel.level[row][column])
-				{
-				case '#':
-					c.X = 1 + ((column - r_cRenderOffset.Y) << 1);
-					g_Console.writeToBuffer(c, "  ", 0x80);
-					break;
-				case '$':
-					c.X = 1 + ((column - r_cRenderOffset.Y) << 1);
-					g_Console.writeToBuffer(c, "  ", 0x40);
-					break;
-				case '&':
-					c.X = 1 + ((column - r_cRenderOffset.Y) << 1);
-					g_Console.writeToBuffer(c, "&_", 0x09);
-					break;
-				}
+			case '#':
+				c.X = 1 + ((column - r_cRenderOffset.Y) << 1);
+				g_Console.writeToBuffer(c, "  ", 0x80);
+				break;
+			case '$':
+				c.X = 1 + ((column - r_cRenderOffset.Y) << 1);
+				g_Console.writeToBuffer(c, "  ", 0x40);
+				break;
+			case '&':
+				c.X = 1 + ((column - r_cRenderOffset.Y) << 1);
+				g_Console.writeToBuffer(c, "&_", 0x09);
+				break;
 			}
-			c.Y++;
 		}
+		c.Y++;
 	}
-	else
-	{
-		// Go through each character inside level and print its respective character
-		for (unsigned int row = 0; row < 1 + (ROOM_X + 1) * GRID_X; row++)
-		{
-			for (unsigned int column = 0; column < g_sLevel.level[row].length(); column++)
-			{
-				switch (g_sLevel.level[row][column])
-				{
-				case '#':
-					c.X = 1 + (column << 1);
-					g_Console.writeToBuffer(c, "  ", 0x80);
-					break;
-				case '$':
-					c.X = 1 + (column << 1);
-					g_Console.writeToBuffer(c, "  ", 0x40);
-					break;
-				}
-			}
-			c.Y++;
-		}
-	}
+	//else
+	//{
+	//	// Go through each character inside level and print its respective character
+	//	for (unsigned int row = 0; row < 1 + (ROOM_X + 1) * GRID_X; row++)
+	//	{
+	//		for (unsigned int column = 0; column < g_sLevel.level[row].length(); column++)
+	//		{
+	//			switch (g_sLevel.level[row][column])
+	//			{
+	//			case '#':
+	//				c.X = 1 + (column << 1);
+	//				g_Console.writeToBuffer(c, "  ", 0x80);
+	//				break;
+	//			case '$':
+	//				c.X = 1 + (column << 1);
+	//				g_Console.writeToBuffer(c, "  ", 0x40);
+	//				break;
+	//			}
+	//		}
+	//		c.Y++;
+	//	}
+	//}
 }
 
 void renderPellets()
@@ -614,12 +616,41 @@ void renderPellets()
 	for (auto& pellet : g_sEntities.m_vPellets)
 	{
 		if (!pellet.m_bFriendly) continue;
-		g_Console.writeToBuffer(pellet.getRealCoords(), "<>", 0x03);
+		if (pellet.m_bHit)
+		{
+			switch (pellet.m_bHitReason)
+			{
+			case pellet::P_WALL:
+				g_Console.writeToBuffer(pellet.getRealCoords(), "><", 0x89);
+				break;
+			case pellet::P_DOOR:
+				g_Console.writeToBuffer(pellet.getRealCoords(), "><", 0x49);
+			}
+		}
+		else
+		{
+			g_Console.writeToBuffer(pellet.getRealCoords(), "<>", 0x03);
+		}
 	}
 	for (auto& pellet : g_sEntities.m_vPellets)
 	{
 		if (pellet.m_bFriendly) continue;
-		g_Console.writeToBuffer(pellet.getRealCoords(), "<>", 0x0C);
+		if (pellet.m_bHit)
+		{
+			switch (pellet.m_bHitReason)
+			{
+			case pellet::P_WALL:
+				g_Console.writeToBuffer(pellet.getRealCoords(), "><", 0x84);
+				break;
+			case pellet::P_DOOR:
+				g_Console.writeToBuffer(pellet.getRealCoords(), "><", 0x44);
+				break;
+			}
+		}
+		else
+		{
+			g_Console.writeToBuffer(pellet.getRealCoords(), "<>", 0x0C);
+		}
 	}
 }
 
@@ -671,4 +702,43 @@ void resetLevel(int floor)
 {
 	g_sLevel.playerStartRoom = g_sLevel.exitRoom;
 	g_sLevel.generateLevel();
+}
+
+
+void checkHitPellets()
+{
+	for (std::vector<SPellet>::iterator pellet = g_sEntities.m_vPellets.begin(); pellet != g_sEntities.m_vPellets.end(); )
+	{
+		// Check for erasal
+		if (pellet->m_bHit)
+		{
+			if (pellet->m_dTime >= 0.15)
+			{
+				pellet = g_sEntities.m_vPellets.erase(pellet);
+				continue;
+			}
+			pellet++;
+			continue;
+		}
+
+		// Check collision with wall
+		if ((pellet->m_cLocation.X - 1) % (ROOM_X + 2) == 0 ||
+			pellet->m_cLocation.X % (ROOM_X + 2) == 0 ||
+			(pellet->m_cLocation.Y - 1) % (ROOM_Y + 2) == 0 ||
+			pellet->m_cLocation.Y % (ROOM_Y + 2) == 0)
+		{
+			pellet->m_bHit = true;
+			if (g_sLevel.getTile(pellet->m_cLocation) == '$')
+			{
+				pellet->m_bHitReason = pellet::P_DOOR;
+			}
+			else
+			{
+				pellet->m_bHitReason = pellet::P_WALL;
+			}
+			continue;
+		}
+
+		pellet++;
+	}
 }

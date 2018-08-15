@@ -57,7 +57,7 @@ void init( void )
 	r_cRenderOffset.Y = 1 + g_sEntities.g_sChar.m_cRoom.Y * (ROOM_Y + 2);
 	g_sLevel.generateLevel();
 	g_sLevel.floor = 1;
-	g_sEntities.m_vEnemy.push_back(std::move(std::unique_ptr<EnemyMelee> (new EnemyMelee("Test", "tt", (WORD)0x09, 10, 0.4, 0.3, 0.1, 0.3))));
+	g_sEntities.m_vEnemy.push_back(std::move(std::unique_ptr<EnemyRanged> (new EnemyRanged("Test", "tt", (WORD)0x09, 10, 0.4, 0.3, 0.1, 0.3, true))));
     // sets the width, height and the font name to use in the console
     g_Console.setConsoleFont(0, 16, L"Consolas");
 }
@@ -429,7 +429,7 @@ void playerShoot()
 				COORD c = g_sEntities.g_sChar.m_cLocation;
 				c.X--;
 				c.Y--;
-				g_sEntities.m_vPellets.push_back(SPellet(&c, 7));
+				g_sEntities.m_vPellets.push_back(SPellet(&c, 7, true));
 				g_bHasShot = true;
 				return;
 			}
@@ -438,7 +438,7 @@ void playerShoot()
 				COORD c = g_sEntities.g_sChar.m_cLocation;
 				c.X--;
 				c.Y++;
-				g_sEntities.m_vPellets.push_back(SPellet(&c, 1));
+				g_sEntities.m_vPellets.push_back(SPellet(&c, 1, true));
 				g_bHasShot = true;
 				return;
 			}
@@ -446,7 +446,7 @@ void playerShoot()
 			{
 				COORD c = g_sEntities.g_sChar.m_cLocation;
 				c.X--;
-				g_sEntities.m_vPellets.push_back(SPellet(&c, 0));
+				g_sEntities.m_vPellets.push_back(SPellet(&c, 0, true));
 				g_bHasShot = true;
 				return;
 			}
@@ -458,7 +458,7 @@ void playerShoot()
 				COORD c = g_sEntities.g_sChar.m_cLocation;
 				c.X++;
 				c.Y--;
-				g_sEntities.m_vPellets.push_back(SPellet(&c, 5));
+				g_sEntities.m_vPellets.push_back(SPellet(&c, 5, true));
 				g_bHasShot = true;
 				return;
 			}
@@ -467,7 +467,7 @@ void playerShoot()
 				COORD c = g_sEntities.g_sChar.m_cLocation;
 				c.X++;
 				c.Y++;
-				g_sEntities.m_vPellets.push_back(SPellet(&c, 3));
+				g_sEntities.m_vPellets.push_back(SPellet(&c, 3, true));
 				g_bHasShot = true;
 				return;
 			}
@@ -475,7 +475,7 @@ void playerShoot()
 			{
 				COORD c = g_sEntities.g_sChar.m_cLocation;
 				c.X++;
-				g_sEntities.m_vPellets.push_back(SPellet(&c, 4));
+				g_sEntities.m_vPellets.push_back(SPellet(&c, 4, true));
 				g_bHasShot = true;
 				return;
 			}
@@ -486,7 +486,7 @@ void playerShoot()
 			{
 				COORD c = g_sEntities.g_sChar.m_cLocation;
 				c.Y--;
-				g_sEntities.m_vPellets.push_back(SPellet(&c, 6));
+				g_sEntities.m_vPellets.push_back(SPellet(&c, 6, true));
 				g_bHasShot = true;
 				return;
 			}
@@ -494,7 +494,7 @@ void playerShoot()
 			{
 				COORD c = g_sEntities.g_sChar.m_cLocation;
 				c.Y++;
-				g_sEntities.m_vPellets.push_back(SPellet(&c, 2));
+				g_sEntities.m_vPellets.push_back(SPellet(&c, 2, true));
 				g_bHasShot = true;
 				return;
 			}
@@ -563,7 +563,7 @@ void renderPellets()
 {
 	for (auto& pellet : g_sEntities.m_vPellets)
 	{
-		g_Console.writeToBuffer(pellet.getRealCoords(), "<>", 0x03);
+		g_Console.writeToBuffer(pellet.getRealCoords(), "<>", (pellet.m_bFriendly) ? (0x03) : (0x0C));
 	}
 }
 

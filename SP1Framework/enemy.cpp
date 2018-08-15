@@ -357,7 +357,13 @@ bool EnemyRanged::updateMovement(SGameChar * player)
 	{
 		if (!this->m_bMobile && this->m_dAttackTime <= 0.0)
 		{
-
+			if ((abs(this->m_cLocation.X - player->m_cLocation.X) > 2 && abs(this->m_cLocation.X - player->m_cLocation.X) < 7) &&
+				(abs(this->m_cLocation.Y - player->m_cLocation.Y) > 2 && abs(this->m_cLocation.Y - player->m_cLocation.Y) < 7) &&
+				(this->m_cLocation.X - player->m_cLocation.X == 0 || this->m_cLocation.Y - player->m_cLocation.Y == 0 ||
+					(abs(this->m_cLocation.X - player->m_cLocation.X) == abs(this->m_cLocation.Y - player->m_cLocation.Y))))
+			{
+				return true;
+			}
 		}
 		
 		if (this->m_dLastMoveTime + this->m_iMoveDuration < this->Timer.accurateTotalTime())
@@ -368,10 +374,265 @@ bool EnemyRanged::updateMovement(SGameChar * player)
 				{
 					if (this->m_cLocation.Y - player->m_cLocation.Y < 0)
 					{
-
+						this->m_cLocation.Y--;
+					}
+					else
+					{
+						this->m_cLocation.Y++;
+					}
+				}
+				else if (abs(this->m_cLocation.Y - player->m_cLocation.Y >= 7))
+				{
+					if (this->m_cLocation.Y - player->m_cLocation.Y < 0)
+					{
+						this->m_cLocation.Y++;
+					}
+					else
+					{
+						this->m_cLocation.Y--;
 					}
 				}
 			}
+			else if (this->m_cLocation.Y == player->m_cLocation.Y)
+			{
+				if (abs(this->m_cLocation.X - player->m_cLocation.X) <= 2)
+				{
+					if (this->m_cLocation.X - player->m_cLocation.X < 0)
+					{
+						this->m_cLocation.X--;
+					}
+					else
+					{
+						this->m_cLocation.X++;
+					}
+				}
+				else if (abs(this->m_cLocation.X - player->m_cLocation.X >= 7))
+				{
+					if (this->m_cLocation.X - player->m_cLocation.X < 0)
+					{
+						this->m_cLocation.X++;
+					}
+					else
+					{
+						this->m_cLocation.X--;
+					}
+				}
+			}
+			else if (abs(this->m_cLocation.X - player->m_cLocation.X) == abs(this->m_cLocation.Y - player->m_cLocation.Y))
+			{
+				if (abs(this->m_cLocation.X - player->m_cLocation.X) <= 2)
+				{
+					if (this->m_cLocation.X - player->m_cLocation.X < 0)
+					{
+						this->m_cLocation.X--;
+						if (this->m_cLocation.Y - player->m_cLocation.Y < 0)
+						{
+							this->m_cLocation.Y--;
+						}
+						else
+						{
+							this->m_cLocation.Y++;
+						}
+					}
+					else
+					{
+						this->m_cLocation.X++;
+						if (this->m_cLocation.Y - player->m_cLocation.Y < 0)
+						{
+							this->m_cLocation.Y--;
+						}
+						else
+						{
+							this->m_cLocation.Y++;
+						}
+					}
+				}
+				else if (abs(this->m_cLocation.X - player->m_cLocation.X) >= 7)
+				{
+					if (this->m_cLocation.X - player->m_cLocation.X < 0)
+					{
+						this->m_cLocation.X++;
+						if (this->m_cLocation.Y - player->m_cLocation.Y < 0)
+						{
+							this->m_cLocation.Y++;
+						}
+						else
+						{
+							this->m_cLocation.Y--;
+						}
+					}
+					else
+					{
+						this->m_cLocation.X--;
+						if (this->m_cLocation.Y - player->m_cLocation.Y < 0)
+						{
+							this->m_cLocation.Y++;
+						}
+						else
+						{
+							this->m_cLocation.Y--;
+						}
+					}
+				}
+			}
+			else {
+				if (abs(this->m_cLocation.X - player->m_cLocation.X) == 1)
+				{
+					if (abs(this->m_cLocation.Y - player->m_cLocation.Y) == 2)
+					{
+						if (this->m_cLocation.Y - player->m_cLocation.Y < 0)
+						{
+							this->m_cLocation.Y--;
+						}
+						else
+						{
+							this->m_cLocation.Y++;
+						}
+					}
+					if (this->m_cLocation.X - player->m_cLocation.X < 0)
+					{
+						this->m_cLocation.X++;
+					}
+					else
+					{
+						this->m_cLocation.X--;
+					}
+				}
+				else if (abs(this->m_cLocation.Y - player->m_cLocation.Y) == 1)
+				{
+					if (abs(this->m_cLocation.X - player->m_cLocation.X) == 2)
+					{
+						if (this->m_cLocation.X - player->m_cLocation.X < 0)
+						{
+							this->m_cLocation.X--;
+						}
+						else
+						{
+							this->m_cLocation.X++;
+						}
+					}
+					if (this->m_cLocation.Y - player->m_cLocation.Y < 0)
+					{
+						this->m_cLocation.Y++;
+					}
+					else
+					{
+						this->m_cLocation.Y--;
+					}
+				}
+				else
+				{
+					if (abs(abs(this->m_cLocation.X - player->m_cLocation.X) - abs(this->m_cLocation.Y - player->m_cLocation.Y)) == 2)
+					{
+						if (this->m_cLocation.X - player->m_cLocation.X < 0)
+						{
+							if (this->m_cLocation.Y - player->m_cLocation.Y < 0)
+							{
+								if (abs(this->m_cLocation.X - player->m_cLocation.X) > abs(this->m_cLocation.Y - player->m_cLocation.Y))
+								{
+									this->m_cLocation.X++;
+									this->m_cLocation.Y--;
+								}
+								else
+								{
+									this->m_cLocation.X--;
+									this->m_cLocation.Y++;
+								}
+							}
+							else
+							{
+								if (abs(this->m_cLocation.X - player->m_cLocation.X) > abs(this->m_cLocation.Y - player->m_cLocation.Y))
+								{
+									this->m_cLocation.X++;
+									this->m_cLocation.Y++;
+								}
+								else
+								{
+									this->m_cLocation.X--;
+									this->m_cLocation.Y--;
+								}
+							}
+						}
+						else
+						{
+							if (this->m_cLocation.Y - player->m_cLocation.Y < 0)
+							{
+								if (abs(this->m_cLocation.X - player->m_cLocation.X) > abs(this->m_cLocation.Y - player->m_cLocation.Y))
+								{
+									this->m_cLocation.X--;
+									this->m_cLocation.Y--;
+								}
+								else
+								{
+									this->m_cLocation.X++;
+									this->m_cLocation.Y++;
+								}
+							}
+							else
+							{
+								if (abs(this->m_cLocation.X - player->m_cLocation.X) > abs(this->m_cLocation.Y - player->m_cLocation.Y))
+								{
+									this->m_cLocation.X--;
+									this->m_cLocation.Y++;
+								}
+								else
+								{
+									this->m_cLocation.X++;
+									this->m_cLocation.Y--;
+								}
+							}
+						}
+					}
+					else
+					{
+						if (abs(this->m_cLocation.X - player->m_cLocation.X) > abs(this->m_cLocation.Y - player->m_cLocation.Y))
+						{
+							if (this->m_cLocation.Y - player->m_cLocation.Y < 0)
+							{
+								this->m_cLocation.Y++;
+							}
+							else
+							{
+								this->m_cLocation.Y--;
+							}
+							if (abs(this->m_cLocation.X - player->m_cLocation.X) >= 7)
+							{
+								if (this->m_cLocation.X - player->m_cLocation.X < 0)
+								{
+									this->m_cLocation.X++;
+								}
+								else
+								{
+									this->m_cLocation.X--;
+								}
+							}
+						}
+						else
+						{
+							if (this->m_cLocation.X - player->m_cLocation.X < 0)
+							{
+								this->m_cLocation.X++;
+							}
+							else
+							{
+								this->m_cLocation.X--;
+							}
+							if (abs(this->m_cLocation.Y - player->m_cLocation.Y) >= 7)
+							{
+								if (this->m_cLocation.Y - player->m_cLocation.Y < 0)
+								{
+									this->m_cLocation.Y++;
+								}
+								else
+								{
+									this->m_cLocation.Y--;
+								}
+							}
+						}
+					}
+				}
+			}
+			this->m_dLastMoveTime = this->Timer.accurateTotalTime();
 		}
 
 		if (this->m_bMobile)

@@ -6,21 +6,22 @@
 #include <iostream>
 #include <sstream>
 
-double  g_dElapsedTime;
-double  g_dDeltaTime;
-int g_iCurrentFrameCount, g_iLastFrameCount, g_iLastMeasuredSecond;
+double	g_dElapsedTime;
+double	g_dDeltaTime;
+int		g_iCurrentFrameCount, g_iLastFrameCount, g_iLastMeasuredSecond;
 double	g_dAccurateElapsedTime;
-bool    g_abKeyPressed[K_COUNT];
-COORD r_cRenderOffset; // To be used for level rendering, tile coordinates
-int r_iMoveDirection;
-double r_dMoveTime;
+bool	g_abKeyPressed[K_COUNT];
+COORD	r_cRenderOffset; // To be used for level rendering, tile coordinates
+COORD	r_curspos;
+int		r_iMoveDirection;
+double	r_dMoveTime;
 
 // Game specific variables here
-EGAMESTATES g_eGameState = S_SPLASHSCREEN;
-SLevel		g_sLevel;
-SaveDataStorage saveDataStorage;
-SAllEntities g_sEntities; // Hold all entities in the level
-double  g_adBounceTime[K_COUNT]; // this is to prevent key bouncing, so we won't trigger keypresses more than once
+EGAMESTATES			g_eGameState = S_SPLASHSCREEN;
+SLevel				g_sLevel;
+SaveDataStorage		saveDataStorage;
+SAllEntities		g_sEntities; // Hold all entities in the level
+double				g_adBounceTime[K_COUNT]; // this is to prevent key bouncing, so we won't trigger keypresses more than once
 
 bool g_bHasShot;
 bool g_bHasWeapon;
@@ -46,7 +47,7 @@ void init( void )
 
 	// sets the initial state for the game
 	g_eGameState = S_SPLASHSCREEN;
-	if (DEBUG) g_eGameState = S_GAME;
+	if (DEBUG) g_eGameState = S_MENU;
 
 	g_bHasShot = false;
 	g_sEntities.g_sChar.m_cLocation.X = 2 + (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
@@ -56,6 +57,8 @@ void init( void )
 	g_sEntities.g_sChar.m_cRoom = g_sLevel.playerStartRoom;
 	r_cRenderOffset.X = 1 + g_sEntities.g_sChar.m_cRoom.X * (ROOM_X + 2);
 	r_cRenderOffset.Y = 1 + g_sEntities.g_sChar.m_cRoom.Y * (ROOM_Y + 2);
+	r_curspos.X = g_Console.getConsoleSize().X >> 1;
+	r_curspos.Y = g_Console.getConsoleSize().Y >> 1;
 	g_sLevel.generateLevel();
 	g_sLevel.floor = 1;
 	COORD c;
@@ -115,7 +118,6 @@ void getInput( void )
 //            Game logic should be done here.
 //            Such as collision checks, determining the position of your game characters, status updates, etc
 //            If there are any calls to write to the console here, then you are doing it wrong.
-//
 //            If your game has multiple states, you should determine the current state, and call the relevant function here.
 //
 // Input    : dt = deltatime
@@ -183,14 +185,14 @@ void splashScreenWait()    // waits for time to pass in splash screen
 void mainMenu()
 {
 	processUserInput(); // checks if you should change states or do something else with the game, e.g. pause, exit
-	if (g_dAccurateElapsedTime > 6.0) // wait for 3 seconds to switch to game mode, else do nothing
-		g_eGameState = S_GAME;
+	menuNavigate();
+	//g_eGameState = S_GAME;
 }
 
 void gameplay()            // gameplay logic
 {
 	processUserInput();	// checks if you should change states or do something else with the game, e.g. pause, exit
-	moveCharacter();	// moves the character, collision detection, physics, etc
+	controlPlayer();	// moves the character, collision detection, physics, etc
 	playerShoot();
 	g_sEntities.updatePellets();
 	checkHitPellets();
@@ -198,7 +200,18 @@ void gameplay()            // gameplay logic
 					// sound can be played here too.
 }
 
-void moveCharacter()
+void menuNavigate()
+{
+
+}
+
+void resetLevel(int floor)
+{
+	g_sLevel.playerStartRoom = g_sLevel.exitRoom;
+	g_sLevel.generateLevel();
+}
+
+void controlPlayer()
 {
 	bool bSomethingHappened = false;
 
@@ -206,7 +219,6 @@ void moveCharacter()
 	// providing a beep sound whenver we shift the character
 	if (g_abKeyPressed[K_UP] && g_sEntities.g_sChar.m_cLocation.X > 0 && g_adBounceTime[K_UP] < g_dElapsedTime)
 	{
-		//Beep(1440, 30);
 		g_sEntities.g_sChar.m_cLocation.X--;
 		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '#')
 		{
@@ -225,7 +237,6 @@ void moveCharacter()
     }
     if (g_abKeyPressed[K_LEFT] && g_sEntities.g_sChar.m_cLocation.Y > 0 && g_adBounceTime[K_LEFT] < g_dElapsedTime)
     {
-        //Beep(1440, 30);
 		g_sEntities.g_sChar.m_cLocation.Y--;
 		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '#')
 		{
@@ -244,7 +255,6 @@ void moveCharacter()
     }
     if (g_abKeyPressed[K_DOWN] && g_adBounceTime[K_DOWN] < g_dElapsedTime)
     {
-        //Beep(1440, 30);
 		g_sEntities.g_sChar.m_cLocation.X++;
 		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '#')
 		{
@@ -263,7 +273,6 @@ void moveCharacter()
     }
     if (g_abKeyPressed[K_RIGHT] && g_adBounceTime[K_RIGHT] < g_dElapsedTime)
     {
-        //Beep(1440, 30);
 		g_sEntities.g_sChar.m_cLocation.Y++;
 		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '#')
 		{
@@ -342,7 +351,7 @@ void processUserInput()
 void clearScreen()
 {
 	// Clears the buffer with this colour attribute
-	g_Console.clearBuffer(0x00);
+	g_Console.clearBuffer(0x0f);
 }
 
 void renderSplashScreen()  // renders the splash screen
@@ -361,28 +370,65 @@ void renderSplashScreen()  // renders the splash screen
 
 void renderMainMenu()
 {
+	renderTitle();
+	renderMenu();
 	renderScore();
+	renderCursor();
 }
 
 void renderGame()
 {
-	//renderMap();        // renders the map to the buffer first
 	renderLevel();
 	renderCharacter();    // renders the character into the buffer
 	renderPellets();
 	renderEnemy();
 	renderStat();
-	//renderEnemy();
+}
+
+void renderTitle()
+{
+	std::string ASCII[7];
+	ASCII[0] = " ÛÛÛÛÛÛÛÛ²°           ÛÛÛÛÛÛ²°                     ÛÛÛÛÛÛÛÛ²°                                   ";
+	ASCII[1] = " Û²°ÛÛ²°Û²°          ÛÛ²°  ÛÛ²°                     ÛÛ²°  Û²°                                   ";
+	ASCII[2] = "    ÛÛ²° Û²°Û²ÛÛÛÛ²  ÛÛ²°     ÛÛÛ² ÛÛÛÛ²°ÛÛ²°ÛÛÛÛ   ÛÛ²°     ÛÛÛ²°ÛÛÛ²°ÛÛ²° ÛÛ²° ÛÛ²°ÛÛÛ²°ÛÛÛÛ²°";
+	ASCII[3] = "    ÛÛ²° Û²°Û²Û²°    ÛÛ²°     Û²°Û²Û²°  Û²°Û² Û     ÛÛÛÛÛÛ²°Û²°  Û²°  Û²°Û²Û²°Û²Û²°Û²Û²°Û²Û²°   ";
+	ASCII[4] = "    ÛÛ²° ÛÛÛÛ²ÛÛÛ²°  ÛÛ²° ÛÛÛ²ÛÛÛÛ²ÛÛÛ²°ÛÛÛÛ² Û     ÛÛ²°     ÛÛ²°Û²°  ÛÛÛÛ²ÛÛÛ²°ÛÛÛÛ²Û²°Û²ÛÛÛ²° ";
+	ASCII[5] = "    ÛÛ²° Û²°Û²Û²°    ÛÛ²°  ÛÛ²Û²Û² Û²°  Û²°Û² Û     ÛÛ²°  Û²°  Û²Û²°  Û²°Û²Û²°  Û²°Û²Û²°Û²Û²°   ";
+	ASCII[6] = "   ÛÛÛÛ²°Û²°Û²ÛÛÛÛ²   ÛÛÛÛÛÛ²°Û² Û²ÛÛÛÛ²Û²°Û² Û    ÛÛÛÛÛÛÛÛ²ÛÛÛ²° ÛÛÛ²Û²°Û²Û²°  Û²°Û²ÛÛÛ² ÛÛÛÛ²°";
+	COORD c = g_Console.getConsoleSize();
+	c.X /= 40;
+	for (int i = 0; i < 7; i++)
+	{
+		c.Y = 2 + i;
+		g_Console.writeToBuffer(c, ASCII[i], 0x64);
+	}
 }
 
 void renderScore() 
 {
+	/*Label*/
 	unsigned int LoadedScore = saveDataStorage.g_iSaveData[0];
 	std::string g_sScore = std::to_string(LoadedScore);
 	COORD c = g_Console.getConsoleSize();
+	c.X -= (SHORT)g_sScore.length();
+	c.Y -= 1;
+	g_Console.writeToBuffer(c, g_sScore, 0x0f);
+	c.X -= 7;
+	g_Console.writeToBuffer(c, "Score: ", 0x0f);
+}
+
+void renderMenu()
+{
+	COORD c = g_Console.getConsoleSize();
 	c.X >>= 1;
 	c.Y >>= 1;
-	g_Console.writeToBuffer(c, g_sScore, 0x0f);
+	g_Console.writeToBuffer(c, "Selection", 0x0f);
+}
+
+void renderCursor()
+{
+	COORD c = r_curspos;
+	g_Console.writeToBuffer(c, ">", 0x0f);
 }
 
 void renderCharacter()
@@ -697,13 +743,6 @@ void renderStat()
 	c.Y = 6;
 	g_Console.writeToBuffer(c, ss.str());
 }
-
-void resetLevel(int floor)
-{
-	g_sLevel.playerStartRoom = g_sLevel.exitRoom;
-	g_sLevel.generateLevel();
-}
-
 
 void checkHitPellets()
 {

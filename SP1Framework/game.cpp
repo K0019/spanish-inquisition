@@ -348,24 +348,6 @@ void renderScore()
 	g_Console.writeToBuffer(c, g_sScore, 0x0f);
 }
 
-void renderMap()
-{
-    // Set up sample colours, and output shadings
-	const WORD colors[] = {
-		0x1A, 0x2B, 0x3C, 0x4D, 0x5E, 0x6F,
-		0xA1, 0xB2, 0xC3, 0xD4, 0xE5, 0xF6
-	};
-
-	COORD c;
-	for (int i = 0; i < 12; ++i)
-	{
-		c.X = 5 * i;
-		c.Y = i + 1;
-		colour(colors[i]);
-		g_Console.writeToBuffer(c, " °±²Û", colors[i]);
-	}
-}
-
 void renderCharacter()
 {
 	// Draw the location of the character
@@ -567,6 +549,7 @@ void renderPellets()
 	}
 	for (auto& pellet : g_sEntities.m_vPellets)
 	{
+		if (pellet.m_bFriendly) continue;
 		g_Console.writeToBuffer(pellet.getRealCoords(), "<>", 0x0C);
 	}
 }

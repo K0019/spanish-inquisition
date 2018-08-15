@@ -65,10 +65,11 @@ class EnemyRanged : public Enemy
 {
 protected:
 	bool m_bMobile; // Ability to shoot while moving
+	double m_dShootVelocity; // Speed of pellet
 	std::vector<SPellet> * m_vPelletList; // Pointer to the list of pellets, to add pellets of the enemy's
 
 public:
-	EnemyRanged(std::vector<SPellet> * pellets, std::string name, std::string indicator, COORD location, WORD color, int HP, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration, bool isMobile);
+	EnemyRanged(std::vector<SPellet> * pellets, std::string name, std::string indicator, COORD location, WORD color, int HP, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration, bool isMobile, double pelletVelocity);
 
 	void update(SGameChar * player);
 	bool updateMovement(SGameChar * player);

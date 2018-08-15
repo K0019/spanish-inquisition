@@ -310,11 +310,12 @@ bool EnemyMelee::updateMovement(SGameChar * player)
 // CLASS DEFINITION: EnemyRanged
 // ---------------------------------------
 
-EnemyRanged::EnemyRanged(std::vector<SPellet> * pellet, std::string name, std::string indicator, COORD location, WORD color, int HP, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration, bool isMobile)
+EnemyRanged::EnemyRanged(std::vector<SPellet> * pellet, std::string name, std::string indicator, COORD location, WORD color, int HP, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration, bool isMobile, double pelletVelocity)
 	: Enemy(name, indicator, location, color, HP, moveDuration, lengthOfAttack, attackTimeThreshold, stunDuration)
 {
 	this->m_vPelletList = pellet;
 	this->m_bMobile = isMobile;
+	this->m_dShootVelocity = pelletVelocity;
 }
 
 void EnemyRanged::update(SGameChar * player)
@@ -665,14 +666,14 @@ void EnemyRanged::updateShooting(SGameChar * player)
 			COORD c;
 			c.X = this->m_cLocation.X;
 			c.Y = this->m_cLocation.Y + 1;
-			this->m_vPelletList->push_back(SPellet(&c, 2, false));
+			this->m_vPelletList->push_back(SPellet(&c, 2, this->m_dShootVelocity, false));
 		}
 		else
 		{
 			COORD c;
 			c.X = this->m_cLocation.X;
 			c.Y = this->m_cLocation.Y - 1;
-			this->m_vPelletList->push_back(SPellet(&c, 6, false));
+			this->m_vPelletList->push_back(SPellet(&c, 6, this->m_dShootVelocity, false));
 		}
 	}
 	else if (this->m_cLocation.Y == player->m_cLocation.Y)
@@ -682,14 +683,14 @@ void EnemyRanged::updateShooting(SGameChar * player)
 			COORD c;
 			c.X = this->m_cLocation.X + 1;
 			c.Y = this->m_cLocation.Y;
-			this->m_vPelletList->push_back(SPellet(&c, 4, false));
+			this->m_vPelletList->push_back(SPellet(&c, 4, this->m_dShootVelocity, false));
 		}
 		else
 		{
 			COORD c;
 			c.X = this->m_cLocation.X - 1;
 			c.Y = this->m_cLocation.Y;
-			this->m_vPelletList->push_back(SPellet(&c, 0, false));
+			this->m_vPelletList->push_back(SPellet(&c, 0, this->m_dShootVelocity, false));
 		}
 	}
 	else
@@ -701,14 +702,14 @@ void EnemyRanged::updateShooting(SGameChar * player)
 				COORD c;
 				c.X = this->m_cLocation.X + 1;
 				c.Y = this->m_cLocation.Y + 1;
-				this->m_vPelletList->push_back(SPellet(&c, 3, false));
+				this->m_vPelletList->push_back(SPellet(&c, 3, this->m_dShootVelocity, false));
 			}
 			else
 			{
 				COORD c;
 				c.X = this->m_cLocation.X + 1;
 				c.Y = this->m_cLocation.Y - 1;
-				this->m_vPelletList->push_back(SPellet(&c, 5, false));
+				this->m_vPelletList->push_back(SPellet(&c, 5, this->m_dShootVelocity, false));
 			}
 		}
 		else
@@ -718,14 +719,14 @@ void EnemyRanged::updateShooting(SGameChar * player)
 				COORD c;
 				c.X = this->m_cLocation.X - 1;
 				c.Y = this->m_cLocation.Y + 1;
-				this->m_vPelletList->push_back(SPellet(&c, 1, false));
+				this->m_vPelletList->push_back(SPellet(&c, 1, this->m_dShootVelocity, false));
 			}
 			else
 			{
 				COORD c;
 				c.X = this->m_cLocation.X - 1;
 				c.Y = this->m_cLocation.Y - 1;
-				this->m_vPelletList->push_back(SPellet(&c, 7, false));
+				this->m_vPelletList->push_back(SPellet(&c, 7, this->m_dShootVelocity, false));
 			}
 		}
 	}

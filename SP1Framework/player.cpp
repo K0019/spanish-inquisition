@@ -177,28 +177,28 @@ void SGameChar::hasItem(bool g_bHasWeapon)
 		{
 			case 1: //BONUS! Level 1
 				{
-					this->m_iPlayerScore *= 1.5;
+					this->m_iPlayerScore = (int)ceil(this->m_iPlayerScore * 1.5);
 					this->m_sPlayerItems.m_vItemsList[5].m_bHasWeapon = true;
 					this->m_sPlayerItems.ItemCount++;
 					break;
 				}
 			case 2: //BONUS! Level 2
 				{
-					this->m_iPlayerScore *= 2;
+					this->m_iPlayerScore <<= 1;
 					this->m_sPlayerItems.m_vItemsList[5].m_bHasWeapon = true;
 					this->m_sPlayerItems.ItemCount++;
 					break;
 				}
 			case 3: //BONUS! Level 3
 				{
-					this->m_iPlayerScore *= 2.5;
+					this->m_iPlayerScore = (int)ceil(this->m_iPlayerDamage * 2.5);
 					this->m_sPlayerItems.m_vItemsList[5].m_bHasWeapon = true;
 					this->m_sPlayerItems.ItemCount++;
 					break;
 				}
 			case 4: //BONUS! Level 4
 				{
-					this->m_iPlayerScore *= 3;
+					this->m_iPlayerScore = (int)ceil(this->m_iPlayerScore * 3);
 					this->m_sPlayerItems.m_vItemsList[5].m_bHasWeapon = true;
 					this->m_sPlayerItems.ItemCount++;
 					break;

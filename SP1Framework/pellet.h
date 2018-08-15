@@ -17,7 +17,7 @@ struct SPellet
 	double m_dTime; // Length of time that the pellet has not updated
 	double m_dVelocity; // Delay to when pellet will move
 
-	SPellet(COORD * c, short direction, double velocity, bool friendly); // Constructor
+	SPellet(COORD * c, int direction, double velocity, bool friendly); // Constructor
 	void update(); // Update position of pellet
 	COORD getRealCoords(); // Get console coordinates of pellet. Used for rendering
 };

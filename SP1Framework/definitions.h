@@ -3,7 +3,7 @@
 #ifndef DEFINITIONSHEAD
 #define DEFINITIONSHEAD
 
-#define DEBUG false
+#define DEBUG true
 #define GRID_X 3
 #define GRID_Y 5
 #define ROOM_X 9

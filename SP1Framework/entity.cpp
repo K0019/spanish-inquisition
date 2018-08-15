@@ -31,4 +31,13 @@ void SAllEntities::updateEnemies()
 		}
 		enemy++;
 	}
+
+	if (this->m_vEnemy.empty())
+	{
+		this->g_sChar.m_bInBattle = false;
+	}
+	else
+	{
+		this->g_sChar.m_bInBattle = true;
+	}
 }

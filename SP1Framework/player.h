@@ -13,6 +13,7 @@ struct SGameChar
 {
 	COORD m_cLocation;
 	COORD m_cRoom; // Room coordinates that the player is in
+	bool m_bInBattle; // If player is in a room with enemies
 	int m_iPlayerHealth = 10;
 	int	m_iPlayerDamage = 3;
 	unsigned int m_iPlayerScore = 0;

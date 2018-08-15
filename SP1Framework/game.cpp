@@ -55,6 +55,7 @@ void init( void )
 	g_sLevel.playerStartRoom.X = GRID_X >> 1;
 	g_sLevel.playerStartRoom.Y = GRID_Y >> 1;
 	g_sEntities.g_sChar.m_cRoom = g_sLevel.playerStartRoom;
+	if (DEBUG) g_sEntities.g_sChar.m_bInBattle = true;
 	r_cRenderOffset.X = 1 + g_sEntities.g_sChar.m_cRoom.X * (ROOM_X + 2);
 	r_cRenderOffset.Y = 1 + g_sEntities.g_sChar.m_cRoom.Y * (ROOM_Y + 2);
 	r_curspos.X = g_Console.getConsoleSize().X >> 1;
@@ -220,7 +221,8 @@ void controlPlayer()
 	if (g_abKeyPressed[K_UP] && g_sEntities.g_sChar.m_cLocation.X > 0 && g_adBounceTime[K_UP] < g_dElapsedTime)
 	{
 		g_sEntities.g_sChar.m_cLocation.X--;
-		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '#')
+		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '#' ||
+			(g_sEntities.g_sChar.m_bInBattle && g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '$'))
 		{
 			g_sEntities.g_sChar.m_cLocation.X++;
 		}
@@ -230,6 +232,7 @@ void controlPlayer()
 			if (g_sEntities.g_sChar.m_cLocation.X < r_cRenderOffset.X)
 			{
 				r_cRenderOffset.X -= (ROOM_X + 2);
+				g_sEntities.g_sChar.m_cLocation.X--;
 				g_sEntities.clearPellets();
 				g_sEntities.clearEnemies();
 			}
@@ -238,7 +241,8 @@ void controlPlayer()
     if (g_abKeyPressed[K_LEFT] && g_sEntities.g_sChar.m_cLocation.Y > 0 && g_adBounceTime[K_LEFT] < g_dElapsedTime)
     {
 		g_sEntities.g_sChar.m_cLocation.Y--;
-		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '#')
+		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '#' ||
+			(g_sEntities.g_sChar.m_bInBattle && g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '$'))
 		{
 			g_sEntities.g_sChar.m_cLocation.Y++;
 		}
@@ -248,6 +252,7 @@ void controlPlayer()
 			if (g_sEntities.g_sChar.m_cLocation.Y < r_cRenderOffset.Y)
 			{
 				r_cRenderOffset.Y -= (ROOM_Y + 2);
+				g_sEntities.g_sChar.m_cLocation.Y--;
 				g_sEntities.clearPellets();
 				g_sEntities.clearEnemies();
 			}
@@ -256,7 +261,8 @@ void controlPlayer()
     if (g_abKeyPressed[K_DOWN] && g_adBounceTime[K_DOWN] < g_dElapsedTime)
     {
 		g_sEntities.g_sChar.m_cLocation.X++;
-		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '#')
+		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '#' ||
+			(g_sEntities.g_sChar.m_bInBattle && g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '$'))
 		{
 			g_sEntities.g_sChar.m_cLocation.X--;
 		}
@@ -266,6 +272,7 @@ void controlPlayer()
 			if (g_sEntities.g_sChar.m_cLocation.X >= r_cRenderOffset.X + ROOM_X + 2)
 			{
 				r_cRenderOffset.X += (ROOM_X + 2);
+				g_sEntities.g_sChar.m_cLocation.X++;
 				g_sEntities.clearPellets();
 				g_sEntities.clearEnemies();
 			}
@@ -274,7 +281,8 @@ void controlPlayer()
     if (g_abKeyPressed[K_RIGHT] && g_adBounceTime[K_RIGHT] < g_dElapsedTime)
     {
 		g_sEntities.g_sChar.m_cLocation.Y++;
-		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '#')
+		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '#' ||
+			(g_sEntities.g_sChar.m_bInBattle && g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '$'))
 		{
 			g_sEntities.g_sChar.m_cLocation.Y--;
 		}
@@ -284,6 +292,7 @@ void controlPlayer()
 			if (g_sEntities.g_sChar.m_cLocation.Y >= r_cRenderOffset.Y + ROOM_Y + 2)
 			{
 				r_cRenderOffset.Y += (ROOM_Y + 2);
+				g_sEntities.g_sChar.m_cLocation.Y++;
 				g_sEntities.clearPellets();
 				g_sEntities.clearEnemies();
 			}
@@ -380,8 +389,8 @@ void renderGame()
 {
 	renderLevel();
 	renderCharacter();    // renders the character into the buffer
-	renderPellets();
 	renderEnemy();
+	renderPellets();
 	renderStat();
 }
 
@@ -623,7 +632,14 @@ void renderLevel()
 				break;
 			case '$':
 				c.X = 1 + ((column - r_cRenderOffset.Y) << 1);
-				g_Console.writeToBuffer(c, "  ", 0x40);
+				if (g_sEntities.g_sChar.m_bInBattle)
+				{
+					g_Console.writeToBuffer(c, "  ", 0x40);
+				}
+				else
+				{
+					g_Console.writeToBuffer(c, "  ", 0x90);
+				}
 				break;
 			case '&':
 				c.X = 1 + ((column - r_cRenderOffset.Y) << 1);
@@ -804,7 +820,7 @@ void checkHitPellets()
 		{
 			for (auto& enemy : g_sEntities.m_vEnemy)
 			{
-				if (pellet->m_cLocation.X == enemy->getLocation().X && pellet->m_cLocation.Y == enemy->getLocation().Y)
+				if (!enemy->isDying() && !enemy->isDead() && pellet->m_cLocation.X == enemy->getLocation().X && pellet->m_cLocation.Y == enemy->getLocation().Y)
 				{
 					pellet->m_bHit = true;
 					pellet->m_bHitReason = pellet::P_ENEMY;

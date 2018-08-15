@@ -17,7 +17,7 @@ double r_dMoveTime;
 
 // Game specific variables here
 EGAMESTATES g_eGameState = S_SPLASHSCREEN;
-SLevel		g_sLevel; 
+SLevel		g_sLevel;
 SaveDataStorage saveDataStorage;
 SAllEntities g_sEntities; // Hold all entities in the level
 double  g_adBounceTime[K_COUNT]; // this is to prevent key bouncing, so we won't trigger keypresses more than once
@@ -38,18 +38,18 @@ Console g_Console(100, 25, "SP1 Framework");
 void init( void )
 {
 	srand((unsigned int)time(NULL));
-    // Set precision for floating point output
-    g_dElapsedTime = 0.0;
+	// Set precision for floating point output
+	g_dElapsedTime = 0.0;
 	g_iCurrentFrameCount = g_iLastMeasuredSecond = 0;
 	g_adBounceTime[K_SHOOTUP] = 0.0;
     for (int i = 0; i < K_COUNT; i++) g_adBounceTime[i] = 0.0;
 
-    // sets the initial state for the game
-    g_eGameState = S_SPLASHSCREEN;
+	// sets the initial state for the game
+	g_eGameState = S_SPLASHSCREEN;
 	if (DEBUG) g_eGameState = S_GAME;
 
 	g_bHasShot = false;
-    g_sEntities.g_sChar.m_cLocation.X = 2 + (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
+	g_sEntities.g_sChar.m_cLocation.X = 2 + (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
 	g_sEntities.g_sChar.m_cLocation.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
 	g_sLevel.playerStartRoom.X = GRID_X >> 1;
 	g_sLevel.playerStartRoom.Y = GRID_Y >> 1;
@@ -73,10 +73,10 @@ void init( void )
 //--------------------------------------------------------------
 void shutdown( void )
 {
-    // Reset to white text on black background
-    colour(FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED);
+	// Reset to white text on black background
+	colour(FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED);
 
-    g_Console.clearBuffer();
+	g_Console.clearBuffer();
 }
 
 //--------------------------------------------------------------
@@ -91,17 +91,17 @@ void shutdown( void )
 // Output   : void
 //--------------------------------------------------------------
 void getInput( void )
-{    
-    g_abKeyPressed[K_UP]     = isKeyPressed(0x57);
-    g_abKeyPressed[K_DOWN]   = isKeyPressed(0x53);
-    g_abKeyPressed[K_LEFT]   = isKeyPressed(0x41);
-    g_abKeyPressed[K_RIGHT]  = isKeyPressed(0x44);
+{
+	g_abKeyPressed[K_UP]     = isKeyPressed(0x57);
+	g_abKeyPressed[K_DOWN]   = isKeyPressed(0x53);
+	g_abKeyPressed[K_LEFT]   = isKeyPressed(0x41);
+	g_abKeyPressed[K_RIGHT]  = isKeyPressed(0x44);
 	g_abKeyPressed[K_SHOOTUP] = isKeyPressed(VK_UP);
 	g_abKeyPressed[K_SHOOTRIGHT] = isKeyPressed(VK_RIGHT);
 	g_abKeyPressed[K_SHOOTDOWN] = isKeyPressed(VK_DOWN);
 	g_abKeyPressed[K_SHOOTLEFT] = isKeyPressed(VK_LEFT);
-    g_abKeyPressed[K_SPACE]  = isKeyPressed(VK_SPACE);
-    g_abKeyPressed[K_ESCAPE] = isKeyPressed(VK_ESCAPE);
+	g_abKeyPressed[K_SPACE]  = isKeyPressed(VK_SPACE);
+	g_abKeyPressed[K_ESCAPE] = isKeyPressed(VK_ESCAPE);
 }
 
 //--------------------------------------------------------------
@@ -122,19 +122,19 @@ void update(CStopWatch * timer, double missedTime)
 {
 	double dt = timer->getElapsedTime() + missedTime;
     // get the delta time
-    g_dElapsedTime += dt;
-    g_dDeltaTime = dt;
+	g_dElapsedTime += dt;
+	g_dDeltaTime = dt;
 	g_dAccurateElapsedTime = timer->accurateTotalTime();
 
-    switch (g_eGameState)
-    {
-        case S_SPLASHSCREEN : splashScreenWait(); // game logic for the splash screen
-            break;
+	switch (g_eGameState)
+	{
+		case S_SPLASHSCREEN : splashScreenWait(); // game logic for the splash screen
+			break;
 		case S_MENU: mainMenu();
 			break;
-        case S_GAME: gameplay(); // gameplay logic when we are in the game
-            break;
-    }
+		case S_GAME: gameplay(); // gameplay logic when we are in the game
+			break;
+	}
 }
 //--------------------------------------------------------------
 // Purpose  : Render function is to update the console screen
@@ -146,16 +146,16 @@ void update(CStopWatch * timer, double missedTime)
 //--------------------------------------------------------------
 void render(CStopWatch * timer)
 {
-    clearScreen();      // clears the current screen and draw from scratch 
-    switch (g_eGameState)
-    {
-        case S_SPLASHSCREEN: renderSplashScreen();
-            break;
+	clearScreen();      // clears the current screen and draw from scratch 
+	switch (g_eGameState)
+	{
+		case S_SPLASHSCREEN: renderSplashScreen();
+			break;
 		case S_MENU: renderMainMenu();
 			break;
-        case S_GAME: renderGame();
-            break;
-    }
+		case S_GAME: renderGame();
+			break;
+	}
     renderFramerate();  // renders debug information, frame rate, elapsed time, etc
     renderToScreen();   // dump the contents of the buffer to the screen, one frame worth of game
 	
@@ -172,37 +172,37 @@ void render(CStopWatch * timer)
 
 void splashScreenWait()    // waits for time to pass in splash screen
 {
-    processUserInput(); // checks if you should change states or do something else with the game, e.g. pause, exit
-    if (g_dAccurateElapsedTime > 3.0) // wait for 3 seconds to switch to game mode, else do nothing
-        g_eGameState = S_MENU;
+	processUserInput(); // checks if you should change states or do something else with the game, e.g. pause, exit
+	if (g_dAccurateElapsedTime > 3.0) // wait for 3 seconds to switch to game mode, else do nothing
+		g_eGameState = S_MENU;
 }
 
 void mainMenu()
 {
-    processUserInput(); // checks if you should change states or do something else with the game, e.g. pause, exit
+	processUserInput(); // checks if you should change states or do something else with the game, e.g. pause, exit
 	if (g_dAccurateElapsedTime > 6.0) // wait for 3 seconds to switch to game mode, else do nothing
 		g_eGameState = S_GAME;
 }
 
 void gameplay()            // gameplay logic
 {
-    processUserInput(); // checks if you should change states or do something else with the game, e.g. pause, exit
-    moveCharacter();    // moves the character, collision detection, physics, etc
+	processUserInput();	// checks if you should change states or do something else with the game, e.g. pause, exit
+	moveCharacter();	// moves the character, collision detection, physics, etc
 	playerShoot();
 	g_sEntities.updatePellets();
 	g_sEntities.updateEnemies();
-                        // sound can be played here too.
+					// sound can be played here too.
 }
 
 void moveCharacter()
 {
 	bool bSomethingHappened = false;
 
-    // Updating the location of the character based on the key press
-    // providing a beep sound whenver we shift the character
-    if (g_abKeyPressed[K_UP] && g_sEntities.g_sChar.m_cLocation.X > 0 && g_adBounceTime[K_UP] < g_dElapsedTime)
-    {
-        //Beep(1440, 30);
+	// Updating the location of the character based on the key press
+	// providing a beep sound whenver we shift the character
+	if (g_abKeyPressed[K_UP] && g_sEntities.g_sChar.m_cLocation.X > 0 && g_adBounceTime[K_UP] < g_dElapsedTime)
+	{
+		//Beep(1440, 30);
 		g_sEntities.g_sChar.m_cLocation.X--;
 		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '#')
 		{
@@ -297,15 +297,15 @@ void moveCharacter()
 
 void processUserInput()
 {
-    // quits the game if player hits the escape key
-    if (g_abKeyPressed[K_ESCAPE])
-        g_bQuitGame = true;
+	// quits the game if player hits the escape key
+	if (g_abKeyPressed[K_ESCAPE])
+		g_bQuitGame = true;
 }
 
 void clearScreen()
 {
-    // Clears the buffer with this colour attribute
-    g_Console.clearBuffer(0x00);
+	// Clears the buffer with this colour attribute
+	g_Console.clearBuffer(0x00);
 }
 
 void renderSplashScreen()  // renders the splash screen
@@ -329,9 +329,9 @@ void renderMainMenu()
 
 void renderGame()
 {
-    //renderMap();        // renders the map to the buffer first
+	//renderMap();        // renders the map to the buffer first
 	renderLevel();
-    renderCharacter();    // renders the character into the buffer
+	renderCharacter();    // renders the character into the buffer
 	renderPellets();
 	renderEnemy();
 	renderStat();
@@ -351,38 +351,38 @@ void renderScore()
 void renderMap()
 {
     // Set up sample colours, and output shadings
-    const WORD colors[] = {
-        0x1A, 0x2B, 0x3C, 0x4D, 0x5E, 0x6F,
-        0xA1, 0xB2, 0xC3, 0xD4, 0xE5, 0xF6
-    };
+	const WORD colors[] = {
+		0x1A, 0x2B, 0x3C, 0x4D, 0x5E, 0x6F,
+		0xA1, 0xB2, 0xC3, 0xD4, 0xE5, 0xF6
+	};
 
-    COORD c;
-    for (int i = 0; i < 12; ++i)
-    {
-        c.X = 5 * i;
-        c.Y = i + 1;
-        colour(colors[i]);
-        g_Console.writeToBuffer(c, " °±²Û", colors[i]);
-    }
+	COORD c;
+	for (int i = 0; i < 12; ++i)
+	{
+		c.X = 5 * i;
+		c.Y = i + 1;
+		colour(colors[i]);
+		g_Console.writeToBuffer(c, " °±²Û", colors[i]);
+	}
 }
 
 void renderCharacter()
 {
-    // Draw the location of the character
-    WORD charColor = 0x0A;
-    g_Console.writeToBuffer(g_sEntities.g_sChar.getRealCoords(), "@@", charColor);
+	// Draw the location of the character
+	WORD charColor = 0x0A;
+	g_Console.writeToBuffer(g_sEntities.g_sChar.getRealCoords(), "@@", charColor);
 }
 
 void renderFramerate()
 {
-    COORD c;
-    // displays the framerate
-    std::ostringstream ss;
-    ss << std::fixed << std::setprecision(3);
-    ss << 1.0 / g_dDeltaTime << "fps";
-    c.X = g_Console.getConsoleSize().X - 9;
-    c.Y = 0;
-    g_Console.writeToBuffer(c, ss.str());
+	COORD c;
+	// displays the framerate
+	std::ostringstream ss;
+	ss << std::fixed << std::setprecision(3);
+	ss << 1.0 / g_dDeltaTime << "fps";
+	c.X = g_Console.getConsoleSize().X - 9;
+	c.Y = 0;
+	g_Console.writeToBuffer(c, ss.str());
 
 	// displays average fps
 	ss.str("");
@@ -390,12 +390,12 @@ void renderFramerate()
 	c.Y++;
 	g_Console.writeToBuffer(c, ss.str());
 
-    // displays the elapsed time
-    ss.str("");
-    ss << g_dAccurateElapsedTime << "secs";
-    c.X = 0;
-    c.Y = 0;
-    g_Console.writeToBuffer(c, ss.str(), 0x59);
+	// displays the elapsed time
+	ss.str("");
+	ss << g_dAccurateElapsedTime << "secs";
+	c.X = 0;
+	c.Y = 0;
+	g_Console.writeToBuffer(c, ss.str(), 0x59);
 
 	if (DEBUG)
 	{
@@ -406,7 +406,7 @@ void renderFramerate()
 void renderToScreen()
 {
     // Writes the buffer to the console, hence you will see what you have written
-    g_Console.flushBufferToConsole();
+	g_Console.flushBufferToConsole();
 }
 
 // *******************************************************

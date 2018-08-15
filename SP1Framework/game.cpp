@@ -17,7 +17,8 @@ double r_dMoveTime;
 
 // Game specific variables here
 EGAMESTATES g_eGameState = S_SPLASHSCREEN;
-SLevel		g_sLevel;
+SLevel		g_sLevel; 
+SaveDataStorage saveDataStorage;
 double  g_adBounceTime[K_COUNT]; // this is to prevent key bouncing, so we won't trigger keypresses more than once
 
 bool g_bHasShot;
@@ -59,6 +60,7 @@ void init( void )
 	g_sLevel.g_sEntities.m_vEnemy.push_back(std::move(std::unique_ptr<EnemyMelee> (new EnemyMelee("Test", "tt", (WORD)0x09, 10, 0.4, 0.3, 0.1, 0.3))));
     // sets the width, height and the font name to use in the console
     g_Console.setConsoleFont(0, 16, L"Consolas");
+	g_LoadFromSave(saveDataStorage.g_iSaveData);
 }
 
 //--------------------------------------------------------------
@@ -337,15 +339,12 @@ void renderGame()
 
 void renderScore() 
 {
-	unsigned int score;
-	score = 456;
-	std::string sScore;
-	sScore = std::to_string(score);
-	load("saves.txt", &sScore);
+	unsigned int LoadedScore = saveDataStorage.g_iSaveData[0];
+	std::string g_sScore = std::to_string(LoadedScore);
 	COORD c = g_Console.getConsoleSize();
-	c.X /= 2;
-	c.Y /= 2;
-	g_Console.writeToBuffer(c, sScore, 0x0f);
+	c.X >>= 1;
+	c.Y >>= 1;
+	g_Console.writeToBuffer(c, g_sScore, 0x0f);
 }
 
 void renderMap()

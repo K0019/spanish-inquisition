@@ -2,6 +2,7 @@
 
 SGameChar::SGameChar()
 {
+
 }
 
 SGameChar::SGameChar(COORD location, bool active, int playerHealth, int playerDamage, int playerScore)

@@ -50,6 +50,14 @@ COORD Enemy::getLocation()
 }
 WORD Enemy::getColor()
 {
+	if (this->m_bHit)
+	{
+		return this->getFlashColorHit();
+	}
+	if (this->m_dAttackTime != 0.0 && this->m_dAttackTime < this->m_dAttackTimeThreshold)
+	{
+		return this->getFlashColorAttacking();
+	}
 	return this->m_cColor;
 }
 int Enemy::getHP()

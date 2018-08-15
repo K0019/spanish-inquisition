@@ -1,32 +1,29 @@
 #include "fileio.h"
 
-//Reads from a file, as specified by fileName and will assign the read value to *variable
-void load(std::string fileName, std::string *variable)
+void g_LoadFromSave(unsigned int* SaveDataArray)
 {
-	std::ifstream currentfile;
-	currentfile.open(fileName);
-	if (currentfile.is_open())
+	std::ifstream SaveFileData("../res/SaveData/saves.txt");
+	if (SaveFileData.is_open())
 	{
-		while (std::getline(currentfile, *variable))
+		int i = 0;
+		for (std::string j; std::getline(SaveFileData, j);)
 		{
-			*variable;
+			SaveDataArray[i] = std::stoi(j);
+			i++;
 		}
 	}
 }
 
-
-//Write to a file, as specified by fileName and will write the *variable to it
-void save(std::string fileName, std::string *variable)
+void g_SaveToSave(unsigned int* SaveDataArray)
 {
-	std::ofstream currentfile;
-	currentfile.open(fileName);
-	if (currentfile.is_open())
+	std::ofstream SaveFileData("../res/SaveData/saves.txt");
+	if (SaveFileData.is_open())
 	{
-		currentfile << *variable;
-		currentfile.close();
+		for (int i = 0; i < 9 ; i++)
+		{
+			SaveFileData << SaveDataArray[i] << '\n';
+		}
+		SaveFileData.close();
 	}
-	else
-	{
-		throw std::invalid_argument("fileName cannot be loaded!");
-	}
+	else throw (std::invalid_argument("cannot write to file."));
 }

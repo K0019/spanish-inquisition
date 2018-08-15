@@ -1,7 +1,7 @@
 #include "item.h"
 #include "stat.h"
 
-
+//Constructor to initialise all item information
 SItem::SItem(std::string name, int index, int damage, int healthGiven, float attackSpeed, float velocity, float moveSpeed, bool hasWeapon, int weaponLevel)
 {
 	this->m_sName = name;

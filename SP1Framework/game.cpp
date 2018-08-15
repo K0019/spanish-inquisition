@@ -61,7 +61,10 @@ void init( void )
 	r_curspos.Y = g_Console.getConsoleSize().Y >> 1;
 	g_sLevel.generateLevel();
 	g_sLevel.floor = 1;
-	g_sEntities.m_vEnemy.push_back(std::move(std::unique_ptr<EnemyMelee> (new EnemyMelee("Test", "tt", (WORD)0x09, 10, 0.4, 0.3, 0.1, 0.3))));
+	COORD c;
+	c.X = (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
+	c.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
+	g_sEntities.m_vEnemy.push_back(std::move(std::unique_ptr<EnemyRanged> (new EnemyRanged(&g_sEntities.m_vPellets, "Test", "tt", c, (WORD)0x09, 10, 0.4, 0.3, 0.1, 0.3, false, 0.25))));
     // sets the width, height and the font name to use in the console
     g_Console.setConsoleFont(0, 16, L"Consolas");
 	g_LoadFromSave(saveDataStorage.g_iSaveData);
@@ -475,7 +478,7 @@ void playerShoot()
 
 	if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_bHasWeapon)
 	{
-		switch (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_iWeaponLevel) // Index 7 (Magic Potion): Decrease attack delay by 10/20/30/40%
+		switch (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_iWeaponLevel) // Index 5 (Magic Potion): Decrease attack delay by 10/20/30/40%
 		{
 		case 1:
 			{

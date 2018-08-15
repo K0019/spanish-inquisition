@@ -23,6 +23,7 @@ struct SGameChar
 	SGameChar(COORD location, bool active, int playerHealth, int playerDamage, int playerScore);
 	void AddItem(bool g_bHasWeapon); //Adds an item to the player's inventory when picked up
 	void hasItem(bool g_bHasWeapon);
+	void minimumScore(int playerScore);
 };
 
 

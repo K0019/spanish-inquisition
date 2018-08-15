@@ -2,7 +2,6 @@
 
 SGameChar::SGameChar()
 {
-
 }
 
 SGameChar::SGameChar(COORD location, bool active, int playerHealth, int playerDamage, int playerScore)
@@ -31,33 +30,13 @@ void SGameChar::AddItem(bool g_bHasWeapon)
 
 void SGameChar::hasItem(bool g_bHasWeapon)
 {
+	//RNG to choose 1 of the 8 items when an item is picked up.
 	int weaponIndex;
-
-	weaponIndex = rand() % 6 + 1; //Choosing a random number between 1 and 7
-								//for (int i = 0; i < 6; i++)
-								//{
-								//	bool check;
-								//	int storedIndex;
-								//	do
-								//	{
-								//		storedIndex = rand() % 6 + 1;
-								//		check = true; //Check if number is already used to prevent repeats
-								//		for (int j = 0; j < i; j++)
-								//		{
-								//			if (storedIndex == weaponIndex[j]) //If number is already used
-								//			{
-								//				check = false; //Set check to false
-								//				break;
-								//			}
-								//		}
-								//	} while (!check);
-								//	weaponIndex[i] = storedIndex;
-								//	break;
-								//}
+	weaponIndex = rand() % 6 + 1; 
 
 	if ((weaponIndex == this->m_sPlayerItems.m_vItemsList[0].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[0].m_bHasWeapon == false)) //Checking if randomized weaponIndex gives the Heaven Cracker
 	{
-		switch (this->m_sPlayerItems.m_vItemsList[0].m_iWeaponLevel)
+		switch (this->m_sPlayerItems.m_vItemsList[0].m_iWeaponLevel) //Index 1 (Heaven Cracker): Increase player damage by 0/1/2/3
 		{
 		case 1:
 			{
@@ -85,9 +64,14 @@ void SGameChar::hasItem(bool g_bHasWeapon)
 			}
 		}
 	}
+	else if ((weaponIndex == this->m_sPlayerItems.m_vItemsList[0].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[0].m_bHasWeapon == true))
+	{
+		this->m_iPlayerScore += 50; //If player picks up another Heaven Cracker, +50 score.
+	}
+
 	else if ((weaponIndex == this->m_sPlayerItems.m_vItemsList[1].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[1].m_bHasWeapon == false)) //Checking if randomized weaponIndex gives the Enchanted Sword
 	{
-		switch (this->m_sPlayerItems.m_vItemsList[1].m_iWeaponLevel)
+		switch (this->m_sPlayerItems.m_vItemsList[1].m_iWeaponLevel) //Index 2 (Enchanted Sword): Increase player health by 1/2/3/4, Increase player damage by 2/3/4/5
 		{
 		case 1: //Enchanted Sword level 1
 			{
@@ -123,9 +107,14 @@ void SGameChar::hasItem(bool g_bHasWeapon)
 			}
 		}
 	}
+	else if ((weaponIndex == this->m_sPlayerItems.m_vItemsList[1].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[1].m_bHasWeapon == true))
+	{
+		this->m_iPlayerScore += 50; //If player picks up another Enchanted Sword, +50 score.
+	}
+
 	else if ((weaponIndex == this->m_sPlayerItems.m_vItemsList[2].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[2].m_bHasWeapon == false)) //Checking if randomized weaponIndex gives the Health Potion
 	{
-		switch (this->m_sPlayerItems.m_vItemsList[2].m_iWeaponLevel)
+		switch (this->m_sPlayerItems.m_vItemsList[2].m_iWeaponLevel) //Index 3 (Health Potion): Increase player health by 2/4/6/8
 		{
 		case 1: //Health Potion level 1
 			{
@@ -157,24 +146,97 @@ void SGameChar::hasItem(bool g_bHasWeapon)
 			}
 		}
 	}
+	else if ((weaponIndex == this->m_sPlayerItems.m_vItemsList[2].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[2].m_bHasWeapon == true))
+	{
+		this->m_iPlayerScore += 50; //If player picks up another Health Potion, +50 score.
+	}
+
 	else if ((weaponIndex == this->m_sPlayerItems.m_vItemsList[3].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[3].m_bHasWeapon == false)) //Checking if randomized weaponIndex gives the Clown Fiesta
 	{
 		this->m_sPlayerItems.m_vItemsList[3].m_bHasWeapon = true;
 		this->m_sPlayerItems.ItemCount++;
 	}
+	else if ((weaponIndex == this->m_sPlayerItems.m_vItemsList[3].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[3].m_bHasWeapon == true))
+	{
+		this->m_iPlayerScore += 50; //If player picks up another Clown Fiesta, +50 score.
+	}
+
 	else if ((weaponIndex == this->m_sPlayerItems.m_vItemsList[4].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[4].m_bHasWeapon == false)) //Checking if randomized weaponIndex gives the Magic Potion
 	{
 		this->m_sPlayerItems.m_vItemsList[4].m_bHasWeapon = true;
 		this->m_sPlayerItems.ItemCount++;
 	}
+	else if ((weaponIndex == this->m_sPlayerItems.m_vItemsList[4].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[4].m_bHasWeapon == true))
+	{
+		this->m_iPlayerScore += 50; //If player picks up another Magic Potion, +50 score.
+	}
+
 	else if ((weaponIndex == this->m_sPlayerItems.m_vItemsList[5].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[5].m_bHasWeapon == false)) //Checking if randomized weaponIndex gives the Bonus!
 	{
-		this->m_sPlayerItems.m_vItemsList[5].m_bHasWeapon = true;
-		this->m_sPlayerItems.ItemCount++;
+		switch (this->m_sPlayerItems.m_vItemsList[5].m_iWeaponLevel) //Index 6 (BONUS!): Multiplies player's score by 1.5/2/2.5/3x
+		{
+			case 1: //BONUS! Level 1
+				{
+					this->m_iPlayerScore = (int)ceil(this->m_iPlayerScore * 1.5);
+					this->m_sPlayerItems.m_vItemsList[5].m_bHasWeapon = true;
+					this->m_sPlayerItems.ItemCount++;
+					break;
+				}
+			case 2: //BONUS! Level 2
+				{
+					this->m_iPlayerScore <<= 1;
+					this->m_sPlayerItems.m_vItemsList[5].m_bHasWeapon = true;
+					this->m_sPlayerItems.ItemCount++;
+					break;
+				}
+			case 3: //BONUS! Level 3
+				{
+					this->m_iPlayerScore = (int)ceil(this->m_iPlayerDamage * 2.5);
+					this->m_sPlayerItems.m_vItemsList[5].m_bHasWeapon = true;
+					this->m_sPlayerItems.ItemCount++;
+					break;
+				}
+			case 4: //BONUS! Level 4
+				{
+					this->m_iPlayerScore = (int)ceil(this->m_iPlayerScore * 3);
+					this->m_sPlayerItems.m_vItemsList[5].m_bHasWeapon = true;
+					this->m_sPlayerItems.ItemCount++;
+					break;
+				}
+		}
 	}
+	else if ((weaponIndex == this->m_sPlayerItems.m_vItemsList[5].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[5].m_bHasWeapon == true))
+	{
+		this->m_iPlayerScore *= 2; //If player picks up another BONUS!, multiply score by 2.
+	}
+
 	else if ((weaponIndex == this->m_sPlayerItems.m_vItemsList[6].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[6].m_bHasWeapon == false)) //Checking if randomized weaponIndex gives the Blue Feather
 	{
 		this->m_sPlayerItems.m_vItemsList[6].m_bHasWeapon = true;
 		this->m_sPlayerItems.ItemCount++;
+	}
+	else if ((weaponIndex == this->m_sPlayerItems.m_vItemsList[6].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[6].m_bHasWeapon == true))
+	{
+		this->m_iPlayerScore += 50; //If player picks up another Blue Feather, +50 score.
+	}
+
+}
+
+void SGameChar::minimumScore(int playerScore) //To make sure the minimum score is 0, it should not go to the negatives
+{
+	if (playerScore < 0)
+	{
+		if (m_iPlayerScore > abs(playerScore))
+		{
+			m_iPlayerScore += playerScore;
+		}
+		else
+		{
+			m_iPlayerScore = 0;
+		}
+	}
+	else
+	{
+		m_iPlayerScore += playerScore;
 	}
 }

@@ -10,7 +10,6 @@
 struct SLevel
 {
 	COORD playerStartRoom, exitRoom; // Stored in grid coordinates
-	SAllEntities g_sEntities; // Hold all entities in the level
 	std::string level[GRID_X + (ROOM_X + 1) * GRID_X + 2]; // Includes borders
 	int floor;
 

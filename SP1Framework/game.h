@@ -5,6 +5,7 @@
 
 #include "Framework\timer.h"
 #include "level.h"
+#include "entity.h"
 #include "fileio.h"
 #include "definitions.h"
 #include <string>

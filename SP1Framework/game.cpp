@@ -18,6 +18,7 @@ double r_dMoveTime;
 // Game specific variables here
 EGAMESTATES g_eGameState = S_SPLASHSCREEN;
 SLevel		g_sLevel;
+SAllEntities g_sEntities; // Hold all entities in the level
 double  g_adBounceTime[K_COUNT]; // this is to prevent key bouncing, so we won't trigger keypresses more than once
 
 bool g_bHasShot;
@@ -47,16 +48,16 @@ void init( void )
 	if (DEBUG) g_eGameState = S_GAME;
 
 	g_bHasShot = false;
-    g_sLevel.g_sEntities.g_sChar.m_cLocation.X = 2 + (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
-	g_sLevel.g_sEntities.g_sChar.m_cLocation.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
+    g_sEntities.g_sChar.m_cLocation.X = 2 + (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
+	g_sEntities.g_sChar.m_cLocation.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
 	g_sLevel.playerStartRoom.X = GRID_X >> 1;
 	g_sLevel.playerStartRoom.Y = GRID_Y >> 1;
-	g_sLevel.g_sEntities.g_sChar.m_cRoom = g_sLevel.playerStartRoom;
-	r_cRenderOffset.X = 1 + g_sLevel.g_sEntities.g_sChar.m_cRoom.X * (ROOM_X + 2);
-	r_cRenderOffset.Y = 1 + g_sLevel.g_sEntities.g_sChar.m_cRoom.Y * (ROOM_Y + 2);
+	g_sEntities.g_sChar.m_cRoom = g_sLevel.playerStartRoom;
+	r_cRenderOffset.X = 1 + g_sEntities.g_sChar.m_cRoom.X * (ROOM_X + 2);
+	r_cRenderOffset.Y = 1 + g_sEntities.g_sChar.m_cRoom.Y * (ROOM_Y + 2);
 	g_sLevel.generateLevel();
 	g_sLevel.floor = 1;
-	g_sLevel.g_sEntities.m_vEnemy.push_back(std::move(std::unique_ptr<EnemyMelee> (new EnemyMelee("Test", "tt", (WORD)0x09, 10, 0.4, 0.3, 0.1, 0.3))));
+	g_sEntities.m_vEnemy.push_back(std::move(std::unique_ptr<EnemyMelee> (new EnemyMelee("Test", "tt", (WORD)0x09, 10, 0.4, 0.3, 0.1, 0.3))));
     // sets the width, height and the font name to use in the console
     g_Console.setConsoleFont(0, 16, L"Consolas");
 }
@@ -186,8 +187,8 @@ void gameplay()            // gameplay logic
     processUserInput(); // checks if you should change states or do something else with the game, e.g. pause, exit
     moveCharacter();    // moves the character, collision detection, physics, etc
 	playerShoot();
-	g_sLevel.g_sEntities.updatePellets();
-	g_sLevel.g_sEntities.updateEnemies();
+	g_sEntities.updatePellets();
+	g_sEntities.updateEnemies();
                         // sound can be played here too.
 }
 
@@ -197,88 +198,88 @@ void moveCharacter()
 
     // Updating the location of the character based on the key press
     // providing a beep sound whenver we shift the character
-    if (g_abKeyPressed[K_UP] && g_sLevel.g_sEntities.g_sChar.m_cLocation.X > 0 && g_adBounceTime[K_UP] < g_dElapsedTime)
+    if (g_abKeyPressed[K_UP] && g_sEntities.g_sChar.m_cLocation.X > 0 && g_adBounceTime[K_UP] < g_dElapsedTime)
     {
         //Beep(1440, 30);
-		g_sLevel.g_sEntities.g_sChar.m_cLocation.X--;
-		if (g_sLevel.getTile(g_sLevel.g_sEntities.g_sChar.m_cLocation) == '#')
+		g_sEntities.g_sChar.m_cLocation.X--;
+		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '#')
 		{
-			g_sLevel.g_sEntities.g_sChar.m_cLocation.X++;
+			g_sEntities.g_sChar.m_cLocation.X++;
 		}
 		else
 		{
 			bSomethingHappened = true;
-			if (g_sLevel.g_sEntities.g_sChar.m_cLocation.X < r_cRenderOffset.X)
+			if (g_sEntities.g_sChar.m_cLocation.X < r_cRenderOffset.X)
 			{
 				r_cRenderOffset.X -= (ROOM_X + 2);
-				g_sLevel.g_sEntities.clearPellets();
+				g_sEntities.clearPellets();
 			}
 		}
     }
-    if (g_abKeyPressed[K_LEFT] && g_sLevel.g_sEntities.g_sChar.m_cLocation.Y > 0 && g_adBounceTime[K_LEFT] < g_dElapsedTime)
+    if (g_abKeyPressed[K_LEFT] && g_sEntities.g_sChar.m_cLocation.Y > 0 && g_adBounceTime[K_LEFT] < g_dElapsedTime)
     {
         //Beep(1440, 30);
-		g_sLevel.g_sEntities.g_sChar.m_cLocation.Y--;
-		if (g_sLevel.getTile(g_sLevel.g_sEntities.g_sChar.m_cLocation) == '#')
+		g_sEntities.g_sChar.m_cLocation.Y--;
+		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '#')
 		{
-			g_sLevel.g_sEntities.g_sChar.m_cLocation.Y++;
+			g_sEntities.g_sChar.m_cLocation.Y++;
 		}
 		else
 		{
 			bSomethingHappened = true;
-			if (g_sLevel.g_sEntities.g_sChar.m_cLocation.Y < r_cRenderOffset.Y)
+			if (g_sEntities.g_sChar.m_cLocation.Y < r_cRenderOffset.Y)
 			{
 				r_cRenderOffset.Y -= (ROOM_Y + 2);
-				g_sLevel.g_sEntities.clearPellets();
+				g_sEntities.clearPellets();
 			}
 		}
     }
     if (g_abKeyPressed[K_DOWN] && g_adBounceTime[K_DOWN] < g_dElapsedTime)
     {
         //Beep(1440, 30);
-		g_sLevel.g_sEntities.g_sChar.m_cLocation.X++;
-		if (g_sLevel.getTile(g_sLevel.g_sEntities.g_sChar.m_cLocation) == '#')
+		g_sEntities.g_sChar.m_cLocation.X++;
+		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '#')
 		{
-			g_sLevel.g_sEntities.g_sChar.m_cLocation.X--;
+			g_sEntities.g_sChar.m_cLocation.X--;
 		}
 		else
 		{
 			bSomethingHappened = true;
-			if (g_sLevel.g_sEntities.g_sChar.m_cLocation.X >= r_cRenderOffset.X + ROOM_X + 2)
+			if (g_sEntities.g_sChar.m_cLocation.X >= r_cRenderOffset.X + ROOM_X + 2)
 			{
 				r_cRenderOffset.X += (ROOM_X + 2);
-				g_sLevel.g_sEntities.clearPellets();
+				g_sEntities.clearPellets();
 			}
 		}
     }
     if (g_abKeyPressed[K_RIGHT] && g_adBounceTime[K_RIGHT] < g_dElapsedTime)
     {
         //Beep(1440, 30);
-		g_sLevel.g_sEntities.g_sChar.m_cLocation.Y++;
-		if (g_sLevel.getTile(g_sLevel.g_sEntities.g_sChar.m_cLocation) == '#')
+		g_sEntities.g_sChar.m_cLocation.Y++;
+		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '#')
 		{
-			g_sLevel.g_sEntities.g_sChar.m_cLocation.Y--;
+			g_sEntities.g_sChar.m_cLocation.Y--;
 		}
 		else
 		{
 			bSomethingHappened = true;
-			if (g_sLevel.g_sEntities.g_sChar.m_cLocation.Y >= r_cRenderOffset.Y + ROOM_Y + 2)
+			if (g_sEntities.g_sChar.m_cLocation.Y >= r_cRenderOffset.Y + ROOM_Y + 2)
 			{
 				r_cRenderOffset.Y += (ROOM_Y + 2);
-				g_sLevel.g_sEntities.clearPellets();
+				g_sEntities.clearPellets();
 			}
 		}
     }
     if (g_abKeyPressed[K_SPACE] && g_adBounceTime[K_SPACE] < g_dElapsedTime)
     {
-		if (g_sLevel.getTile(g_sLevel.g_sEntities.g_sChar.m_cLocation) == '&')
+		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '&')
 		{
 			resetLevel(++g_sLevel.floor);
 			bSomethingHappened = true;
 		}
-		if (g_sLevel.getTile(g_sLevel.g_sEntities.g_sChar.m_cLocation) == '%') //When spacebar is pressed when on top of item
+		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '%') //When spacebar is pressed when on top of item
 		{
-			g_sLevel.g_sEntities.g_sChar.AddItem(true);
+			g_sEntities.g_sChar.AddItem(true);
 		}
     }
 
@@ -370,7 +371,7 @@ void renderCharacter()
 {
     // Draw the location of the character
     WORD charColor = 0x0A;
-    g_Console.writeToBuffer(g_sLevel.g_sEntities.g_sChar.getRealCoords(), "@@", charColor);
+    g_Console.writeToBuffer(g_sEntities.g_sChar.getRealCoords(), "@@", charColor);
 }
 
 void renderFramerate()
@@ -425,27 +426,27 @@ void playerShoot()
 		{
 			if (g_abKeyPressed[K_SHOOTLEFT] && !g_abKeyPressed[K_SHOOTRIGHT])
 			{
-				COORD c = g_sLevel.g_sEntities.g_sChar.m_cLocation;
+				COORD c = g_sEntities.g_sChar.m_cLocation;
 				c.X--;
 				c.Y--;
-				g_sLevel.g_sEntities.m_vPellets.push_back(SPellet(&c, 7));
+				g_sEntities.m_vPellets.push_back(SPellet(&c, 7));
 				g_bHasShot = true;
 				return;
 			}
 			else if (!g_abKeyPressed[K_SHOOTLEFT] && g_abKeyPressed[K_SHOOTRIGHT])
 			{
-				COORD c = g_sLevel.g_sEntities.g_sChar.m_cLocation;
+				COORD c = g_sEntities.g_sChar.m_cLocation;
 				c.X--;
 				c.Y++;
-				g_sLevel.g_sEntities.m_vPellets.push_back(SPellet(&c, 1));
+				g_sEntities.m_vPellets.push_back(SPellet(&c, 1));
 				g_bHasShot = true;
 				return;
 			}
 			else if (!g_abKeyPressed[K_SHOOTLEFT] && !g_abKeyPressed[K_SHOOTRIGHT])
 			{
-				COORD c = g_sLevel.g_sEntities.g_sChar.m_cLocation;
+				COORD c = g_sEntities.g_sChar.m_cLocation;
 				c.X--;
-				g_sLevel.g_sEntities.m_vPellets.push_back(SPellet(&c, 0));
+				g_sEntities.m_vPellets.push_back(SPellet(&c, 0));
 				g_bHasShot = true;
 				return;
 			}
@@ -454,27 +455,27 @@ void playerShoot()
 		{
 			if (g_abKeyPressed[K_SHOOTLEFT] && !g_abKeyPressed[K_SHOOTRIGHT])
 			{
-				COORD c = g_sLevel.g_sEntities.g_sChar.m_cLocation;
+				COORD c = g_sEntities.g_sChar.m_cLocation;
 				c.X++;
 				c.Y--;
-				g_sLevel.g_sEntities.m_vPellets.push_back(SPellet(&c, 5));
+				g_sEntities.m_vPellets.push_back(SPellet(&c, 5));
 				g_bHasShot = true;
 				return;
 			}
 			else if (!g_abKeyPressed[K_SHOOTLEFT] && g_abKeyPressed[K_SHOOTRIGHT])
 			{
-				COORD c = g_sLevel.g_sEntities.g_sChar.m_cLocation;
+				COORD c = g_sEntities.g_sChar.m_cLocation;
 				c.X++;
 				c.Y++;
-				g_sLevel.g_sEntities.m_vPellets.push_back(SPellet(&c, 3));
+				g_sEntities.m_vPellets.push_back(SPellet(&c, 3));
 				g_bHasShot = true;
 				return;
 			}
 			else if (!g_abKeyPressed[K_SHOOTLEFT] && !g_abKeyPressed[K_SHOOTRIGHT])
 			{
-				COORD c = g_sLevel.g_sEntities.g_sChar.m_cLocation;
+				COORD c = g_sEntities.g_sChar.m_cLocation;
 				c.X++;
-				g_sLevel.g_sEntities.m_vPellets.push_back(SPellet(&c, 4));
+				g_sEntities.m_vPellets.push_back(SPellet(&c, 4));
 				g_bHasShot = true;
 				return;
 			}
@@ -483,17 +484,17 @@ void playerShoot()
 		{
 			if (g_abKeyPressed[K_SHOOTLEFT] && !g_abKeyPressed[K_SHOOTRIGHT])
 			{
-				COORD c = g_sLevel.g_sEntities.g_sChar.m_cLocation;
+				COORD c = g_sEntities.g_sChar.m_cLocation;
 				c.Y--;
-				g_sLevel.g_sEntities.m_vPellets.push_back(SPellet(&c, 6));
+				g_sEntities.m_vPellets.push_back(SPellet(&c, 6));
 				g_bHasShot = true;
 				return;
 			}
 			else if (!g_abKeyPressed[K_SHOOTLEFT] && g_abKeyPressed[K_SHOOTRIGHT])
 			{
-				COORD c = g_sLevel.g_sEntities.g_sChar.m_cLocation;
+				COORD c = g_sEntities.g_sChar.m_cLocation;
 				c.Y++;
-				g_sLevel.g_sEntities.m_vPellets.push_back(SPellet(&c, 2));
+				g_sEntities.m_vPellets.push_back(SPellet(&c, 2));
 				g_bHasShot = true;
 				return;
 			}
@@ -560,7 +561,7 @@ void renderLevel()
 
 void renderPellets()
 {
-	for (auto& pellet : g_sLevel.g_sEntities.m_vPellets)
+	for (auto& pellet : g_sEntities.m_vPellets)
 	{
 		g_Console.writeToBuffer(pellet.getRealCoords(), "<>", 0x03);
 	}
@@ -568,7 +569,7 @@ void renderPellets()
 
 void renderEnemy()
 {
-	for (auto& enemy : g_sLevel.g_sEntities.m_vEnemy)
+	for (auto& enemy : g_sEntities.m_vEnemy)
 	{
 		g_Console.writeToBuffer(enemy->getRealLocation(), enemy->getIdentifier(), enemy->getColor());
 	}
@@ -580,20 +581,20 @@ void renderStat()
 	COORD c;
 	std::ostringstream ss;
 	ss.str("");
-	ss << "HP: " << g_sLevel.g_sEntities.g_sChar.m_iPlayerHealth;
+	ss << "HP: " << g_sEntities.g_sChar.m_iPlayerHealth;
 	c.X = g_Console.getConsoleSize().X - 9;
 	c.Y = 2;
 	g_Console.writeToBuffer(c, ss.str());
 
 	//Rendering player's damage
 	ss.str("");
-	ss << "Damage: " << g_sLevel.g_sEntities.g_sChar.m_iPlayerDamage;
+	ss << "Damage: " << g_sEntities.g_sChar.m_iPlayerDamage;
 	c.Y = 3;
 	g_Console.writeToBuffer(c, ss.str());
 
 	//Rendering player's score
 	ss.str("");
-	ss << "Score: " << g_sLevel.g_sEntities.g_sChar.m_iPlayerScore;
+	ss << "Score: " << g_sEntities.g_sChar.m_iPlayerScore;
 	c.Y = 4;
 	g_Console.writeToBuffer(c, ss.str());
 

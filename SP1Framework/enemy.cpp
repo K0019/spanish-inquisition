@@ -379,5 +379,5 @@ bool EnemyRanged::updateMovement(SGameChar * player)
 
 		}
 	}
-	return 0;
+	return false;
 }

@@ -78,6 +78,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="consumables.cpp" />
     <ClCompile Include="enemy.cpp" />
     <ClCompile Include="entity.cpp" />
     <ClCompile Include="fileio.cpp" />
@@ -93,6 +94,7 @@
     <ClCompile Include="stat.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="consumables.h" />
     <ClInclude Include="definitions.h" />
     <ClInclude Include="enemy.h" />
     <ClInclude Include="entity.h" />

@@ -343,9 +343,25 @@ void controlPlayer()
 			resetLevel(++g_sLevel.floor);
 			bSomethingHappened = true;
 		}
-		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '%') //When spacebar is pressed when on top of item
+		else if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '%') //When spacebar is pressed on top of an item
 		{
-			g_sEntities.g_sChar.AddItem(true);
+			g_sEntities.g_sChar.addItem(true);
+		}
+		else if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '1')
+		{
+			g_sEntities.g_sChar.addConsumable(true, 1);
+		}
+		else if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '2')
+		{
+			g_sEntities.g_sChar.addConsumable(true, 2);
+		}
+		else if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '3')
+		{
+			g_sEntities.g_sChar.addConsumable(true, 3);
+		}
+		else if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '4')
+		{
+			g_sEntities.g_sChar.addConsumable(true, 4);
 		}
     }
 
@@ -510,7 +526,7 @@ void renderFramerate()
 	std::ostringstream ss;
 	ss << std::fixed << std::setprecision(3);
 	ss << 1.0 / g_dDeltaTime << "fps";
-	c.X = g_Console.getConsoleSize().X - 9;
+	c.X = g_Console.getConsoleSize().X - 11;
 	c.Y = 0;
 	g_Console.writeToBuffer(c, ss.str());
 
@@ -813,8 +829,8 @@ void renderStat()
 	COORD c;
 	std::ostringstream ss;
 	ss.str("");
-	ss << "HP: " << g_sEntities.g_sChar.m_iPlayerHealth;
-	c.X = g_Console.getConsoleSize().X - 9;
+	ss << "HP: " << g_sEntities.g_sChar.m_iPlayerHealth << " / " << g_sEntities.g_sChar.m_iMaxHealth;
+	c.X = g_Console.getConsoleSize().X - 11;
 	c.Y = 2;
 	g_Console.writeToBuffer(c, ss.str());
 

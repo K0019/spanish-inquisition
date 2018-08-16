@@ -40,7 +40,7 @@ public:
 	Enemy(SLevel * levelPointer, std::string name, std::string indicator, COORD location, WORD color,  int HP, int damage, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration); // Constructor
 
 	virtual void update(SGameChar * player) =0; // Update everything about enemy
-	virtual bool updateMovement(SGameChar * player) =0;
+	virtual bool updateMovement(SGameChar * player) =0; // Update the movement
 	double checkAttackDelayExpire(); // Update attack timings
 	void updateFlashHitState(); // Get true or false depending on duration of FlashHitTime and StunDuration
 	std::string getIdentifier(); // Get the char identifier of the enemy
@@ -68,8 +68,8 @@ public:
 	EnemyMelee(SLevel * levelPointer, std::string name, std::string indicator, COORD location, WORD color, int HP, int damage, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration);
 
 	void update(SGameChar * player);
-	void setAttackDirection(SGameChar * player);
-	void strikeAttack(SGameChar * player);
+	void setAttackDirection(SGameChar * player); // Target a tile to attack
+	void strikeAttack(SGameChar * player); // Hit the player if player is in the tile that enemy was attacking
 	bool updateMovement(SGameChar * player); // Updates enemy movement, returns true or false depending on whether the enemy should attack or not
 };
 
@@ -84,8 +84,8 @@ public:
 	EnemyRanged(SLevel * levelPointer, std::vector<SPellet> * pellets, std::string name, std::string indicator, COORD location, WORD color, int HP, int damage, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration, bool isMobile, double pelletVelocity);
 
 	void update(SGameChar * player);
-	bool updateMovement(SGameChar * player);
-	void updateShooting(SGameChar * player);
+	bool updateMovement(SGameChar * player); // Updates enemy movement, returns true or false depending on whether the enemy should attack or not
+	void updateShooting(SGameChar * player); // Create an enemy pellet
 };
 
 #endif

@@ -1,6 +1,7 @@
-﻿# The Great Escapade
-	by
-      Team 01
+# ﻿The Great Escapade
+> by
+>
+> Team 01
 
 
 This game is made using the Studio Project Framework in Visual Studio 2015 and 2017. (Framework provided by Nanyang Polytechnic).

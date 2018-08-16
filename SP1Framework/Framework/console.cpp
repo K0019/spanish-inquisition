@@ -204,6 +204,8 @@ void Console::setConsoleWindowSize()
 		bSuccess = SetConsoleWindowInfo(hConsole, TRUE, &windowSize);    
 		PERR( bSuccess, "SetConsoleWindowInfo" );
 	}
+	bSuccess = GetConsoleScreenBufferInfo(hConsole, &csbi);
+	PERR(bSuccess, "GetConsoleScreenBufferInfo");
 }
 void Console::clearBuffer(WORD attribute)
 {

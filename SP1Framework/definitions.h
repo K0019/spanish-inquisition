@@ -1,5 +1,7 @@
 #pragma once
 
+/* SHARED BY ALL, NO ONE OWNS THIS FILE */
+
 #ifndef DEFINITIONSHEAD
 #define DEFINITIONSHEAD
 
@@ -8,8 +10,13 @@
 #define GRID_Y 5
 #define ROOM_X 11
 #define ROOM_Y 19
+#define SPECIAL_ROOMS_COUNT 2
 #define SHOOTSPEED 0.350
 #define SHOOTVELOCITY 0.25
 #define ENEMY_DYING_LENGTH 1.0
+#define PELLET_CHARACTER_TOP "/\\"
+#define PELLET_CHARACTER_BOTTOM "\\/"
+#define PELLET_CHARACTER_HIT_TOP "\\/"
+#define PELLET_CHARACTER_HIT_BOTTOM "/\\"
 
 #endif // !DEFINITIONSHEAD

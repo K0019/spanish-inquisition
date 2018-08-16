@@ -11,6 +11,7 @@ void g_LoadFromSave(unsigned int* SaveDataArray)
 			SaveDataArray[i] = std::stoi(j);
 			i++;
 		}
+		SaveFileData.close();
 	}
 }
 
@@ -28,28 +29,35 @@ void g_SaveToSave(unsigned int* SaveDataArray)
 	else throw (std::invalid_argument("cannot write to file."));
 }
 
-void g_LoadFromFloor(short FloorNumber, std::vector<std::string> *currRoomIndex)
+void g_LoadFromFloor(short FloorNumber, std::vector<std::string> *selectionAvailable)
 {
 	std::string FloorSelector = "../res/MapData/FloorData/Floor" + std::to_string(FloorNumber) + ".txt";
 	std::ifstream FloorFileData(FloorSelector);
 	if (FloorFileData.is_open())
 	{
+		// Get the selection
 		for (std::string j; std::getline(FloorFileData, j);)
 		{
-			currRoomIndex->push_back(j);
+			selectionAvailable->push_back(j);
 		}
+		FloorFileData.close();
 	}
 }
 
-void g_LoadFromRoom(std::string *RoomNumber, std::string *Level)
+void g_LoadFromRoom(std::string *RoomNumber, char (*Level)[(ROOM_X + 2) * GRID_X + 2][(ROOM_Y + 2) * GRID_Y + 2], COORD gridCoords)
 {
 	std::string RoomSelector = "../res/MapData/RoomData/" + *RoomNumber +".txt";
 	std::ifstream RoomFileData(RoomSelector);
+	unsigned int row = 0;
 	if (RoomFileData.is_open())
 	{
-		for (std::string j; std::getline(RoomFileData, j);)
+		for (std::string line; std::getline(RoomFileData, line); row++)
 		{
-			// KENDRICK DO THINGS
+			for (unsigned int column = 0; column < line.length(); column++)
+			{
+				(*Level)[1 + gridCoords.X * (ROOM_X + 2) + row][1 + gridCoords.Y * (ROOM_Y + 2) + column] = line[column];
+			}
 		}
+		RoomFileData.close();
 	}
 }

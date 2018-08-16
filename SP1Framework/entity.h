@@ -1,5 +1,7 @@
 #pragma once
 
+/* MADE BY: Kendrick */
+
 #ifndef ENTITYHEAD
 #define ENTITYHEAD
 

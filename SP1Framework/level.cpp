@@ -12,56 +12,22 @@ void SLevel::generateLevel()
 	for (int index = 0; index < GRID_X * GRID_Y; index++)
 		roomsHaveExit[index] = false;
 
+	// RESET MEMBER VARIABLES
+	this->roomSelections.clear();
+
 	// -----Clear Level-----
-	for (auto& line : this->level)
+	for (int row = 0; row < (ROOM_X + 2) * GRID_X + 2; row++)
 	{
-		line = "";
-	}
-
-	// -----Borders and Padding-----
-	// Add the top border
-	for (int i = 0; i < 2; i++)
-	{
-		for (int gridColumn = 0; gridColumn <= GRID_Y * (ROOM_Y + 1) + GRID_Y + 1; gridColumn++)
+		for (int column = 0; column < (ROOM_Y + 2) * GRID_X + 2; column++)
 		{
-			this->level[i] += "#";
+			this->level[row][column] = ' ';
 		}
 	}
 
-	// Add the middle w/ padding
-	for (int gridRow = 0; gridRow < GRID_X; gridRow++)
-	{
-		for (int cRow = 0; cRow < ROOM_X; cRow++)
-		{
-			for (int gridColumn = 0; gridColumn <= GRID_Y; gridColumn++)
-			{
-				this->level[gridRow * ROOM_X + (gridRow << 1) + cRow + 2] += "##";
-				if (gridColumn != GRID_Y)
-					for (int padding = 0; padding < ROOM_Y; padding++)
-						this->level[gridRow * ROOM_X + (gridRow << 1) + cRow + 2] += " ";
-			}
-		}
-		if (gridRow == GRID_X - 1) break;
-		for (int i = 0; i < 2; i++)
-		{
-			for (int gridColumn = 0; gridColumn <= GRID_Y * (ROOM_Y + 1) + GRID_Y + 1; gridColumn++)
-			{
-				this->level[(gridRow + 1) * (ROOM_X + 1) + i + gridRow + 1] += "#";
-			}
-		}
-	}
+	// Get possible room selections
+	g_LoadFromFloor(this->floor, &this->roomSelections);
 
-	// Add the bottom border
-	for (int i = 0; i < 2; i++)
-	{
-		for (int gridColumn = 0; gridColumn <= GRID_Y * (ROOM_Y + 1) + GRID_Y + 1; gridColumn++)
-		{
-			this->level[GRID_X + (ROOM_X + 1) * GRID_X + i] += "#";
-		}
-	}
-
-
-	// -----Required Border Holes-----
+	// -----Borders and Room Contents-----
 	// Set exit room, at least 2 rooms away from entry room
 	do
 	{
@@ -71,6 +37,86 @@ void SLevel::generateLevel()
 		this->exitRoom.X <= this->playerStartRoom.X + 1 &&
 		this->exitRoom.Y >= this->playerStartRoom.Y - 1 &&
 		this->exitRoom.Y <= this->playerStartRoom.Y + 1);
+
+	for (int gridRow = 0; gridRow < GRID_X; gridRow++)
+	{
+		for (int gridColumn = 0; gridColumn < GRID_Y; gridColumn++)
+		{
+			if ((this->exitRoom.X == gridRow && this->exitRoom.Y == gridColumn) ||
+				(this->playerStartRoom.X == gridRow && this->playerStartRoom.Y == gridColumn))
+			{
+				for (int wallColumn = 0; wallColumn < ROOM_Y + 2; wallColumn++)
+					this->level[1 + gridRow * (ROOM_X + 2)][1 + gridColumn * (ROOM_Y + 2) + wallColumn] = '#';
+				for (int roomRow = 1; roomRow <= ROOM_X; roomRow++)
+				{
+					this->level[1 + gridRow * (ROOM_X + 2) + roomRow][1 + gridColumn * (ROOM_Y + 2)] = '#';
+					this->level[1 + gridRow * (ROOM_X + 2) + roomRow][(gridColumn + 1) * (ROOM_Y + 2)] = '#';
+				}
+				for (int wallColumn = 0; wallColumn < ROOM_Y + 2; wallColumn++)
+					this->level[(gridRow + 1) * (ROOM_X + 2)][1 + gridColumn * (ROOM_Y + 2) + wallColumn] = '#';
+			}
+			else
+			{
+				g_LoadFromRoom(&this->roomSelections[rand() / (RAND_MAX / this->roomSelections.size())], &this->level, fastCoord(gridRow, gridColumn));
+			}
+		}
+	}
+
+	std::ofstream dump("level.txt");
+	for (int row = 0; row < (ROOM_X + 2) * GRID_X + 2; row++)
+	{
+		std::string line;
+		for (int column = 0; column < (ROOM_Y + 2) * GRID_Y + 2; column++)
+		{
+			line += this->level[row][column];
+		}
+		dump << line << std::endl;
+	}
+
+	//// -----Borders and Padding-----
+	//// Add the top border
+	//for (int i = 0; i < 2; i++)
+	//{
+	//	for (int gridColumn = 0; gridColumn <= GRID_Y * (ROOM_Y + 1) + GRID_Y + 1; gridColumn++)
+	//	{
+	//		this->level[i] += "#";
+	//	}
+	//}
+
+	//// Add the middle w/ padding
+	//for (int gridRow = 0; gridRow < GRID_X; gridRow++)
+	//{
+	//	for (int cRow = 0; cRow < ROOM_X; cRow++)
+	//	{
+	//		for (int gridColumn = 0; gridColumn <= GRID_Y; gridColumn++)
+	//		{
+	//			this->level[gridRow * ROOM_X + (gridRow << 1) + cRow + 2] += "##";
+	//			if (gridColumn != GRID_Y)
+	//				for (int padding = 0; padding < ROOM_Y; padding++)
+	//					this->level[gridRow * ROOM_X + (gridRow << 1) + cRow + 2] += " ";
+	//		}
+	//	}
+	//	if (gridRow == GRID_X - 1) break;
+	//	for (int i = 0; i < 2; i++)
+	//	{
+	//		for (int gridColumn = 0; gridColumn <= GRID_Y * (ROOM_Y + 1) + GRID_Y + 1; gridColumn++)
+	//		{
+	//			this->level[(gridRow + 1) * (ROOM_X + 1) + i + gridRow + 1] += "#";
+	//		}
+	//	}
+	//}
+
+	//// Add the bottom border
+	//for (int i = 0; i < 2; i++)
+	//{
+	//	for (int gridColumn = 0; gridColumn <= GRID_Y * (ROOM_Y + 1) + GRID_Y + 1; gridColumn++)
+	//	{
+	//		this->level[GRID_X + (ROOM_X + 1) * GRID_X + i] += "#";
+	//	}
+	//}
+
+
+	// -----Required Border Holes-----
 
 	// Generate a route to the end
 	std::vector<COORD> routeToEnd = { this->playerStartRoom };
@@ -88,8 +134,8 @@ void SLevel::generateLevel()
 		int xDiff = (iter - 1)->X - iter->X;
 		int yDiff = (iter - 1)->Y - iter->Y;
 		COORD * c = this->getCoordinatesForDoor(iter->X, iter->Y, (xDiff < 0) ? (2) : (0) + (yDiff != 0) ? ((yDiff > 0) ? (3) : (1)) : (0));
-		this->modifyTile(c[0], "$");
-		this->modifyTile(c[1], "$");
+		this->modifyTile(c[0], '$');
+		this->modifyTile(c[1], '$');
 	}
 
 	// Add an opening for rooms with no entrances
@@ -105,7 +151,7 @@ void SLevel::generateLevel()
 		COORD c;
 		c.X = 2 + (ROOM_X >> 1) + this->exitRoom.X * (ROOM_X + 2);
 		c.Y = 2 + (ROOM_Y >> 1) + this->exitRoom.Y * (ROOM_Y + 2);
-		this->modifyTile(c, "&");
+		this->modifyTile(c, '&');
 	}
 
 	// DELETE ALLOCATED STORAGE
@@ -179,8 +225,8 @@ void SLevel::uncoverAll(COORD room, bool * roomsHaveExit)
 			if (room.X - 1 < 0) continue;
 			if (roomsHaveExit[(room.X - 1) * GRID_Y + room.Y]) continue;
 			cPointer = this->getCoordinatesForDoor(--c.X, c.Y, 0);
-			this->modifyTile(cPointer[0], "$");
-			this->modifyTile(cPointer[1], "$");
+			this->modifyTile(cPointer[0], '$');
+			this->modifyTile(cPointer[1], '$');
 			roomsHaveExit[c.X * GRID_Y + c.Y] = true;
 			this->uncoverAll(c, roomsHaveExit);
 			break;
@@ -188,8 +234,8 @@ void SLevel::uncoverAll(COORD room, bool * roomsHaveExit)
 			if (room.Y + 1 >= GRID_Y) continue;
 			if (roomsHaveExit[room.X * GRID_Y + room.Y + 1]) continue;
 			cPointer = this->getCoordinatesForDoor(c.X, ++c.Y, 1);
-			this->modifyTile(cPointer[0], "$");
-			this->modifyTile(cPointer[1], "$");
+			this->modifyTile(cPointer[0], '$');
+			this->modifyTile(cPointer[1], '$');
 			roomsHaveExit[c.X * GRID_Y + c.Y] = true;
 			this->uncoverAll(c, roomsHaveExit);
 			break;
@@ -197,8 +243,8 @@ void SLevel::uncoverAll(COORD room, bool * roomsHaveExit)
 			if (room.X + 1 >= GRID_X) continue;
 			if (roomsHaveExit[(room.X + 1) * GRID_Y + room.Y]) continue;
 			cPointer = this->getCoordinatesForDoor(++c.X, c.Y, 2);
-			this->modifyTile(cPointer[0], "$");
-			this->modifyTile(cPointer[1], "$");
+			this->modifyTile(cPointer[0], '$');
+			this->modifyTile(cPointer[1], '$');
 			roomsHaveExit[c.X * GRID_Y + c.Y] = true;
 			this->uncoverAll(c, roomsHaveExit);
 			break;
@@ -206,8 +252,8 @@ void SLevel::uncoverAll(COORD room, bool * roomsHaveExit)
 			if (room.Y - 1 < 0) continue;
 			if (roomsHaveExit[room.X * GRID_Y + room.Y - 1]) continue;
 			cPointer = this->getCoordinatesForDoor(c.X, --c.Y, 3);
-			this->modifyTile(cPointer[0], "$");
-			this->modifyTile(cPointer[1], "$");
+			this->modifyTile(cPointer[0], '$');
+			this->modifyTile(cPointer[1], '$');
 			roomsHaveExit[c.X * GRID_Y + c.Y] = true;
 			this->uncoverAll(c, roomsHaveExit);
 			break;
@@ -215,9 +261,9 @@ void SLevel::uncoverAll(COORD room, bool * roomsHaveExit)
 	}
 }
 
-void SLevel::modifyTile(COORD c, std::string ch)
+void SLevel::modifyTile(COORD c, char ch)
 {
-	this->level[c.X].replace(c.Y, ch.length(), ch);
+	this->level[c.X][c.Y] = ch;
 }
 
 char SLevel::getTile(COORD c)
@@ -255,5 +301,13 @@ COORD * SLevel::getCoordinatesForDoor(const SHORT& X, const SHORT& Y, const int&
 		c[1].Y++;
 		break;
 	}
+	return c;
+}
+
+COORD fastCoord(int& x, int& y)
+{
+	COORD c;
+	c.X = x;
+	c.Y = y;
 	return c;
 }

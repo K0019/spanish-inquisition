@@ -4,12 +4,13 @@
 // CLASS DEFINITION: Enemy [ABSTRACT]
 // ---------------------------------------
 
-Enemy::Enemy(SLevel * levelPointer, std::string name, std::string identifier, COORD location, WORD color, int HP, int damage, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration)
+Enemy::Enemy(SLevel * levelPointer, std::string name, std::string identifier, std::string identifier2, COORD location, WORD color, int HP, int damage, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration)
 	: m_iMoveDuration(moveDuration), m_sName(name), m_dLengthOfAttack(lengthOfAttack), m_dAttackTimeThreshold(attackTimeThreshold), m_dStunDuration(stunDuration)
 {
 	this->levelPointer = levelPointer;
 	this->Timer.startTimer();
-	this->m_cIdentifier = identifier;
+	this->m_cIdentifier[0] = identifier;
+	this->m_cIdentifier[1] = identifier2;
 	this->m_iHP = HP;
 	this->m_iStrength = damage;
 	this->m_bFlashAttacking = false;
@@ -42,7 +43,7 @@ void Enemy::updateFlashHitState()
 	this->m_bFlashHit = ((LONGLONG)((this->m_dStunDuration - this->m_dStunTime) / 50) % 2) ? (false) : (true);
 }
 
-std::string Enemy::getIdentifier()
+std::string * Enemy::getIdentifier()
 {
 	return this->m_cIdentifier;
 }
@@ -113,7 +114,8 @@ COORD Enemy::getRealLocation()
 	while (c.Y > ROOM_Y + 2)
 		c.Y -= (ROOM_Y + 2);
 	std::swap(c.X, c.Y);
-	c.X = (c.X << 1) - 1;
+	c.X = (c.X << 2) - 3;
+	c.Y = (c.Y << 1) - 1;
 	return c;
 }
 
@@ -214,8 +216,8 @@ bool Enemy::checkOutOfBounds()
 // CLASS DEFINITION: EnemyMelee
 // ---------------------------------------
 
-EnemyMelee::EnemyMelee(SLevel * levelPointer, std::string name, std::string indicator, COORD location, WORD color, int HP, int damage, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration)
-	: Enemy(levelPointer, name, indicator, location, color, HP, damage, moveDuration, lengthOfAttack, attackTimeThreshold, stunDuration)
+EnemyMelee::EnemyMelee(SLevel * levelPointer, std::string name, std::string indicator, std::string indicator2, COORD location, WORD color, int HP, int damage, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration)
+	: Enemy(levelPointer, name, indicator, indicator2, location, color, HP, damage, moveDuration, lengthOfAttack, attackTimeThreshold, stunDuration)
 {
 
 }
@@ -602,8 +604,8 @@ bool EnemyMelee::updateMovement(SGameChar * player)
 // CLASS DEFINITION: EnemyRanged
 // ---------------------------------------
 
-EnemyRanged::EnemyRanged(SLevel * levelPointer, std::vector<SPellet> * pellet, std::string name, std::string indicator, COORD location, WORD color, int HP, int damage, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration, bool isMobile, double pelletVelocity)
-	: Enemy(levelPointer, name, indicator, location, color, HP, damage, moveDuration, lengthOfAttack, attackTimeThreshold, stunDuration)
+EnemyRanged::EnemyRanged(SLevel * levelPointer, std::vector<SPellet> * pellet, std::string name, std::string indicator, std::string indicator2, COORD location, WORD color, int HP, int damage, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration, bool isMobile, double pelletVelocity)
+	: Enemy(levelPointer, name, indicator, indicator2, location, color, HP, damage, moveDuration, lengthOfAttack, attackTimeThreshold, stunDuration)
 {
 	this->m_vPelletList = pellet;
 	this->m_bMobile = isMobile;

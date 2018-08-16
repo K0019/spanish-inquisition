@@ -1,5 +1,7 @@
 #pragma once
 
+/* MADE BY: Kendrick */
+
 #ifndef ENEMYHEAD
 #define ENEMYHEAD
 #include "Framework/timer.h"
@@ -18,7 +20,7 @@ protected:
 	double m_dStunTime; // Time to delay all updates by, when hit, supersedes m_dAttackTime
 	double m_dAttackTime; // Time to delay all updates by, when attacking
 	double m_dDeadTime; // Time to track when to delete this enemy when dead
-	std::string m_cIdentifier; // Identifier for rendering
+	std::string m_cIdentifier[2]; // Identifier for rendering
 	WORD m_cColor; // Color of enemy for rendering
 	COORD m_cLocation; // Location of enemy on map, tile coordinates
 	int m_iHP; // HP of enemy
@@ -37,13 +39,13 @@ protected:
 	const double m_iMoveDuration; // Duration this enemy should be delayed by before moving again
 
 public:
-	Enemy(SLevel * levelPointer, std::string name, std::string indicator, COORD location, WORD color,  int HP, int damage, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration); // Constructor
+	Enemy(SLevel * levelPointer, std::string name, std::string indicator, std::string indicator2, COORD location, WORD color,  int HP, int damage, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration); // Constructor
 
 	virtual void update(SGameChar * player) =0; // Update everything about enemy
 	virtual bool updateMovement(SGameChar * player) =0; // Update the movement
 	double checkAttackDelayExpire(); // Update attack timings
 	void updateFlashHitState(); // Get true or false depending on duration of FlashHitTime and StunDuration
-	std::string getIdentifier(); // Get the char identifier of the enemy
+	std::string * getIdentifier(); // Get the char identifier of the enemy
 	COORD getLocation(); // Get tile coordinates of where enemy is
 	WORD getColor(); // Get normal color of enemy
 	int getHP(); // Get current health of enemy
@@ -65,7 +67,7 @@ class EnemyMelee : public Enemy
 protected:
 	int attackDirection; // Up Right Down Left
 public:
-	EnemyMelee(SLevel * levelPointer, std::string name, std::string indicator, COORD location, WORD color, int HP, int damage, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration);
+	EnemyMelee(SLevel * levelPointer, std::string name, std::string indicator, std::string indicator2, COORD location, WORD color, int HP, int damage, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration);
 
 	void update(SGameChar * player);
 	void setAttackDirection(SGameChar * player); // Target a tile to attack
@@ -81,7 +83,7 @@ protected:
 	std::vector<SPellet> * m_vPelletList; // Pointer to the list of pellets, to add pellets of the enemy's
 
 public:
-	EnemyRanged(SLevel * levelPointer, std::vector<SPellet> * pellets, std::string name, std::string indicator, COORD location, WORD color, int HP, int damage, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration, bool isMobile, double pelletVelocity);
+	EnemyRanged(SLevel * levelPointer, std::vector<SPellet> * pellets, std::string name, std::string indicator, std::string indicator2, COORD location, WORD color, int HP, int damage, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration, bool isMobile, double pelletVelocity);
 
 	void update(SGameChar * player);
 	bool updateMovement(SGameChar * player); // Updates enemy movement, returns true or false depending on whether the enemy should attack or not

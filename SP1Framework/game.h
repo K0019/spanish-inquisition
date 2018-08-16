@@ -1,5 +1,7 @@
 #pragma once
 
+/* SHARED */
+
 #ifndef _GAME_H
 #define _GAME_H
 
@@ -13,11 +15,11 @@
 #include <cstdlib>
 #include <vector>
 
-extern CStopWatch g_swTimer;
-extern bool g_bQuitGame;
+extern CStopWatch g_swTimer; /* FRAMEWORK */
+extern bool g_bQuitGame; /* FRAMEWORK */
 
 // Enumeration to store the control keys that your game will have
-enum EKEYS
+enum EKEYS /* FRAMEWORK */
 {
     K_UP,
     K_DOWN,
@@ -34,7 +36,7 @@ enum EKEYS
 };
 
 // Enumeration for the different screen states
-enum EGAMESTATES
+enum EGAMESTATES /* FRAMEWORK */
 {
     S_SPLASHSCREEN,
 	S_MENU,
@@ -47,11 +49,11 @@ enum EGAMESTATES
 
 
 
-void init        ( void );      // initialize your variables, allocate memory, etc
-void getInput    ( void );      // get input from player
-void update      ( CStopWatch * timer, double missedTime ); // update the game and the state of the game
-void render      ( CStopWatch * timer );      // renders the current state of the game to the console
-void shutdown    ( void );      // do clean up, free memory
+void init        ( void ); /* FRAMEWORK */ // initialize your variables, allocate memory, etc
+void getInput    ( void ); /* FRAMEWORK */ // get input from player
+void update      ( CStopWatch * timer, double missedTime ); /* FRAMEWORK */ // update the game and the state of the game
+void render      ( CStopWatch * timer ); /* FRAMEWORK */ // renders the current state of the game to the console
+void shutdown    ( void ); /* FRAMEWORK */ // do clean up, free memory
 
 /*
 	THE UPDATE FUNCTIONS
@@ -91,5 +93,7 @@ void renderLevel();			// renders the borders of the rooms
 void renderPellets();		// render pellets to buffer
 void renderEnemy();			// renders all enemies to the buffer
 void renderStat();			//renders the player stats on the right side of the console
+void render(COORD c, LPCSTR text, LPCSTR text2, WORD color);
+void render(COORD c, std::string& text, std::string& text2, WORD color);
 
 #endif // _GAME_H

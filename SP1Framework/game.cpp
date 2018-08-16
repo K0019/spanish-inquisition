@@ -208,6 +208,8 @@ void mainMenu()
 void tutorial()
 {
 	processUserInput();
+	goBack();
+	processMenuEvent();
 }
 
 void shop()
@@ -272,6 +274,14 @@ void menuNavigate()
 			g_adBounceTime[K_SHOOTUP] = g_dElapsedTime + 0.125;
 		if (g_abKeyPressed[K_SHOOTDOWN]) 
 			g_adBounceTime[K_SHOOTDOWN] = g_dElapsedTime + 0.125;
+	}
+}
+
+void goBack()
+{
+	if (g_abKeyPressed[K_ENTER] == true)
+	{
+		g_mEvent.bMenu = true;
 	}
 }
 
@@ -535,6 +545,11 @@ void processMenuEvent()
 		g_eGameState = S_OPTIONS;
 		g_mEvent.bOptions = false;
 	}
+	if (g_mEvent.bMenu == true)
+	{
+		g_eGameState = S_MENU;
+		g_mEvent.bMenu = false;
+	}
 }
 void renderSplashScreen()  // renders the splash screen
 {
@@ -560,7 +575,7 @@ void renderMainMenu()
 
 void renderTutorial()
 {
-	
+	g_mEvent.renderTutorialDetails();
 }
 
 void renderShop()

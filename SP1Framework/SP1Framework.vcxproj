@@ -110,7 +110,16 @@
     <ClInclude Include="stat.h" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="saves.txt" />
+    <Text Include="..\res\MapData\FloorData\Floor1.txt" />
+    <Text Include="..\res\MapData\FloorData\Floor2.txt" />
+    <Text Include="..\res\MapData\FloorData\Floor3.txt" />
+    <Text Include="..\res\MapData\FloorData\Floor4.txt" />
+    <Text Include="..\res\MapData\FloorData\Floor5.txt" />
+    <Text Include="..\res\MapData\RoomData\00.txt" />
+    <Text Include="..\res\MapData\RoomData\01.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\res\SaveData\saves.SAVE" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

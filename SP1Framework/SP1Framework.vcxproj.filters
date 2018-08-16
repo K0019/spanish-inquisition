@@ -19,6 +19,18 @@
     <Filter Include="Source Files\Framework">
       <UniqueIdentifier>{37c19c94-9502-4b2b-b3f1-70fa908b49af}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\MapData">
+      <UniqueIdentifier>{815a660e-ee27-4943-b921-7e14c1e1dd3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\SaveData">
+      <UniqueIdentifier>{4633633a-1808-4416-a86e-4475772cc229}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\MapData\FloorData">
+      <UniqueIdentifier>{34450117-4685-403f-8f9e-35ce42999873}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\MapData\RoomData">
+      <UniqueIdentifier>{16fae992-d734-443c-83f6-64f4ad062d66}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -109,8 +121,31 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="saves.txt">
-      <Filter>Resource Files</Filter>
+    <Text Include="..\res\MapData\RoomData\00.txt">
+      <Filter>Resource Files\MapData\RoomData</Filter>
     </Text>
+    <Text Include="..\res\MapData\RoomData\01.txt">
+      <Filter>Resource Files\MapData\RoomData</Filter>
+    </Text>
+    <Text Include="..\res\MapData\FloorData\Floor1.txt">
+      <Filter>Resource Files\MapData\FloorData</Filter>
+    </Text>
+    <Text Include="..\res\MapData\FloorData\Floor2.txt">
+      <Filter>Resource Files\MapData\FloorData</Filter>
+    </Text>
+    <Text Include="..\res\MapData\FloorData\Floor3.txt">
+      <Filter>Resource Files\MapData\FloorData</Filter>
+    </Text>
+    <Text Include="..\res\MapData\FloorData\Floor4.txt">
+      <Filter>Resource Files\MapData\FloorData</Filter>
+    </Text>
+    <Text Include="..\res\MapData\FloorData\Floor5.txt">
+      <Filter>Resource Files\MapData\FloorData</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\res\SaveData\saves.SAVE">
+      <Filter>Resource Files\SaveData</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -11,10 +11,14 @@ struct MenuEvent
 	bool bOptions = false;
 	bool bShop = false;
 	bool bHowToPlay = false;
+	bool bMenu = false;
 	short sh_cursSel = 0;
 	MenuEvent(Console* mainConsole);
+
 	void renderTitle();
 	void renderMenu();
 	void renderCursor();
+	
+	void renderTutorialDetails();
 };
 #endif // !_MENU_H

@@ -9,11 +9,14 @@ SPellet::SPellet(COORD * c, int direction, int damage, double velocity, bool fri
 	this->m_dVelocity = velocity;
 	this->m_bFriendly = friendly;
 	this->m_bHit = false;
+	this->m_dLifespan = 0.0;
 	this->Timer.startTimer();
 }
 void SPellet::update()
 {
-	this->m_dTime += this->Timer.getElapsedTime();
+	double dt = this->Timer.getElapsedTime();
+	this->m_dTime += dt;
+	this->m_dLifespan += dt;
 	if (this->m_bHit) return;
 	if (this->m_dTime >= this->m_dVelocity)
 	{

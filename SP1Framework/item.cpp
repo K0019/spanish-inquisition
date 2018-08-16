@@ -21,8 +21,8 @@ SAllItems::SAllItems() //Constructor to initialise each unique item
 	this->addItem(SItem("Heaven Cracker", 1, 0, 0, 0.0, 0.0, 0.0, false, 1));
 	this->addItem(SItem("Enchanted Sword", 2, 2, 1, 0.0, 0.0, 0.0, false, 1));
 	this->addItem(SItem("Health Potion", 3, 0, 2, 0.0, 0.0, 0.0, false, 1));
-	this->addItem(SItem("Clown Fiesta", 4, 0, 0, 0.0, 0.0, 0.0, false, 1));
-	this->addItem(SItem("Magic Potion", 5, 0, 0, 0.0, 0.0, 0.0, false, 1));
+	this->addItem(SItem("Glass Canon", 4, 1, 0, 0.0, 0.0, 0.0, false, 1));
+	this->addItem(SItem("Magic Potion", 5, 0, 0, (float)0.9, 0.0, 0.0, false, 1));
 	this->addItem(SItem("Bonus!", 6, 0, 0, 0.0, 0.0, 0.0, false, 1));
 	this->addItem(SItem("Blue Feather", 7, 0, 0, 0.0, 0.0, (float)0.9, false, 1));
 }

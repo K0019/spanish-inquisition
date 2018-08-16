@@ -66,7 +66,8 @@ void init( void )
 	COORD c;
 	c.X = (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
 	c.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
-	g_sEntities.m_vEnemy.push_back(std::move(std::unique_ptr<EnemyRanged> (new EnemyRanged(&g_sEntities.m_vPellets, "Test", "tt", c, (WORD)0x09, 10, 3, 0.4, 0.3, 0.1, 0.3, false, 0.25))));
+	//g_sEntities.m_vEnemy.push_back(std::move(std::unique_ptr<EnemyMelee>(new EnemyMelee(&g_sLevel, "Test", "tt", c, (WORD)0x09, 10, 3, 0.4, 0.3, 0.1, 0.3))));
+	g_sEntities.m_vEnemy.push_back(std::move(std::unique_ptr<EnemyRanged> (new EnemyRanged(&g_sLevel, &g_sEntities.m_vPellets, "Test", "tt", c, (WORD)0x09, 10, 3, 0.4, 0.3, 0.1, 0.3, false, 0.25))));
     // sets the width, height and the font name to use in the console
     g_Console.setConsoleFont(0, 16, L"Consolas");
 	g_LoadFromSave(saveDataStorage.g_iSaveData);
@@ -296,13 +297,27 @@ void controlPlayer()
 		}
 		else
 		{
-			bSomethingHappened = true;
-			if (g_sEntities.g_sChar.m_cLocation.X < r_cRenderOffset.X)
+			bool skip = false;
+
+			for (auto& enemy : g_sEntities.m_vEnemy)
 			{
-				r_cRenderOffset.X -= (ROOM_X + 2);
-				g_sEntities.g_sChar.m_cLocation.X--;
-				g_sEntities.clearPellets();
-				g_sEntities.clearEnemies();
+				if (g_sEntities.g_sChar.m_cLocation.X == enemy->getLocation().X && g_sEntities.g_sChar.m_cLocation.Y == enemy->getLocation().Y)
+				{
+					skip = true;
+					g_sEntities.g_sChar.m_cLocation.X++;
+					break;
+				}
+			}
+			if (!skip)
+			{
+				bSomethingHappened = true;
+				if (g_sEntities.g_sChar.m_cLocation.X < r_cRenderOffset.X)
+				{
+					r_cRenderOffset.X -= (ROOM_X + 2);
+					g_sEntities.g_sChar.m_cLocation.X--;
+					g_sEntities.clearPellets();
+					g_sEntities.clearEnemies();
+				}
 			}
 		}
     }
@@ -316,13 +331,27 @@ void controlPlayer()
 		}
 		else
 		{
-			bSomethingHappened = true;
-			if (g_sEntities.g_sChar.m_cLocation.Y < r_cRenderOffset.Y)
+			bool skip = false;
+
+			for (auto& enemy : g_sEntities.m_vEnemy)
 			{
-				r_cRenderOffset.Y -= (ROOM_Y + 2);
-				g_sEntities.g_sChar.m_cLocation.Y--;
-				g_sEntities.clearPellets();
-				g_sEntities.clearEnemies();
+				if (g_sEntities.g_sChar.m_cLocation.X == enemy->getLocation().X && g_sEntities.g_sChar.m_cLocation.Y == enemy->getLocation().Y)
+				{
+					skip = true;
+					g_sEntities.g_sChar.m_cLocation.Y++;
+					break;
+				}
+			}
+			if (!skip)
+			{
+				bSomethingHappened = true;
+				if (g_sEntities.g_sChar.m_cLocation.Y < r_cRenderOffset.Y)
+				{
+					r_cRenderOffset.Y -= (ROOM_Y + 2);
+					g_sEntities.g_sChar.m_cLocation.Y--;
+					g_sEntities.clearPellets();
+					g_sEntities.clearEnemies();
+				}
 			}
 		}
     }
@@ -336,13 +365,27 @@ void controlPlayer()
 		}
 		else
 		{
-			bSomethingHappened = true;
-			if (g_sEntities.g_sChar.m_cLocation.X >= r_cRenderOffset.X + ROOM_X + 2)
+			bool skip = false;
+
+			for (auto& enemy : g_sEntities.m_vEnemy)
 			{
-				r_cRenderOffset.X += (ROOM_X + 2);
-				g_sEntities.g_sChar.m_cLocation.X++;
-				g_sEntities.clearPellets();
-				g_sEntities.clearEnemies();
+				if (g_sEntities.g_sChar.m_cLocation.X == enemy->getLocation().X && g_sEntities.g_sChar.m_cLocation.Y == enemy->getLocation().Y)
+				{
+					skip = true;
+					g_sEntities.g_sChar.m_cLocation.X--;
+					break;
+				}
+			}
+			if (!skip)
+			{
+				bSomethingHappened = true;
+				if (g_sEntities.g_sChar.m_cLocation.X >= r_cRenderOffset.X + ROOM_X + 2)
+				{
+					r_cRenderOffset.X += (ROOM_X + 2);
+					g_sEntities.g_sChar.m_cLocation.X++;
+					g_sEntities.clearPellets();
+					g_sEntities.clearEnemies();
+				}
 			}
 		}
     }
@@ -356,13 +399,27 @@ void controlPlayer()
 		}
 		else
 		{
-			bSomethingHappened = true;
-			if (g_sEntities.g_sChar.m_cLocation.Y >= r_cRenderOffset.Y + ROOM_Y + 2)
+			bool skip = false;
+
+			for (auto& enemy : g_sEntities.m_vEnemy)
 			{
-				r_cRenderOffset.Y += (ROOM_Y + 2);
-				g_sEntities.g_sChar.m_cLocation.Y++;
-				g_sEntities.clearPellets();
-				g_sEntities.clearEnemies();
+				if (g_sEntities.g_sChar.m_cLocation.X == enemy->getLocation().X && g_sEntities.g_sChar.m_cLocation.Y == enemy->getLocation().Y)
+				{
+					skip = true;
+					g_sEntities.g_sChar.m_cLocation.Y--;
+					break;
+				}
+			}
+			if (!skip)
+			{
+				bSomethingHappened = true;
+				if (g_sEntities.g_sChar.m_cLocation.Y >= r_cRenderOffset.Y + ROOM_Y + 2)
+				{
+					r_cRenderOffset.Y += (ROOM_Y + 2);
+					g_sEntities.g_sChar.m_cLocation.Y++;
+					g_sEntities.clearPellets();
+					g_sEntities.clearEnemies();
+				}
 			}
 		}
     }
@@ -373,9 +430,25 @@ void controlPlayer()
 			resetLevel(++g_sLevel.floor);
 			bSomethingHappened = true;
 		}
-		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '%') //When spacebar is pressed when on top of item
+		else if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '%') //When spacebar is pressed on top of an item
 		{
-			g_sEntities.g_sChar.AddItem(true);
+			g_sEntities.g_sChar.addItem(true);
+		}
+		else if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '1')
+		{
+			g_sEntities.g_sChar.addConsumable(true, 1);
+		}
+		else if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '2')
+		{
+			g_sEntities.g_sChar.addConsumable(true, 2);
+		}
+		else if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '3')
+		{
+			g_sEntities.g_sChar.addConsumable(true, 3);
+		}
+		else if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '4')
+		{
+			g_sEntities.g_sChar.addConsumable(true, 4);
 		}
     }
 
@@ -390,24 +463,24 @@ void controlPlayer()
 				{
 					switch (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_iWeaponLevel)
 					{
-					case 1:
+					case 1: //Blue Feather Level 1: Decrease movement delay by 10%
 						{
 							g_adBounceTime[i] *= g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed;
 							break;
 						}
-					case 2:
+					case 2: //Blue Feather Level 2: Decrease movement delay by 20%
 						{
-							g_adBounceTime[i] *= (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.1);
+							g_adBounceTime[i] *= (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.10);
 							break;
 						}
-					case 3:
+					case 3: //Blue Feather Level 3: Decrease movement delay by 30%
 						{
-							g_adBounceTime[i] *= (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.2);
+							g_adBounceTime[i] *= (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.20);
 							break;
 						}
-					case 4:
+					case 4: //Blue Feather Level 4: Decrease movement delay by 40%
 						{
-							g_adBounceTime[i] *= (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.3);
+							g_adBounceTime[i] *= (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.30);
 							break;
 						}
 					}
@@ -593,7 +666,7 @@ void renderFramerate()
 	std::ostringstream ss;
 	ss << std::fixed << std::setprecision(3);
 	ss << 1.0 / g_dDeltaTime << "fps";
-	c.X = g_Console.getConsoleSize().X - 9;
+	c.X = g_Console.getConsoleSize().X - 11;
 	c.Y = 0;
 	g_Console.writeToBuffer(c, ss.str());
 
@@ -633,24 +706,24 @@ void playerShoot()
 	{
 		switch (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_iWeaponLevel) // Index 5 (Magic Potion): Decrease attack delay by 10/20/30/40%
 		{
-		case 1:
+		case 1: //Magic Potion Level 1: Decrease attack delay by 10%
 			{
-				delay = SHOOTSPEED * 0.90;
+				delay = SHOOTSPEED * g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_fWeaponAttackSpeed;
 				break;
 			}
-		case 2:
+		case 2: //Magic Potion Level 2: Decrease attack delay by 20%
 			{
-				delay = SHOOTSPEED * 0.80;
+				delay = SHOOTSPEED * g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_fWeaponAttackSpeed - 0.10;
 				break;
 			}
-		case 3:
+		case 3: //Magic Potion Level 3: Decrease attack delay by 30%
 			{
-				delay = SHOOTSPEED * 0.70;
+				delay = SHOOTSPEED * g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_fWeaponAttackSpeed - 0.20;
 				break;
 			}
-		case 4:
+		case 4: //Magic Potion Level 4: Decrease attack delay by 40%
 			{
-				delay = SHOOTSPEED * 0.60;
+				delay = SHOOTSPEED * g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_fWeaponAttackSpeed - 0.30;
 				break;
 			}
 		}
@@ -837,6 +910,9 @@ void renderPellets()
 			case pellet::P_ENEMY:
 				g_Console.writeToBuffer(pellet.getRealCoords(), "><", 0x09);
 				break;
+			case pellet::P_FLOOR:
+				g_Console.writeToBuffer(pellet.getRealCoords(), "><", 0x09);
+				break;
 			}
 		}
 		else
@@ -867,6 +943,9 @@ void renderPellets()
 			case pellet::P_PLAYER:
 				g_Console.writeToBuffer(pellet.getRealCoords(), "><", 0x04);
 				break;
+			case pellet::P_FLOOR:
+				g_Console.writeToBuffer(pellet.getRealCoords(), "><", 0x04);
+				break;
 			}
 		}
 		else
@@ -890,8 +969,8 @@ void renderStat()
 	COORD c;
 	std::ostringstream ss;
 	ss.str("");
-	ss << "HP: " << g_sEntities.g_sChar.m_iPlayerHealth;
-	c.X = g_Console.getConsoleSize().X - 9;
+	ss << "HP: " << g_sEntities.g_sChar.m_iPlayerHealth << " / " << g_sEntities.g_sChar.m_iMaxHealth;
+	c.X = g_Console.getConsoleSize().X - 11;
 	c.Y = 2;
 	g_Console.writeToBuffer(c, ss.str());
 
@@ -901,7 +980,7 @@ void renderStat()
 	c.Y = 3;
 	g_Console.writeToBuffer(c, ss.str());
 
-	//Rendering player's damage
+	//Rendering player's item count
 	ss.str("");
 	ss << "Items: " << g_sEntities.g_sChar.m_sPlayerItems.ItemCount;
 	c.Y = 4;
@@ -920,3 +999,129 @@ void renderStat()
 	g_Console.writeToBuffer(c, ss.str());
 }
 
+void checkHitPellets()
+{
+	for (std::vector<SPellet>::iterator pellet = g_sEntities.m_vPellets.begin(); pellet != g_sEntities.m_vPellets.end(); )
+	{
+		// Check for erasal
+		if (pellet->m_bHit)
+		{
+			if (pellet->m_dTime >= 0.15)
+			{
+				pellet = g_sEntities.m_vPellets.erase(pellet);
+				continue;
+			}
+			pellet++;
+			continue;
+		}
+		if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[0].m_bHasWeapon) //Index 1 (Heaven Cracker): Doubles the pellet lifespan to 5 seconds.
+		{
+			g_sEntities.g_sChar.m_dRange *= 2; //!Current issue!: if player has weapon, both player and enemy receives the range increase
+			if (pellet->m_dLifespan >= g_sEntities.g_sChar.m_dRange)  //Check if the pellet has reached its lifespan of 5 seconds, if it does, clear the pellet and show the "><" hit effect.
+			{
+				pellet->m_bHit = true;
+				pellet->m_bHitReason = pellet::P_FLOOR;
+				continue;
+			}
+		}
+		else
+		{
+			if (pellet->m_dLifespan >= g_sEntities.g_sChar.m_dRange)
+			{
+				pellet->m_bHit = true;
+				pellet->m_bHitReason = pellet::P_FLOOR;
+				continue;
+			}
+		}
+
+
+
+		// Check collision with wall
+		if ((pellet->m_cLocation.X - 1) % (ROOM_X + 2) == 0 ||
+			pellet->m_cLocation.X % (ROOM_X + 2) == 0 ||
+			(pellet->m_cLocation.Y - 1) % (ROOM_Y + 2) == 0 ||
+			pellet->m_cLocation.Y % (ROOM_Y + 2) == 0)
+		{
+			if (g_sLevel.getTile(pellet->m_cLocation) == '$')
+			{
+				pellet->m_bHit = true;
+				pellet->m_bHitReason = pellet::P_DOOR;
+			}
+			else
+			{
+				//if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[0].m_bHasWeapon) //Index 1 (Heaven Cracker): Player shot pelllets ignore wall collision and appear on the other side of the room
+				//{
+
+				//}
+				//else
+				//{
+					pellet->m_bHit = true;
+					pellet->m_bHitReason = pellet::P_WALL;
+				//}
+			}
+			pellet++;
+			continue;
+		}
+
+		// Check collision with player, if enemy pellet
+		if (!pellet->m_bFriendly && pellet->m_cLocation.X == g_sEntities.g_sChar.m_cLocation.X && pellet->m_cLocation.Y == g_sEntities.g_sChar.m_cLocation.Y)
+		{
+			pellet->m_bHit = true;
+			pellet->m_bHitReason = pellet::P_PLAYER;
+			
+			if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[3].m_bHasWeapon) //Index 4 (Glass Canon): All Enemies deal 1/2/3/4 more damage to players.
+			{
+				switch (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[3].m_iWeaponLevel)
+				{
+					case 1: //Glass Canon Level 1: All Enemies deal 1 more damage to the player
+						{
+							g_sEntities.g_sChar.m_iPlayerHealth -= (pellet->m_iDamage + 1);
+							break;
+						}
+					case 2: //Glass Canon Level 2: All Enemies deal 2 more damage to the player
+						{
+							g_sEntities.g_sChar.m_iPlayerHealth -= (pellet->m_iDamage + 2);
+							break;
+						}
+					case 3: //Glass Canon Level 3: All Enemies deal 3 more damage to the player
+						{
+							g_sEntities.g_sChar.m_iPlayerHealth -= (pellet->m_iDamage + 3);
+							break;
+						}
+					case 4: //Glass Canon Level 4: All Enemies deal 4 more damage to the player
+						{
+							g_sEntities.g_sChar.m_iPlayerHealth -= (pellet->m_iDamage + 4);
+							break;
+						}
+				}
+			}
+			else
+			{
+				g_sEntities.g_sChar.m_iPlayerHealth -= pellet->m_iDamage;
+			}
+			// TODO: Check for death
+
+			pellet++;
+			continue;
+		}
+
+		// Check collision with enemy, if player pellet
+		if (pellet->m_bFriendly)
+		{
+			for (auto& enemy : g_sEntities.m_vEnemy)
+			{
+				if (!enemy->isDying() && !enemy->isDead() && pellet->m_cLocation.X == enemy->getLocation().X && pellet->m_cLocation.Y == enemy->getLocation().Y)
+				{
+					pellet->m_bHit = true;
+					pellet->m_bHitReason = pellet::P_ENEMY;
+
+					enemy->takeDamage(pellet->m_iDamage);
+
+					break;
+				}
+			}
+		}
+
+		pellet++;
+	}
+}

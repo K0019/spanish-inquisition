@@ -4,9 +4,10 @@
 // CLASS DEFINITION: Enemy [ABSTRACT]
 // ---------------------------------------
 
-Enemy::Enemy(std::string name, std::string identifier, COORD location, WORD color, int HP, int damage, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration)
+Enemy::Enemy(SLevel * levelPointer, std::string name, std::string identifier, COORD location, WORD color, int HP, int damage, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration)
 	: m_iMoveDuration(moveDuration), m_sName(name), m_dLengthOfAttack(lengthOfAttack), m_dAttackTimeThreshold(attackTimeThreshold), m_dStunDuration(stunDuration)
 {
+	this->levelPointer = levelPointer;
 	this->Timer.startTimer();
 	this->m_cIdentifier = identifier;
 	this->m_iHP = HP;
@@ -121,12 +122,100 @@ void Enemy::takeDamage(int amount)
 	this->m_iHP -= amount;
 }
 
+bool Enemy::move(int direction)
+{
+	switch (direction)
+	{
+	case 0:
+		this->m_cLocation.X--;
+		if (this->checkOutOfBounds())
+		{
+			this->m_cLocation.X++;
+			return false;
+		}
+		return true;
+	case 1:
+		this->m_cLocation.X--;
+		this->m_cLocation.Y++;
+		if (this->checkOutOfBounds())
+		{
+			this->m_cLocation.X++;
+			this->m_cLocation.Y--;
+			return false;
+		}
+		return true;
+	case 2:
+		this->m_cLocation.Y++;
+		if (this->checkOutOfBounds())
+		{
+			this->m_cLocation.Y--;
+			return false;
+		}
+		return true;
+	case 3:
+		this->m_cLocation.X++;
+		this->m_cLocation.Y++;
+		if (this->checkOutOfBounds())
+		{
+			this->m_cLocation.X--;
+			this->m_cLocation.Y--;
+			return false;
+		}
+		return true;
+	case 4:
+		this->m_cLocation.X++;
+		if (this->checkOutOfBounds())
+		{
+			this->m_cLocation.X--;
+			return false;
+		}
+		return true;
+	case 5:
+		this->m_cLocation.X++;
+		this->m_cLocation.Y--;
+		if (this->checkOutOfBounds())
+		{
+			this->m_cLocation.X--;
+			this->m_cLocation.Y++;
+			return false;
+		}
+		return true;
+	case 6:
+		this->m_cLocation.Y--;
+		if (this->checkOutOfBounds())
+		{
+			this->m_cLocation.Y++;
+			return false;
+		}
+		return true;
+	case 7:
+		this->m_cLocation.X--;
+		this->m_cLocation.Y--;
+		if (this->checkOutOfBounds())
+		{
+			this->m_cLocation.X++;
+			this->m_cLocation.Y++;
+			return false;
+		}
+		return true;
+	}
+	return false;
+}
+bool Enemy::checkOutOfBounds()
+{
+	if (this->levelPointer->getTile(this->m_cLocation) != ' ')
+	{
+		return true;
+	}
+	return false;
+}
+
 // ---------------------------------------
 // CLASS DEFINITION: EnemyMelee
 // ---------------------------------------
 
-EnemyMelee::EnemyMelee(std::string name, std::string indicator, COORD location, WORD color, int HP, int damage, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration)
-	: Enemy(name, indicator, location, color, HP, damage, moveDuration, lengthOfAttack, attackTimeThreshold, stunDuration)
+EnemyMelee::EnemyMelee(SLevel * levelPointer, std::string name, std::string indicator, COORD location, WORD color, int HP, int damage, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration)
+	: Enemy(levelPointer, name, indicator, location, color, HP, damage, moveDuration, lengthOfAttack, attackTimeThreshold, stunDuration)
 {
 
 }
@@ -183,6 +272,8 @@ void EnemyMelee::update(SGameChar * player)
 
 bool EnemyMelee::updateMovement(SGameChar * player)
 {
+	bool notMoved = false;
+
 	if (!this->isHit() && this->m_dAttackTime <= 0.0)
 	{
 		if (((this->m_cLocation.X == player->m_cLocation.X + 1 || this->m_cLocation.X == player->m_cLocation.X - 1) && this->m_cLocation.Y == player->m_cLocation.Y) ||
@@ -194,134 +285,257 @@ bool EnemyMelee::updateMovement(SGameChar * player)
 		{
 			if (this->m_cLocation.X - player->m_cLocation.X == 0) // Same row
 			{
-				if (this->m_cLocation.Y - player->m_cLocation.Y > 0)
+				if (this->m_cLocation.Y - player->m_cLocation.Y > 0) // To right of player
 				{
-					this->m_cLocation.Y--;
+					while (true)
+					{
+						if (this->move(6)) break;
+						if (this->move(7)) break;
+						if (this->move(5)) break;
+						if (this->move(4)) break;
+						if (this->move(0)) break;
+						notMoved = true;
+						break;
+					}
 				}
-				else
+				else // To left of player
 				{
-					this->m_cLocation.Y++;
+					while (true)
+					{
+						if (this->move(2)) break;
+						if (this->move(3)) break;
+						if (this->move(1)) break;
+						if (this->move(0)) break;
+						if (this->move(4)) break;
+						notMoved = true;
+						break;
+					}
 				}
 			}
 			else if (this->m_cLocation.Y - player->m_cLocation.Y == 0) // Same column
 			{
-				if (this->m_cLocation.X - player->m_cLocation.X > 0)
+				if (this->m_cLocation.X - player->m_cLocation.X > 0) // If below player
 				{
-					this->m_cLocation.X--;
+					while (true)
+					{
+						if (this->move(0)) break;
+						if (this->move(7)) break;
+						if (this->move(1)) break;
+						if (this->move(6)) break;
+						if (this->move(2)) break;
+						notMoved = true;
+						break;
+					}
 				}
-				else
+				else // If above player
 				{
-					this->m_cLocation.X++;
+					while (true)
+					{
+						if (this->move(4)) break;
+						if (this->move(3)) break;
+						if (this->move(5)) break;
+						if (this->move(2)) break;
+						if (this->move(6)) break;
+						notMoved = true;
+						break;
+					}
 				}
 			}
 			else
 			{
 				if (abs(this->m_cLocation.X - player->m_cLocation.X) == abs(this->m_cLocation.Y - player->m_cLocation.Y)) // Exactly diagonal
 				{
-					if (abs(this->m_cLocation.X - player->m_cLocation.X) == 1 && abs(this->m_cLocation.Y - player->m_cLocation.Y) == 1)
+					if (abs(this->m_cLocation.X - player->m_cLocation.X) == 1 && abs(this->m_cLocation.Y - player->m_cLocation.Y) == 1) // Within 1 tile of player
 					{
 						short dir = rand() / (RAND_MAX / 2);
-						if (this->m_cLocation.X - player->m_cLocation.X > 0)
+						if (this->m_cLocation.X - player->m_cLocation.X > 0) // Below player
 						{
-							if (this->m_cLocation.Y - player->m_cLocation.Y > 0)
+							if (this->m_cLocation.Y - player->m_cLocation.Y > 0) // To right of player
 							{
-								switch (dir)
+								while (true)
 								{
-								case 0:
-									this->m_cLocation.Y--;
-									break;
-								case 1:
-									this->m_cLocation.X--;
+									if (this->move(6)) break;
+									if (this->move(0)) break;
+									notMoved = true;
 									break;
 								}
 							}
-							else
+							else // To left of player
 							{
-								switch (dir)
+								while (true)
 								{
-								case 0:
-									this->m_cLocation.X--;
-									break;
-								case 1:
-									this->m_cLocation.Y++;
+									if (this->move(0)) break;
+									if (this->move(2)) break;
+									notMoved = true;
 									break;
 								}
 							}
 						}
-						else
+						else // Above player
 						{
-							if (this->m_cLocation.Y - player->m_cLocation.Y > 0)
+							if (this->m_cLocation.Y - player->m_cLocation.Y > 0) // To right of player
 							{
-								switch (dir)
+								while (true)
 								{
-								case 0:
-									this->m_cLocation.X++;
+									if (this->move(4)) break;
+									if (this->move(6)) break;
+									notMoved = true;
 									break;
-								case 1:
-									this->m_cLocation.Y--;
 								}
 							}
-							else
+							else // To left of player
 							{
-								switch (dir)
+								while (true)
 								{
-								case 0:
-									this->m_cLocation.Y++;
-									break;
-								case 1:
-									this->m_cLocation.X++;
+									if (this->move(2)) break;
+									if (this->move(4)) break;
+									notMoved = true;
 									break;
 								}
 							}
 						}
 					}
-					else
+					else // Not within 1 tile of player
 					{
-						if (this->m_cLocation.X - player->m_cLocation.X > 0)
+						if (this->m_cLocation.X - player->m_cLocation.X > 0) // Below player
 						{
-							this->m_cLocation.X--;
+							if (this->m_cLocation.Y - player->m_cLocation.Y > 0) // To right of player
+							{
+								while (true)
+								{
+									if (this->move(7)) break;
+									if (this->move(6)) break;
+									if (this->move(0)) break;
+									notMoved = true;
+									break;
+								}
+							}
+							else // To left of player
+							{
+								while (true)
+								{
+									if (this->move(1)) break;
+									if (this->move(0)) break;
+									if (this->move(2)) break;
+									notMoved = true;
+									break;
+								}
+							}
 						}
-						else
+						else // Above player
 						{
-							this->m_cLocation.X++;
-						}
-						if (this->m_cLocation.Y - player->m_cLocation.Y > 0)
-						{
-							this->m_cLocation.Y--;
-						}
-						else
-						{
-							this->m_cLocation.Y++;
+							if (this->m_cLocation.Y - player->m_cLocation.Y > 0) // To right of player
+							{
+								while (true)
+								{
+									if (this->move(5)) break;
+									if (this->move(4)) break;
+									if (this->move(6)) break;
+									notMoved = true;
+									break;
+								}
+							}
+							else // To left of player
+							{
+								while (true)
+								{
+									if (this->move(3)) break;
+									if (this->move(2)) break;
+									if (this->move(4)) break;
+									notMoved = true;
+									break;
+								}
+							}
 						}
 					}
 				}
-				else
+				else // Some different location
 				{
-					if (abs(this->m_cLocation.X - player->m_cLocation.X) > abs(this->m_cLocation.Y - player->m_cLocation.Y))
+					if (abs(this->m_cLocation.X - player->m_cLocation.X) > abs(this->m_cLocation.Y - player->m_cLocation.Y)) // X difference is greater than Y difference
 					{
-						if (this->m_cLocation.X - player->m_cLocation.X > 0)
+						if (this->m_cLocation.X - player->m_cLocation.X > 0) // Below player
 						{
-							this->m_cLocation.X--;
+							while (true)
+							{
+								if (this->move(0)) break;
+								if (this->m_cLocation.Y - player->m_cLocation.Y > 0) // To right of player
+								{
+									if (this->move(7)) break;
+									if (this->move(6)) break;
+								}
+								else // To left of player
+								{
+									if (this->move(1)) break;
+									if (this->move(2)) break;
+								}
+								notMoved = true;
+								break;
+							}
 						}
-						else
+						else // Above player
 						{
-							this->m_cLocation.X++;
+							while (true)
+							{
+								if (this->move(4)) break;
+								if (this->m_cLocation.Y - player->m_cLocation.Y > 0) // To right of player
+								{
+									if (this->move(5)) break;
+									if (this->move(6)) break;
+								}
+								else // To left of player
+								{
+									if (this->move(3)) break;
+									if (this->move(2)) break;
+								}
+								notMoved = true;
+								break;
+							}
 						}
 					}
-					else
+					else // Y difference is greater than X difference
 					{
-						if (this->m_cLocation.Y - player->m_cLocation.Y > 0)
+						if (this->m_cLocation.Y - player->m_cLocation.Y > 0) // To right of player
 						{
-							this->m_cLocation.Y--;
+							while (true)
+							{
+								if (this->move(6)) break;
+								if (this->m_cLocation.X - player->m_cLocation.X > 0) // Below player
+								{
+									if (this->move(7)) break;
+									if (this->move(0)) break;
+								}
+								else // Above player
+								{
+									if (this->move(5)) break;
+									if (this->move(4)) break;
+								}
+								notMoved = true;
+								break;
+							}
 						}
-						else
+						else // To left of player
 						{
-							this->m_cLocation.Y++;
+							while (true)
+							{
+								if (this->move(2)) break;
+								if (this->m_cLocation.X - player->m_cLocation.X > 0) // Below player
+								{
+									if (this->move(1)) break;
+									if (this->move(0)) break;
+								}
+								else
+								{
+									if (this->move(3)) break;
+									if (this->move(4)) break;
+								}
+								notMoved = true;
+								break;
+							}
 						}
 					}
 				}
 			}
-			this->m_dLastMoveTime = this->Timer.accurateTotalTime();
+			if (!notMoved) this->m_dLastMoveTime = this->Timer.accurateTotalTime();
 		}
 	}
 	return false;
@@ -331,8 +545,8 @@ bool EnemyMelee::updateMovement(SGameChar * player)
 // CLASS DEFINITION: EnemyRanged
 // ---------------------------------------
 
-EnemyRanged::EnemyRanged(std::vector<SPellet> * pellet, std::string name, std::string indicator, COORD location, WORD color, int HP, int damage, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration, bool isMobile, double pelletVelocity)
-	: Enemy(name, indicator, location, color, HP, damage, moveDuration, lengthOfAttack, attackTimeThreshold, stunDuration)
+EnemyRanged::EnemyRanged(SLevel * levelPointer, std::vector<SPellet> * pellet, std::string name, std::string indicator, COORD location, WORD color, int HP, int damage, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration, bool isMobile, double pelletVelocity)
+	: Enemy(levelPointer, name, indicator, location, color, HP, damage, moveDuration, lengthOfAttack, attackTimeThreshold, stunDuration)
 {
 	this->m_vPelletList = pellet;
 	this->m_bMobile = isMobile;
@@ -404,273 +618,657 @@ bool EnemyRanged::updateMovement(SGameChar * player)
 			}
 		}
 		
+		bool notMoved = false;
+
 		if (this->m_dLastMoveTime + this->m_iMoveDuration < this->Timer.accurateTotalTime())
 		{
 			if (this->m_cLocation.X == player->m_cLocation.X) // If same row
 			{
-				if (abs(this->m_cLocation.Y - player->m_cLocation.Y) <= 2)
+				if (abs(this->m_cLocation.Y - player->m_cLocation.Y) <= 2) // If Y distance 2 or less
 				{
-					if (this->m_cLocation.Y - player->m_cLocation.Y < 0)
+					if (this->m_cLocation.Y - player->m_cLocation.Y < 0) // If left of player
 					{
-						this->m_cLocation.Y--;
+						if (!this->move(6)) notMoved = true;
 					}
-					else
+					else // If right of player
 					{
-						this->m_cLocation.Y++;
+						if (!this->move(2)) notMoved = true;
 					}
 				}
-				else if (abs(this->m_cLocation.Y - player->m_cLocation.Y) >= 7)
+				else if (abs(this->m_cLocation.Y - player->m_cLocation.Y) >= 7) // If Y distance 7 or more
 				{
-					if (this->m_cLocation.Y - player->m_cLocation.Y < 0)
+					if (this->m_cLocation.Y - player->m_cLocation.Y < 0) // If left of player
 					{
-						this->m_cLocation.Y++;
+						if (!this->move(2)) notMoved = true;
 					}
-					else
+					else // If right of player
 					{
-						this->m_cLocation.Y--;
+						if (!this->move(6)) notMoved = true;
 					}
 				}
 			}
 			else if (this->m_cLocation.Y == player->m_cLocation.Y) // If same column
 			{
-				if (abs(this->m_cLocation.X - player->m_cLocation.X) <= 2)
+				if (abs(this->m_cLocation.X - player->m_cLocation.X) <= 2) // If X distance 2 or less
 				{
-					if (this->m_cLocation.X - player->m_cLocation.X < 0)
+					if (this->m_cLocation.X - player->m_cLocation.X < 0) // If above player
 					{
-						this->m_cLocation.X--;
+						if (!this->move(0)) notMoved = true;
 					}
-					else
+					else // If below player
 					{
-						this->m_cLocation.X++;
+						if (!this->move(4)) notMoved = true;
 					}
 				}
-				else if (abs(this->m_cLocation.X - player->m_cLocation.X >= 7))
+				else if (abs(this->m_cLocation.X - player->m_cLocation.X) >= 7) // If Y distance 7 or more
 				{
-					if (this->m_cLocation.X - player->m_cLocation.X < 0)
+					if (this->m_cLocation.X - player->m_cLocation.X < 0) // If above player
 					{
-						this->m_cLocation.X++;
+						if (!this->move(4)) notMoved = true;
 					}
-					else
+					else // If below player
 					{
-						this->m_cLocation.X--;
+						if (!this->move(0)) notMoved = true;
 					}
 				}
 			}
-			else if (abs(this->m_cLocation.X - player->m_cLocation.X) == abs(this->m_cLocation.Y - player->m_cLocation.Y))
+			else if (abs(this->m_cLocation.X - player->m_cLocation.X) == abs(this->m_cLocation.Y - player->m_cLocation.Y)) // If diagonal
 			{
-				if (abs(this->m_cLocation.X - player->m_cLocation.X) <= 2)
+				if (abs(this->m_cLocation.X - player->m_cLocation.X) <= 2) // If distance 2 or less
 				{
-					if (this->m_cLocation.X - player->m_cLocation.X < 0)
+					if (this->m_cLocation.X - player->m_cLocation.X < 0) // If above player
 					{
-						this->m_cLocation.X--;
-						if (this->m_cLocation.Y - player->m_cLocation.Y < 0)
+						if (this->m_cLocation.Y - player->m_cLocation.Y < 0) // If left of player
 						{
-							this->m_cLocation.Y--;
+							while (true)
+							{
+								if (this->move(7)) break;
+								if (this->move(6)) break;
+								if (this->move(0)) break;
+								notMoved = true;
+								break;
+							}
 						}
-						else
+						else // If right of player
 						{
-							this->m_cLocation.Y++;
+							while (true)
+							{
+								if (this->move(1)) break;
+								if (this->move(0)) break;
+								if (this->move(2)) break;
+								notMoved = true;
+								break;
+							}
 						}
 					}
-					else
+					else // If below player
 					{
-						this->m_cLocation.X++;
-						if (this->m_cLocation.Y - player->m_cLocation.Y < 0)
+						if (this->m_cLocation.Y - player->m_cLocation.Y < 0) // If left of player
 						{
-							this->m_cLocation.Y--;
+							while (true)
+							{
+								if (this->move(5)) break;
+								if (this->move(4)) break;
+								if (this->move(6)) break;
+								notMoved = true;
+								break;
+							}
 						}
-						else
+						else // If right of player
 						{
-							this->m_cLocation.Y++;
+							while (true)
+							{
+								if (this->move(3)) break;
+								if (this->move(2)) break;
+								if (this->move(4)) break;
+								notMoved = true;
+								break;
+							}
 						}
 					}
 				}
-				else if (abs(this->m_cLocation.X - player->m_cLocation.X) >= 7)
+				else if (abs(this->m_cLocation.X - player->m_cLocation.X) >= 7) // If distance 7 or more
 				{
-					if (this->m_cLocation.X - player->m_cLocation.X < 0)
+					if (this->m_cLocation.X - player->m_cLocation.X < 0) // If above player
 					{
 						this->m_cLocation.X++;
-						if (this->m_cLocation.Y - player->m_cLocation.Y < 0)
+						if (this->m_cLocation.Y - player->m_cLocation.Y < 0) // If left of player
 						{
-							this->m_cLocation.Y++;
+							while (true)
+							{
+								if (this->move(3)) break;
+								if (this->move(2)) break;
+								if (this->move(4)) break;
+								notMoved = true;
+								break;
+							}
 						}
-						else
+						else // If right of player
 						{
-							this->m_cLocation.Y--;
+							while (true)
+							{
+								if (this->move(5)) break;
+								if (this->move(4)) break;
+								if (this->move(6)) break;
+								notMoved = true;
+								break;
+							}
 						}
 					}
-					else
+					else // If below player
 					{
-						this->m_cLocation.X--;
-						if (this->m_cLocation.Y - player->m_cLocation.Y < 0)
+						if (this->m_cLocation.Y - player->m_cLocation.Y < 0) // If left of player
 						{
-							this->m_cLocation.Y++;
+							while (true)
+							{
+								if (this->move(1)) break;
+								if (this->move(0)) break;
+								if (this->move(2)) break;
+								notMoved = true;
+								break;
+							}
 						}
-						else
+						else // If right of player
 						{
-							this->m_cLocation.Y--;
+							while (true)
+							{
+								if (this->move(7)) break;
+								if (this->move(6)) break;
+								if (this->move(0)) break;
+								notMoved = true;
+								break;
+							}
 						}
 					}
 				}
 			}
-			else {
-				if (abs(this->m_cLocation.X - player->m_cLocation.X) == 1)
+			else { // Any other location
+				if (abs(this->m_cLocation.X - player->m_cLocation.X) == 1) // If next to row
 				{
-					if (abs(this->m_cLocation.Y - player->m_cLocation.Y) == 2)
+					if (this->m_cLocation.X - player->m_cLocation.X < 0) // If above player
 					{
-						if (this->m_cLocation.Y - player->m_cLocation.Y < 0)
+						if (abs(this->m_cLocation.Y - player->m_cLocation.Y) == 2) // If in special location
 						{
-							this->m_cLocation.Y--;
+							if (this->m_cLocation.Y - player->m_cLocation.Y < 0) // If left of player
+							{
+								while (true)
+								{
+									if (this->move(5)) break;
+									if (this->move(6)) break;
+									if (this->move(7)) break;
+									notMoved = true;
+									break;
+								}
+							}
+							else // If right of player
+							{
+								while (true)
+								{
+									if (this->move(3)) break;
+									if (this->move(2)) break;
+									if (this->move(1)) break;
+									notMoved = true;
+									break;
+								}
+							}
 						}
-						else
+						else if (abs(this->m_cLocation.Y - player->m_cLocation.Y) == 3) // If 3 Y away from player
 						{
-							this->m_cLocation.Y++;
+							if (this->m_cLocation.Y - player->m_cLocation.Y < 0) // If left of player
+							{
+								while (true)
+								{
+									if (this->move(4)) break;
+									if (this->move(5)) break;
+									notMoved = true;
+									break;
+								}
+							}
+							else // If right of player
+							{
+								while (true)
+								{
+									if (this->move(4)) break;
+									if (this->move(3)) break;
+									notMoved = true;
+									break;
+								}
+							}
+						}
+						else // Any other distance
+						{
+							if (this->m_cLocation.Y - player->m_cLocation.Y < 0) // If left of player
+							{
+								while (true)
+								{
+									if (this->move(4)) break;
+									if (this->move(3)) break;
+									if (this->move(5)) break;
+									notMoved = true;
+									break;
+								}
+							}
+							else // If right of player
+							{
+								while (true)
+								{
+									if (this->move(4)) break;
+									if (this->move(5)) break;
+									if (this->move(3)) break;
+									notMoved = true;
+									break;
+								}
+							}
 						}
 					}
-					if (this->m_cLocation.X - player->m_cLocation.X < 0)
+					else // If below player
 					{
-						this->m_cLocation.X++;
-					}
-					else
-					{
-						this->m_cLocation.X--;
+						if (abs(this->m_cLocation.Y - player->m_cLocation.Y) == 2) // If in special location
+						{
+							if (this->m_cLocation.Y - player->m_cLocation.Y < 0) // If left of player
+							{
+								while (true)
+								{
+									if (this->move(7)) break;
+									if (this->move(6)) break;
+									if (this->move(5)) break;
+									notMoved = true;
+									break;
+								}
+							}
+							else // If right of player
+							{
+								while (true)
+								{
+									if (this->move(1)) break;
+									if (this->move(2)) break;
+									if (this->move(3)) break;
+									notMoved = true;
+									break;
+								}
+							}
+						}
+						else if (abs(this->m_cLocation.Y - player->m_cLocation.Y) == 3) // If 3 Y away from player
+						{
+							if (this->m_cLocation.Y - player->m_cLocation.Y < 0) // If left of player
+							{
+								while (true)
+								{
+									if (this->move(0)) break;
+									if (this->move(7)) break;
+									notMoved = true;
+									break;
+								}
+							}
+							else // If right of player
+							{
+								while (true)
+								{
+									if (this->move(0)) break;
+									if (this->move(1)) break;
+									notMoved = true;
+									break;
+								}
+							}
+						}
+						else // Any other location
+						{
+							if (this->m_cLocation.Y - player->m_cLocation.Y < 0) // If left of player
+							{
+								while (true)
+								{
+									if (this->move(0)) break;
+									if (this->move(1)) break;
+									if (this->move(7)) break;
+									notMoved = true;
+									break;
+								}
+							}
+							else // If right of player
+							{
+								while (true)
+								{
+									if (this->move(0)) break;
+									if (this->move(7)) break;
+									if (this->move(1)) break;
+									notMoved = true;
+									break;
+								}
+							}
+						}
 					}
 				}
-				else if (abs(this->m_cLocation.Y - player->m_cLocation.Y) == 1)
+				else if (abs(this->m_cLocation.Y - player->m_cLocation.Y) == 1) // If next to column
 				{
-					if (abs(this->m_cLocation.X - player->m_cLocation.X) == 2)
+					if (this->m_cLocation.Y - player->m_cLocation.Y < 0) // If left of player
 					{
-						if (this->m_cLocation.X - player->m_cLocation.X < 0)
+						if (abs(this->m_cLocation.X - player->m_cLocation.X) == 2) // If in special location
 						{
-							this->m_cLocation.X--;
+							if (this->m_cLocation.X - player->m_cLocation.X < 0) // If above player
+							{
+								while (true)
+								{
+									if (this->move(1)) break;
+									if (this->move(0)) break;
+									if (this->move(7)) break;
+									notMoved = true;
+									break;
+								}
+							}
+							else // If below player
+							{
+								while (true)
+								{
+									if (this->move(3)) break;
+									if (this->move(4)) break;
+									if (this->move(5)) break;
+									notMoved = true;
+									break;
+								}
+							}
 						}
-						else
+						else if (abs(this->m_cLocation.X - player->m_cLocation.X) == 3) // If 3 X away from player
 						{
-							this->m_cLocation.X++;
+							if (this->m_cLocation.X - player->m_cLocation.X < 0) // If above player
+							{
+								while (true)
+								{
+									if (this->move(2)) break;
+									if (this->move(1)) break;
+									notMoved = true;
+									break;
+								}
+							}
+							else // If below player
+							{
+								while (true)
+								{
+									if (this->move(2)) break;
+									if (this->move(3)) break;
+									notMoved = true;
+									break;
+								}
+							}
+						}
+						else // Any other distance
+						{
+							if (this->m_cLocation.X - player->m_cLocation.X < 0) // If above player
+							{
+								while (true)
+								{
+									if (this->move(2)) break;
+									if (this->move(3)) break;
+									if (this->move(1)) break;
+									notMoved = true;
+									break;
+								}
+							}
+							else // If below player
+							{
+								while (true)
+								{
+									if (this->move(2)) break;
+									if (this->move(1)) break;
+									if (this->move(3)) break;
+									notMoved = true;
+									break;
+								}
+							}
 						}
 					}
-					if (this->m_cLocation.Y - player->m_cLocation.Y < 0)
+					else // If right of player
 					{
-						this->m_cLocation.Y++;
-					}
-					else
-					{
-						this->m_cLocation.Y--;
+						if (abs(this->m_cLocation.X - player->m_cLocation.X) == 2) // If in special location
+						{
+							if (this->m_cLocation.X - player->m_cLocation.X < 0) // If above player
+							{
+								while (true)
+								{
+									if (this->move(7)) break;
+									if (this->move(0)) break;
+									if (this->move(1)) break;
+									notMoved = true;
+									break;
+								}
+							}
+							else // If below player
+							{
+								while (true)
+								{
+									if (this->move(5)) break;
+									if (this->move(4)) break;
+									if (this->move(3)) break;
+									notMoved = true;
+									break;
+								}
+							}
+						}
+						else if (abs(this->m_cLocation.X - player->m_cLocation.X) == 3) // If 3 X away from player
+						{
+							if (this->m_cLocation.X - player->m_cLocation.X < 0) // If above player
+							{
+								while (true)
+								{
+									if (this->move(6)) break;
+									if (this->move(7)) break;
+									notMoved = true;
+									break;
+								}
+							}
+							else // If below player
+							{
+								while (true)
+								{
+									if (this->move(6)) break;
+									if (this->move(5)) break;
+									notMoved = true;
+									break;
+								}
+							}
+						}
+						else // Any other distance
+						{
+							if (this->m_cLocation.X - player->m_cLocation.X < 0) // If above player
+							{
+								while (true)
+								{
+									if (this->move(6)) break;
+									if (this->move(5)) break;
+									if (this->move(7)) break;
+									notMoved = true;
+									break;
+								}
+							}
+							else // If below player
+							{
+								while (true)
+								{
+									if (this->move(6)) break;
+									if (this->move(7)) break;
+									if (this->move(5)) break;
+									notMoved = true;
+									break;
+								}
+							}
+						}
 					}
 				}
 				else
 				{
-					if (abs(abs(this->m_cLocation.X - player->m_cLocation.X) - abs(this->m_cLocation.Y - player->m_cLocation.Y)) == 2)
+					if (abs(abs(this->m_cLocation.X - player->m_cLocation.X) - abs(this->m_cLocation.Y - player->m_cLocation.Y)) == 2) // If next to diagonal
 					{
-						if (this->m_cLocation.X - player->m_cLocation.X < 0)
+						if (this->m_cLocation.X - player->m_cLocation.X < 0) // If above player
 						{
-							if (this->m_cLocation.Y - player->m_cLocation.Y < 0)
+							if (this->m_cLocation.Y - player->m_cLocation.Y < 0) // If left of player
 							{
-								if (abs(this->m_cLocation.X - player->m_cLocation.X) > abs(this->m_cLocation.Y - player->m_cLocation.Y))
+								if (abs(this->m_cLocation.X - player->m_cLocation.X) > abs(this->m_cLocation.Y - player->m_cLocation.Y)) // If X difference is more than Y difference
 								{
-									this->m_cLocation.X++;
-									this->m_cLocation.Y--;
+									while (true)
+									{
+										if (this->move(5)) break;
+										if (this->move(2)) break;
+										notMoved = true;
+										break;
+									}
 								}
-								else
+								else // If Y difference is more than X difference
 								{
-									this->m_cLocation.X--;
-									this->m_cLocation.Y++;
+									while (true)
+									{
+										if (this->move(1)) break;
+										if (this->move(4)) break;
+										notMoved = true;
+										break;
+									}
 								}
 							}
-							else
+							else // If right of player
 							{
-								if (abs(this->m_cLocation.X - player->m_cLocation.X) > abs(this->m_cLocation.Y - player->m_cLocation.Y))
+								if (abs(this->m_cLocation.X - player->m_cLocation.X) > abs(this->m_cLocation.Y - player->m_cLocation.Y))// If X difference is more than Y difference
 								{
-									this->m_cLocation.X++;
-									this->m_cLocation.Y++;
+									while (true)
+									{
+										if (this->move(3)) break;
+										if (this->move(0)) break;
+										notMoved = true;
+										break;
+									}
 								}
-								else
+								else // If Y difference is more than X difference
 								{
-									this->m_cLocation.X--;
-									this->m_cLocation.Y--;
+									while (true)
+									{
+										if (this->move(7)) break;
+										if (this->move(2)) break;
+										notMoved = true;
+										break;
+									}
 								}
 							}
 						}
-						else
+						else // If below player
 						{
-							if (this->m_cLocation.Y - player->m_cLocation.Y < 0)
+							if (this->m_cLocation.Y - player->m_cLocation.Y < 0) // If left of player
 							{
-								if (abs(this->m_cLocation.X - player->m_cLocation.X) > abs(this->m_cLocation.Y - player->m_cLocation.Y))
+								if (abs(this->m_cLocation.X - player->m_cLocation.X) > abs(this->m_cLocation.Y - player->m_cLocation.Y)) // If X difference is more than Y difference
 								{
-									this->m_cLocation.X--;
-									this->m_cLocation.Y--;
+									while (true)
+									{
+										if (this->move(7)) break;
+										if (this->move(4)) break;
+										notMoved = true;
+										break;
+									}
 								}
-								else
+								else // If Y difference is more than X difference
 								{
-									this->m_cLocation.X++;
-									this->m_cLocation.Y++;
+									while (true)
+									{
+										if (this->move(3)) break;
+										if (this->move(6)) break;
+										notMoved = true;
+										break;
+									}
 								}
 							}
-							else
+							else // If right of player
 							{
-								if (abs(this->m_cLocation.X - player->m_cLocation.X) > abs(this->m_cLocation.Y - player->m_cLocation.Y))
+								if (abs(this->m_cLocation.X - player->m_cLocation.X) > abs(this->m_cLocation.Y - player->m_cLocation.Y)) // If X difference is more than Y difference
 								{
-									this->m_cLocation.X--;
-									this->m_cLocation.Y++;
+									while (true)
+									{
+										if (this->move(1)) break;
+										if (this->move(6)) break;
+										notMoved = true;
+										break;
+									}
 								}
-								else
+								else // If Y difference is more than X difference
 								{
-									this->m_cLocation.X++;
-									this->m_cLocation.Y--;
+									while (true)
+									{
+										if (this->move(5)) break;
+										if (this->move(0)) break;
+										notMoved = true;
+										break;
+									}
 								}
 							}
 						}
 					}
-					else
+					else // Any other location
 					{
-						if (abs(this->m_cLocation.X - player->m_cLocation.X) > abs(this->m_cLocation.Y - player->m_cLocation.Y))
+						if (abs(this->m_cLocation.X - player->m_cLocation.X) > abs(this->m_cLocation.Y - player->m_cLocation.Y)) // If X difference is more than Y difference
 						{
-							if (this->m_cLocation.Y - player->m_cLocation.Y < 0)
+							if (this->m_cLocation.Y - player->m_cLocation.Y < 0) // If left of player
 							{
-								this->m_cLocation.Y++;
-							}
-							else
-							{
-								this->m_cLocation.Y--;
-							}
-							if (abs(this->m_cLocation.X - player->m_cLocation.X) >= 7)
-							{
-								if (this->m_cLocation.X - player->m_cLocation.X < 0)
+								while (true)
 								{
-									this->m_cLocation.X++;
+									if (abs(this->m_cLocation.X - player->m_cLocation.X) >= 7)
+										if (this->move(1)) break;
+									if (this->move(2)) break;
+									if (abs(this->m_cLocation.X - player->m_cLocation.X) < 7)
+										if (this->move(3)) break;
+									if (this->move(1)) break;
+									notMoved = true;
+									break;
 								}
-								else
+							}
+							else // If right of player
+							{
+								while (true)
 								{
-									this->m_cLocation.X--;
+									if (abs(this->m_cLocation.X - player->m_cLocation.X) >= 7)
+										if (this->move(7)) break;
+									if (this->move(6)) break;
+									if (abs(this->m_cLocation.X - player->m_cLocation.X) < 7)
+										if (this->move(5)) break;
+									if (this->move(7)) break;
+									notMoved = true;
+									break;
 								}
 							}
 						}
-						else
+						else // If Y difference is more than X difference
 						{
-							if (this->m_cLocation.X - player->m_cLocation.X < 0)
+							if (this->m_cLocation.X - player->m_cLocation.X < 0) // If above player
 							{
-								this->m_cLocation.X++;
-							}
-							else
-							{
-								this->m_cLocation.X--;
-							}
-							if (abs(this->m_cLocation.Y - player->m_cLocation.Y) >= 7)
-							{
-								if (this->m_cLocation.Y - player->m_cLocation.Y < 0)
+								while (true)
 								{
-									this->m_cLocation.Y++;
+									if (abs(this->m_cLocation.Y - player->m_cLocation.Y) >= 7)
+										if (this->move(3)) break;
+									if (this->move(4)) break;
+									if (abs(this->m_cLocation.Y - player->m_cLocation.Y) < 7)
+										if (this->move(5)) break;
+									if (this->move(3)) break;
+									notMoved = true;
+									break;
 								}
-								else
+							}
+							else // If below player
+							{
+								while (true)
 								{
-									this->m_cLocation.Y--;
+									if (abs(this->m_cLocation.Y - player->m_cLocation.Y) >= 7)
+										if (this->move(7)) break;
+									if (this->move(0)) break;
+									if (abs(this->m_cLocation.Y - player->m_cLocation.Y) < 7)
+										if (this->move(1)) break;
+									if (this->move(7)) break;
+									notMoved = true;
+									break;
 								}
 							}
 						}
 					}
 				}
 			}
-			this->m_dLastMoveTime = this->Timer.accurateTotalTime();
+			if (!notMoved) this->m_dLastMoveTime = this->Timer.accurateTotalTime();
+		}
+
+		if (!this->m_bMobile && this->m_dAttackTime <= 0.0 && notMoved)
+		{
+			return true;
 		}
 
 		if (this->m_bMobile)

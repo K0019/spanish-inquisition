@@ -14,7 +14,8 @@ namespace pellet
 		P_WALL,
 		P_DOOR,
 		P_PLAYER,
-		P_ENEMY
+		P_ENEMY,
+		P_FLOOR
 	};
 }
 
@@ -29,6 +30,7 @@ struct SPellet
 	double m_dTime; // Length of time that the pellet has not updated
 	double m_dVelocity; // Delay to when pellet will move
 	int m_iDamage; // Damage pellet deals to entity hit
+	double m_dLifespan; //Pellet lifespan
 
 	SPellet(COORD * c, int direction, int damage, double velocity, bool friendly); // Constructor
 	void update(); // Update position of pellet

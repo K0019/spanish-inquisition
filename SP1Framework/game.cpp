@@ -12,22 +12,23 @@ int		g_iCurrentFrameCount, g_iLastFrameCount, g_iLastMeasuredSecond;
 double	g_dAccurateElapsedTime;
 bool	g_abKeyPressed[K_COUNT];
 COORD	r_cRenderOffset; // To be used for level rendering, tile coordinates
-COORD	r_curspos;
+
 int		r_iMoveDirection;
 double	r_dMoveTime;
+
+// Console object
+Console g_Console(100, 25, "The Great Escapade");
 
 // Game specific variables here
 EGAMESTATES			g_eGameState = S_SPLASHSCREEN;
 SLevel				g_sLevel;
 SaveDataStorage		saveDataStorage;
 SAllEntities		g_sEntities; // Hold all entities in the level
+MenuEvent			g_mEvent(&g_Console);
 double				g_adBounceTime[K_COUNT]; // this is to prevent key bouncing, so we won't trigger keypresses more than once
 
 bool g_bHasShot;
 bool g_bHasWeapon;
-
-// Console object
-Console g_Console(100, 25, "The Great Escapade");
 
 //--------------------------------------------------------------
 // Purpose  : Initialisation function
@@ -58,8 +59,8 @@ void init( void )
 	if (DEBUG) g_sEntities.g_sChar.m_bInBattle = true;
 	r_cRenderOffset.X = 1 + g_sEntities.g_sChar.m_cRoom.X * (ROOM_X + 2);
 	r_cRenderOffset.Y = 1 + g_sEntities.g_sChar.m_cRoom.Y * (ROOM_Y + 2);
-	r_curspos.X = g_Console.getConsoleSize().X >> 1;
-	r_curspos.Y = g_Console.getConsoleSize().Y >> 1;
+	g_mEvent.r_curspos.X = g_Console.getConsoleSize().X / 5;
+	g_mEvent.r_curspos.Y = g_Console.getConsoleSize().Y / 10 * 6;
 	g_sLevel.generateLevel();
 	g_sLevel.floor = 1;
 	COORD c;
@@ -110,6 +111,7 @@ void getInput( void )
 	g_abKeyPressed[K_SHOOTLEFT] = isKeyPressed(VK_LEFT);
 	g_abKeyPressed[K_SPACE]  = isKeyPressed(VK_SPACE);
 	g_abKeyPressed[K_ESCAPE] = isKeyPressed(VK_ESCAPE);
+	g_abKeyPressed[K_ENTER] = isKeyPressed(VK_RETURN);
 }
 
 //--------------------------------------------------------------
@@ -188,7 +190,7 @@ void mainMenu()
 {
 	processUserInput(); // checks if you should change states or do something else with the game, e.g. pause, exit
 	menuNavigate();
-	g_eGameState = S_GAME;
+	processMenuEvent();
 }
 
 void gameplay()            // gameplay logic
@@ -199,12 +201,48 @@ void gameplay()            // gameplay logic
 	g_sEntities.updatePellets(); // update locations of pellets
 	checkHitPellets(); // checks if the pellets have hit anything, and update stats accordingly
 	g_sEntities.updateEnemies(); // update locations of enemies and add pellets of the enemies'
-					// sound can be played here too.
+	// sound can be played here too.
 }
 
 void menuNavigate()
 {
-
+	bool KeyPressed = false;
+	if (g_abKeyPressed[K_SHOOTUP] && g_mEvent.sh_cursSel > 0 && g_adBounceTime[K_SHOOTUP] < g_dElapsedTime)
+	{
+		g_mEvent.sh_cursSel--;
+		g_mEvent.r_curspos.Y--;
+		KeyPressed = true;
+	}
+	else if (g_abKeyPressed[K_SHOOTDOWN] && g_mEvent.sh_cursSel < 2 && g_adBounceTime[K_SHOOTDOWN] < g_dElapsedTime)
+	{
+		g_mEvent.sh_cursSel++;
+		g_mEvent.r_curspos.Y++;
+		KeyPressed = true;
+	}
+	if (g_abKeyPressed[K_ENTER])
+	{
+		switch (g_mEvent.sh_cursSel)
+		{
+		case 0:
+			g_mEvent.bStartGame = true;
+			break;
+		case 1:
+			g_mEvent.bOptions = true;
+			break;
+		case 2:
+			g_bQuitGame = !g_bQuitGame;
+			break;
+		default:
+			break;
+		}
+	}
+	if (KeyPressed)
+	{
+		if (g_abKeyPressed[K_SHOOTUP])
+			g_adBounceTime[K_SHOOTUP] = g_dElapsedTime + 0.25;
+		if (g_abKeyPressed[K_SHOOTDOWN]) 
+			g_adBounceTime[K_SHOOTDOWN] = g_dElapsedTime + 0.25;
+	}
 }
 
 void resetLevel(int floor)
@@ -379,24 +417,24 @@ void controlPlayer()
 				{
 					switch (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_iWeaponLevel)
 					{
-					case 1:
+					case 1: //Blue Feather Level 1: Decrease movement delay by 10%
 						{
 							g_adBounceTime[i] *= g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed;
 							break;
 						}
-					case 2:
+					case 2: //Blue Feather Level 2: Decrease movement delay by 20%
 						{
-							g_adBounceTime[i] *= (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.1);
+							g_adBounceTime[i] *= (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.10);
 							break;
 						}
-					case 3:
+					case 3: //Blue Feather Level 3: Decrease movement delay by 30%
 						{
-							g_adBounceTime[i] *= (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.2);
+							g_adBounceTime[i] *= (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.20);
 							break;
 						}
-					case 4:
+					case 4: //Blue Feather Level 4: Decrease movement delay by 40%
 						{
-							g_adBounceTime[i] *= (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.3);
+							g_adBounceTime[i] *= (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.30);
 							break;
 						}
 					}
@@ -420,6 +458,13 @@ void clearScreen()
 	g_Console.clearBuffer(0x0f);
 }
 
+void processMenuEvent()
+{
+	if (g_mEvent.bStartGame == 1)
+	{
+		g_eGameState = S_GAME;
+	}
+}
 void renderSplashScreen()  // renders the splash screen
 {
 	COORD c = g_Console.getConsoleSize();
@@ -485,16 +530,27 @@ void renderScore()
 
 void renderMenu()
 {
-	COORD c = g_Console.getConsoleSize();
-	c.X >>= 1;
-	c.Y >>= 1;
-	g_Console.writeToBuffer(c, "Selection", 0x0f);
+	COORD c;
+	c.X = g_Console.getConsoleSize().X / 5 + 2;
+	c.Y = g_Console.getConsoleSize().Y / 10 * 6;
+	g_Console.writeToBuffer(c, "PLAY", 0x8f);
+	c.Y++;
+	g_Console.writeToBuffer(c, "OPTIONS", 0x0f);
+	c.Y++;
+	g_Console.writeToBuffer(c, "SHOP", 0x8f);
 }
 
 void renderCursor()
 {
-	COORD c = r_curspos;
+	COORD c = g_mEvent.r_curspos;
 	g_Console.writeToBuffer(c, ">", 0x0f);
+	if (DEBUG)
+	{
+		c.X -= 2;
+		g_Console.writeToBuffer(c, std::to_string(g_mEvent.r_curspos.Y), 0x0f);
+		c.X -= 2;
+		g_Console.writeToBuffer(c, std::to_string(g_mEvent.sh_cursSel), 0x0f);
+	}
 }
 
 void renderCharacter()
@@ -551,24 +607,24 @@ void playerShoot()
 	{
 		switch (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_iWeaponLevel) // Index 5 (Magic Potion): Decrease attack delay by 10/20/30/40%
 		{
-		case 1:
+		case 1: //Magic Potion Level 1: Decrease attack delay by 10%
 			{
-				delay = SHOOTSPEED * 0.90;
+				delay = SHOOTSPEED * g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_fWeaponAttackSpeed;
 				break;
 			}
-		case 2:
+		case 2: //Magic Potion Level 2: Decrease attack delay by 20%
 			{
-				delay = SHOOTSPEED * 0.80;
+				delay = SHOOTSPEED * g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_fWeaponAttackSpeed - 0.10;
 				break;
 			}
-		case 3:
+		case 3: //Magic Potion Level 3: Decrease attack delay by 30%
 			{
-				delay = SHOOTSPEED * 0.70;
+				delay = SHOOTSPEED * g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_fWeaponAttackSpeed - 0.20;
 				break;
 			}
-		case 4:
+		case 4: //Magic Potion Level 4: Decrease attack delay by 40%
 			{
-				delay = SHOOTSPEED * 0.60;
+				delay = SHOOTSPEED * g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_fWeaponAttackSpeed - 0.30;
 				break;
 			}
 		}
@@ -755,6 +811,9 @@ void renderPellets()
 			case pellet::P_ENEMY:
 				g_Console.writeToBuffer(pellet.getRealCoords(), "><", 0x09);
 				break;
+			case pellet::P_FLOOR:
+				g_Console.writeToBuffer(pellet.getRealCoords(), "><", 0x09);
+				break;
 			}
 		}
 		else
@@ -783,6 +842,9 @@ void renderPellets()
 				}
 				break;
 			case pellet::P_PLAYER:
+				g_Console.writeToBuffer(pellet.getRealCoords(), "><", 0x04);
+				break;
+			case pellet::P_FLOOR:
 				g_Console.writeToBuffer(pellet.getRealCoords(), "><", 0x04);
 				break;
 			}
@@ -819,7 +881,7 @@ void renderStat()
 	c.Y = 3;
 	g_Console.writeToBuffer(c, ss.str());
 
-	//Rendering player's damage
+	//Rendering player's item count
 	ss.str("");
 	ss << "Items: " << g_sEntities.g_sChar.m_sPlayerItems.ItemCount;
 	c.Y = 4;
@@ -853,6 +915,27 @@ void checkHitPellets()
 			pellet++;
 			continue;
 		}
+		if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[0].m_bHasWeapon) //Index 1 (Heaven Cracker): Doubles the pellet lifespan to 5 seconds.
+		{
+			g_sEntities.g_sChar.m_dRange *= 2; //!Current issue!: if player has weapon, both player and enemy receives the range increase
+			if (pellet->m_dLifespan >= g_sEntities.g_sChar.m_dRange)  //Check if the pellet has reached its lifespan of 5 seconds, if it does, clear the pellet and show the "><" hit effect.
+			{
+				pellet->m_bHit = true;
+				pellet->m_bHitReason = pellet::P_FLOOR;
+				continue;
+			}
+		}
+		else
+		{
+			if (pellet->m_dLifespan >= g_sEntities.g_sChar.m_dRange)
+			{
+				pellet->m_bHit = true;
+				pellet->m_bHitReason = pellet::P_FLOOR;
+				continue;
+			}
+		}
+
+
 
 		// Check collision with wall
 		if ((pellet->m_cLocation.X - 1) % (ROOM_X + 2) == 0 ||
@@ -860,14 +943,22 @@ void checkHitPellets()
 			(pellet->m_cLocation.Y - 1) % (ROOM_Y + 2) == 0 ||
 			pellet->m_cLocation.Y % (ROOM_Y + 2) == 0)
 		{
-			pellet->m_bHit = true;
 			if (g_sLevel.getTile(pellet->m_cLocation) == '$')
 			{
+				pellet->m_bHit = true;
 				pellet->m_bHitReason = pellet::P_DOOR;
 			}
 			else
 			{
-				pellet->m_bHitReason = pellet::P_WALL;
+				//if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[0].m_bHasWeapon) //Index 1 (Heaven Cracker): Player shot pelllets ignore wall collision and appear on the other side of the room
+				//{
+
+				//}
+				//else
+				//{
+					pellet->m_bHit = true;
+					pellet->m_bHitReason = pellet::P_WALL;
+				//}
 			}
 			pellet++;
 			continue;
@@ -879,7 +970,36 @@ void checkHitPellets()
 			pellet->m_bHit = true;
 			pellet->m_bHitReason = pellet::P_PLAYER;
 			
-			g_sEntities.g_sChar.m_iPlayerHealth -= pellet->m_iDamage;
+			if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[3].m_bHasWeapon) //Index 4 (Glass Canon): All Enemies deal 1/2/3/4 more damage to players.
+			{
+				switch (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[3].m_iWeaponLevel)
+				{
+					case 1: //Glass Canon Level 1: All Enemies deal 1 more damage to the player
+						{
+							g_sEntities.g_sChar.m_iPlayerHealth -= (pellet->m_iDamage + 1);
+							break;
+						}
+					case 2: //Glass Canon Level 2: All Enemies deal 2 more damage to the player
+						{
+							g_sEntities.g_sChar.m_iPlayerHealth -= (pellet->m_iDamage + 2);
+							break;
+						}
+					case 3: //Glass Canon Level 3: All Enemies deal 3 more damage to the player
+						{
+							g_sEntities.g_sChar.m_iPlayerHealth -= (pellet->m_iDamage + 3);
+							break;
+						}
+					case 4: //Glass Canon Level 4: All Enemies deal 4 more damage to the player
+						{
+							g_sEntities.g_sChar.m_iPlayerHealth -= (pellet->m_iDamage + 4);
+							break;
+						}
+				}
+			}
+			else
+			{
+				g_sEntities.g_sChar.m_iPlayerHealth -= pellet->m_iDamage;
+			}
 			// TODO: Check for death
 
 			pellet++;

@@ -27,3 +27,29 @@ void g_SaveToSave(unsigned int* SaveDataArray)
 	}
 	else throw (std::invalid_argument("cannot write to file."));
 }
+
+void g_LoadFromFloor(short FloorNumber, std::vector<std::string> *currRoomIndex)
+{
+	std::string FloorSelector = "../res/MapData/FloorData/Floor" + std::to_string(FloorNumber) + ".txt";
+	std::ifstream FloorFileData(FloorSelector);
+	if (FloorFileData.is_open())
+	{
+		for (std::string j; std::getline(FloorFileData, j);)
+		{
+			currRoomIndex->push_back(j);
+		}
+	}
+}
+
+void g_LoadFromRoom(std::string *RoomNumber, std::string *Level)
+{
+	std::string RoomSelector = "../res/MapData/RoomData/" + *RoomNumber +".txt";
+	std::ifstream RoomFileData(RoomSelector);
+	if (RoomFileData.is_open())
+	{
+		for (std::string j; std::getline(RoomFileData, j);)
+		{
+			// KENDRICK DO THINGS
+		}
+	}
+}

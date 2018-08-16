@@ -4,6 +4,7 @@
 #define LEVELHEAD
 
 #include "definitions.h"
+#include "fileio.h"
 #include <Windows.h>
 #include <vector>
 #include <algorithm>
@@ -13,7 +14,7 @@ struct SLevel
 {
 	COORD playerStartRoom, exitRoom; // Stored in grid coordinates
 	std::string level[GRID_X + (ROOM_X + 1) * GRID_X + 2]; // Includes borders
-	int floor;
+	short floor;
 
 	void generateLevel(); // Create a new level
 	std::vector<COORD> seekToEnd(std::vector<COORD>& returned); // Find a path from playerStartRoom to exitRoom
@@ -21,7 +22,8 @@ struct SLevel
 	void modifyTile(COORD c, std::string ch); // Change a tile on the level, using tile coordinates
 	char getTile(COORD c); // Get what tile is at the coordinate, using tile coordinates
 	COORD * getCoordinatesForDoor(const SHORT& X, const SHORT& Y, const int& direction); // Get console coordinates of a door placement
-};
 
+	std::vector<std::string> roomIndex;
+};
 
 #endif // !LEVELHEAD

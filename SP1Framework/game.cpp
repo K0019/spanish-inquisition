@@ -66,7 +66,8 @@ void init( void )
 	COORD c;
 	c.X = (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
 	c.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
-	g_sEntities.m_vEnemy.push_back(std::move(std::unique_ptr<EnemyRanged> (new EnemyRanged(&g_sEntities.m_vPellets, "Test", "tt", c, (WORD)0x09, 10, 3, 0.4, 0.3, 0.1, 0.3, false, 0.25))));
+	//g_sEntities.m_vEnemy.push_back(std::move(std::unique_ptr<EnemyMelee>(new EnemyMelee(&g_sLevel, "Test", "tt", c, (WORD)0x09, 10, 3, 0.4, 0.3, 0.1, 0.3))));
+	g_sEntities.m_vEnemy.push_back(std::move(std::unique_ptr<EnemyRanged> (new EnemyRanged(&g_sLevel, &g_sEntities.m_vPellets, "Test", "tt", c, (WORD)0x09, 10, 3, 0.4, 0.3, 0.1, 0.3, false, 0.25))));
     // sets the width, height and the font name to use in the console
     g_Console.setConsoleFont(0, 16, L"Consolas");
 	g_LoadFromSave(saveDataStorage.g_iSaveData);
@@ -266,13 +267,27 @@ void controlPlayer()
 		}
 		else
 		{
-			bSomethingHappened = true;
-			if (g_sEntities.g_sChar.m_cLocation.X < r_cRenderOffset.X)
+			bool skip = false;
+
+			for (auto& enemy : g_sEntities.m_vEnemy)
 			{
-				r_cRenderOffset.X -= (ROOM_X + 2);
-				g_sEntities.g_sChar.m_cLocation.X--;
-				g_sEntities.clearPellets();
-				g_sEntities.clearEnemies();
+				if (g_sEntities.g_sChar.m_cLocation.X == enemy->getLocation().X && g_sEntities.g_sChar.m_cLocation.Y == enemy->getLocation().Y)
+				{
+					skip = true;
+					g_sEntities.g_sChar.m_cLocation.X++;
+					break;
+				}
+			}
+			if (!skip)
+			{
+				bSomethingHappened = true;
+				if (g_sEntities.g_sChar.m_cLocation.X < r_cRenderOffset.X)
+				{
+					r_cRenderOffset.X -= (ROOM_X + 2);
+					g_sEntities.g_sChar.m_cLocation.X--;
+					g_sEntities.clearPellets();
+					g_sEntities.clearEnemies();
+				}
 			}
 		}
     }
@@ -286,13 +301,27 @@ void controlPlayer()
 		}
 		else
 		{
-			bSomethingHappened = true;
-			if (g_sEntities.g_sChar.m_cLocation.Y < r_cRenderOffset.Y)
+			bool skip = false;
+
+			for (auto& enemy : g_sEntities.m_vEnemy)
 			{
-				r_cRenderOffset.Y -= (ROOM_Y + 2);
-				g_sEntities.g_sChar.m_cLocation.Y--;
-				g_sEntities.clearPellets();
-				g_sEntities.clearEnemies();
+				if (g_sEntities.g_sChar.m_cLocation.X == enemy->getLocation().X && g_sEntities.g_sChar.m_cLocation.Y == enemy->getLocation().Y)
+				{
+					skip = true;
+					g_sEntities.g_sChar.m_cLocation.Y++;
+					break;
+				}
+			}
+			if (!skip)
+			{
+				bSomethingHappened = true;
+				if (g_sEntities.g_sChar.m_cLocation.Y < r_cRenderOffset.Y)
+				{
+					r_cRenderOffset.Y -= (ROOM_Y + 2);
+					g_sEntities.g_sChar.m_cLocation.Y--;
+					g_sEntities.clearPellets();
+					g_sEntities.clearEnemies();
+				}
 			}
 		}
     }
@@ -306,13 +335,27 @@ void controlPlayer()
 		}
 		else
 		{
-			bSomethingHappened = true;
-			if (g_sEntities.g_sChar.m_cLocation.X >= r_cRenderOffset.X + ROOM_X + 2)
+			bool skip = false;
+
+			for (auto& enemy : g_sEntities.m_vEnemy)
 			{
-				r_cRenderOffset.X += (ROOM_X + 2);
-				g_sEntities.g_sChar.m_cLocation.X++;
-				g_sEntities.clearPellets();
-				g_sEntities.clearEnemies();
+				if (g_sEntities.g_sChar.m_cLocation.X == enemy->getLocation().X && g_sEntities.g_sChar.m_cLocation.Y == enemy->getLocation().Y)
+				{
+					skip = true;
+					g_sEntities.g_sChar.m_cLocation.X--;
+					break;
+				}
+			}
+			if (!skip)
+			{
+				bSomethingHappened = true;
+				if (g_sEntities.g_sChar.m_cLocation.X >= r_cRenderOffset.X + ROOM_X + 2)
+				{
+					r_cRenderOffset.X += (ROOM_X + 2);
+					g_sEntities.g_sChar.m_cLocation.X++;
+					g_sEntities.clearPellets();
+					g_sEntities.clearEnemies();
+				}
 			}
 		}
     }
@@ -326,13 +369,27 @@ void controlPlayer()
 		}
 		else
 		{
-			bSomethingHappened = true;
-			if (g_sEntities.g_sChar.m_cLocation.Y >= r_cRenderOffset.Y + ROOM_Y + 2)
+			bool skip = false;
+
+			for (auto& enemy : g_sEntities.m_vEnemy)
 			{
-				r_cRenderOffset.Y += (ROOM_Y + 2);
-				g_sEntities.g_sChar.m_cLocation.Y++;
-				g_sEntities.clearPellets();
-				g_sEntities.clearEnemies();
+				if (g_sEntities.g_sChar.m_cLocation.X == enemy->getLocation().X && g_sEntities.g_sChar.m_cLocation.Y == enemy->getLocation().Y)
+				{
+					skip = true;
+					g_sEntities.g_sChar.m_cLocation.Y--;
+					break;
+				}
+			}
+			if (!skip)
+			{
+				bSomethingHappened = true;
+				if (g_sEntities.g_sChar.m_cLocation.Y >= r_cRenderOffset.Y + ROOM_Y + 2)
+				{
+					r_cRenderOffset.Y += (ROOM_Y + 2);
+					g_sEntities.g_sChar.m_cLocation.Y++;
+					g_sEntities.clearPellets();
+					g_sEntities.clearEnemies();
+				}
 			}
 		}
     }

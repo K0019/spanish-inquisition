@@ -3,7 +3,9 @@
 #ifndef LEVELHEAD
 #define LEVELHEAD
 
-#include "entity.h"
+#include "definitions.h"
+#include <Windows.h>
+#include <vector>
 #include <algorithm>
 #include <fstream>
 

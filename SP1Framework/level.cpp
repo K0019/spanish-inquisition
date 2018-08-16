@@ -62,17 +62,6 @@ void SLevel::generateLevel()
 		}
 	}
 
-	std::ofstream dump("level.txt");
-	for (int row = 0; row < (ROOM_X + 2) * GRID_X + 2; row++)
-	{
-		std::string line;
-		for (int column = 0; column < (ROOM_Y + 2) * GRID_Y + 2; column++)
-		{
-			line += this->level[row][column];
-		}
-		dump << line << std::endl;
-	}
-
 	//// -----Borders and Padding-----
 	//// Add the top border
 	//for (int i = 0; i < 2; i++)

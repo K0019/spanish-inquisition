@@ -2,7 +2,7 @@
 
 void g_LoadFromSave(unsigned int* SaveDataArray)
 {
-	std::ifstream SaveFileData("../res/SaveData/saves.txt");
+	std::ifstream SaveFileData("../res/SaveData/saves.SAVE");
 	if (SaveFileData.is_open())
 	{
 		int i = 0;
@@ -16,7 +16,7 @@ void g_LoadFromSave(unsigned int* SaveDataArray)
 
 void g_SaveToSave(unsigned int* SaveDataArray)
 {
-	std::ofstream SaveFileData("../res/SaveData/saves.txt");
+	std::ofstream SaveFileData("../res/SaveData/saves.SAVE");
 	if (SaveFileData.is_open())
 	{
 		for (int i = 0; i < 9 ; i++)

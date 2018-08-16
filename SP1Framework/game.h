@@ -29,6 +29,7 @@ enum EKEYS
 	K_SHOOTLEFT,
     K_ESCAPE,
     K_SPACE,
+	K_ENTER,
     K_COUNT
 };
 
@@ -41,6 +42,8 @@ enum EGAMESTATES
     S_GAME,
     S_COUNT
 };
+
+
 
 void init        ( void );      // initialize your variables, allocate memory, etc
 void getInput    ( void );      // get input from player
@@ -62,6 +65,7 @@ void controlPlayer();		// moves the character, collision detection, physics, etc
 void processUserInput();	// checks if you should change states or do something else with the game, e.g. pause, exit
 void clearScreen();			// clears the current screen and draw from scratch 
 void checkHitPellets(); // Check if pellets have hit anything
+void processMenuEvent();
 
 /*
 	THE RENDER FUNCTIONS

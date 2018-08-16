@@ -12,7 +12,7 @@
 // struct for the game character
 struct SGameChar
 {
-	COORD m_cLocation;
+	COORD m_cLocation; // Tile coordinates of the player
 	COORD m_cRoom; // Room coordinates that the player is in
 	bool m_bInBattle; // If player is in a room with enemies
 	int m_iMaxHealth = 10;
@@ -23,9 +23,9 @@ struct SGameChar
 	SAllItems m_sPlayerItems;
 	SAllConsumables m_sConsumables;
 
-	COORD getRealCoords();
-	SGameChar();
-	SGameChar(COORD location, bool active, int playerHealth, int playerDamage, int playerScore);
+	COORD getRealCoords(); // Get console coordinates of the player
+	SGameChar(); // Constructor
+	SGameChar(COORD location, bool active, int playerHealth, int playerDamage, int playerScore); // Constructor
 	void addItem(bool g_bHasWeapon); //Adds an item to the player's inventory when picked up
 	void hasItem(bool g_bHasWeapon);
 	void addConsumable(bool g_bHasConsumable, int index);

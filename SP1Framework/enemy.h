@@ -1,5 +1,7 @@
 #pragma once
 
+/* MADE BY: Kendrick */
+
 #ifndef ENEMYHEAD
 #define ENEMYHEAD
 #include "Framework/timer.h"

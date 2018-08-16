@@ -17,7 +17,7 @@ int		r_iMoveDirection;
 double	r_dMoveTime;
 
 // Console object
-Console g_Console(100, 25, "The Great Escapade");
+Console g_Console(100, 40, "The Great Escapade");
 
 // Game specific variables here
 EGAMESTATES			g_eGameState = S_SPLASHSCREEN;

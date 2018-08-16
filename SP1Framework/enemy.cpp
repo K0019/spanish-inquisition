@@ -260,13 +260,70 @@ void EnemyMelee::update(SGameChar * player)
 	if (this->m_dAttackTime > 0.0)
 	{
 		this->m_dAttackTime -= dt;
+		if (!this->m_bAttacked && this->m_dAttackTime <= this->m_dAttackTimeThreshold)
+		{
+			this->strikeAttack(player);
+			this->m_bAttacked = true;
+		}
 		this->m_dLastMoveTime -= this->checkAttackDelayExpire();
+		if (this->m_dAttackTime == 0.0)
+		{
+			this->m_bAttacked = false;
+		}
 	}
 
 	if (this->updateMovement(player))
 	{
 		this->m_dAttackTime = this->m_dLengthOfAttack;
-		// TODO: Logic for attack
+		this->setAttackDirection(player);
+		if (this->m_dAttackTimeThreshold == 0.0)
+		{
+			this->strikeAttack(player);
+			this->m_bAttacked = true;
+		}
+	}
+}
+
+void EnemyMelee::setAttackDirection(SGameChar * player)
+{
+	if (this->m_cLocation.X == player->m_cLocation.X + 1)
+	{
+		this->attackDirection = 0;
+	}
+	else if (this->m_cLocation.X == player->m_cLocation.X - 1)
+	{
+		this->attackDirection = 2;
+	}
+	else if (this->m_cLocation.Y == player->m_cLocation.Y + 1)
+	{
+		this->attackDirection = 3;
+	}
+	else
+	{
+		this->attackDirection = 1;
+	}
+}
+
+void EnemyMelee::strikeAttack(SGameChar * player)
+{
+	switch (this->attackDirection)
+	{
+	case 0:
+		if (this->m_cLocation.X == player->m_cLocation.X + 1 && this->m_cLocation.Y == player->m_cLocation.Y)
+			player->m_iPlayerHealth -= this->m_iStrength;
+		break;
+	case 1:
+		if (this->m_cLocation.X == player->m_cLocation.X && this->m_cLocation.Y == player->m_cLocation.Y - 1)
+			player->m_iPlayerHealth -= this->m_iStrength;
+		break;
+	case 2:
+		if (this->m_cLocation.X == player->m_cLocation.X - 1 && this->m_cLocation.Y == player->m_cLocation.Y)
+			player->m_iPlayerHealth -= this->m_iStrength;
+		break;
+	case 3:
+		if (this->m_cLocation.X == player->m_cLocation.X && this->m_cLocation.Y == player->m_cLocation.Y + 1)
+			player->m_iPlayerHealth -= this->m_iStrength;
+		break;
 	}
 }
 

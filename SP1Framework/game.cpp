@@ -66,8 +66,8 @@ void init( void )
 	COORD c;
 	c.X = (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
 	c.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
-	//g_sEntities.m_vEnemy.push_back(std::move(std::unique_ptr<EnemyMelee>(new EnemyMelee(&g_sLevel, "Test", "tt", c, (WORD)0x09, 10, 3, 0.4, 0.3, 0.1, 0.3))));
-	g_sEntities.m_vEnemy.push_back(std::move(std::unique_ptr<EnemyRanged> (new EnemyRanged(&g_sLevel, &g_sEntities.m_vPellets, "Test", "tt", c, (WORD)0x09, 10, 3, 0.4, 0.3, 0.1, 0.3, false, 0.25))));
+	g_sEntities.m_vEnemy.push_back(std::move(std::unique_ptr<EnemyMelee>(new EnemyMelee(&g_sLevel, "Test", "tt", c, (WORD)0x09, 10, 3, 0.4, 0.3, 0.1, 0.3))));
+	//g_sEntities.m_vEnemy.push_back(std::move(std::unique_ptr<EnemyRanged> (new EnemyRanged(&g_sLevel, &g_sEntities.m_vPellets, "Test", "tt", c, (WORD)0x09, 10, 3, 0.4, 0.3, 0.1, 0.3, false, 0.25))));
     // sets the width, height and the font name to use in the console
     g_Console.setConsoleFont(0, 16, L"Consolas");
 	g_LoadFromSave(saveDataStorage.g_iSaveData);
@@ -239,9 +239,9 @@ void menuNavigate()
 	if (KeyPressed)
 	{
 		if (g_abKeyPressed[K_SHOOTUP])
-			g_adBounceTime[K_SHOOTUP] = g_dElapsedTime + 0.25;
+			g_adBounceTime[K_SHOOTUP] = g_dElapsedTime + 0.125;
 		if (g_abKeyPressed[K_SHOOTDOWN]) 
-			g_adBounceTime[K_SHOOTDOWN] = g_dElapsedTime + 0.25;
+			g_adBounceTime[K_SHOOTDOWN] = g_dElapsedTime + 0.125;
 	}
 }
 

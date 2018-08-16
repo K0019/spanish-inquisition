@@ -425,30 +425,39 @@ void controlPlayer()
     }
     if (g_abKeyPressed[K_SPACE] && g_adBounceTime[K_SPACE] < g_dElapsedTime)
     {
-		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '&')
+		switch (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation))
 		{
-			resetLevel(++g_sLevel.floor);
-			bSomethingHappened = true;
-		}
-		else if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '%') //When spacebar is pressed on top of an item
-		{
-			g_sEntities.g_sChar.addItem(true);
-		}
-		else if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '1')
-		{
-			g_sEntities.g_sChar.addConsumable(true, 1);
-		}
-		else if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '2')
-		{
-			g_sEntities.g_sChar.addConsumable(true, 2);
-		}
-		else if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '3')
-		{
-			g_sEntities.g_sChar.addConsumable(true, 3);
-		}
-		else if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '4')
-		{
-			g_sEntities.g_sChar.addConsumable(true, 4);
+			case '&':
+			{
+				resetLevel(++g_sLevel.floor);
+				bSomethingHappened = true;
+				break;
+			}
+			case '%': //When spacebar is pressed on top of an item
+			{
+				g_sEntities.g_sChar.addItem(true);
+				break;
+			}
+			case '1':
+			{
+				g_sEntities.g_sChar.addConsumable(true, 1);
+				break;
+			}
+			case '2':
+			{
+				g_sEntities.g_sChar.addConsumable(true, 2);
+				break;
+			}
+			case '3':
+			{
+				g_sEntities.g_sChar.addConsumable(true, 3);
+				break;
+			}
+			case '4':
+			{
+				g_sEntities.g_sChar.addConsumable(true, 4);
+				break;
+			}
 		}
     }
 

@@ -7,7 +7,7 @@ SConsumable::SConsumable(std::string name, int index, int health, int score)
 	this->m_iConsumableScore = score;
 }
 
-SAllConsumables::SAllConsumables()
+SAllConsumables::SAllConsumables() //Constructor to initialise each unique consumable and their stats.
 {
 	this->addConsumable(SConsumable("Minor Health Potion", 1, 5, 0));
 	this->addConsumable(SConsumable("Greater Health Potion", 2, 10, 0));

@@ -16,7 +16,7 @@ SItem::SItem(std::string name, int index, int damage, int healthGiven, float att
 }
 
 
-SAllItems::SAllItems() //Constructor to initialise each unique item
+SAllItems::SAllItems() //Constructor to initialise each unique item and their stats.
 {
 	this->addItem(SItem("Heaven Cracker", 1, 0, 0, 0.0, 0.0, 0.0, false, 1));
 	this->addItem(SItem("Enchanted Sword", 2, 2, 1, 0.0, 0.0, 0.0, false, 1));

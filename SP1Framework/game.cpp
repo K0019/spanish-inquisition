@@ -322,24 +322,24 @@ void controlPlayer()
 				{
 					switch (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_iWeaponLevel)
 					{
-					case 1:
+					case 1: //Blue Feather Level 1: Decrease movement delay by 10%
 						{
 							g_adBounceTime[i] *= g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed;
 							break;
 						}
-					case 2:
+					case 2: //Blue Feather Level 2: Decrease movement delay by 20%
 						{
-							g_adBounceTime[i] *= (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.1);
+							g_adBounceTime[i] *= (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.10);
 							break;
 						}
-					case 3:
+					case 3: //Blue Feather Level 3: Decrease movement delay by 30%
 						{
-							g_adBounceTime[i] *= (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.2);
+							g_adBounceTime[i] *= (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.20);
 							break;
 						}
-					case 4:
+					case 4: //Blue Feather Level 4: Decrease movement delay by 40%
 						{
-							g_adBounceTime[i] *= (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.3);
+							g_adBounceTime[i] *= (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.30);
 							break;
 						}
 					}
@@ -494,24 +494,24 @@ void playerShoot()
 	{
 		switch (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_iWeaponLevel) // Index 5 (Magic Potion): Decrease attack delay by 10/20/30/40%
 		{
-		case 1:
+		case 1: //Magic Potion Level 1: Decrease attack delay by 10%
 			{
-				delay = SHOOTSPEED * 0.90;
+				delay = SHOOTSPEED * g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_fWeaponAttackSpeed;
 				break;
 			}
-		case 2:
+		case 2: //Magic Potion Level 2: Decrease attack delay by 20%
 			{
-				delay = SHOOTSPEED * 0.80;
+				delay = SHOOTSPEED * g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_fWeaponAttackSpeed - 0.10;
 				break;
 			}
-		case 3:
+		case 3: //Magic Potion Level 3: Decrease attack delay by 30%
 			{
-				delay = SHOOTSPEED * 0.70;
+				delay = SHOOTSPEED * g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_fWeaponAttackSpeed - 0.20;
 				break;
 			}
-		case 4:
+		case 4: //Magic Potion Level 4: Decrease attack delay by 40%
 			{
-				delay = SHOOTSPEED * 0.60;
+				delay = SHOOTSPEED * g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_fWeaponAttackSpeed - 0.30;
 				break;
 			}
 		}
@@ -698,6 +698,9 @@ void renderPellets()
 			case pellet::P_ENEMY:
 				g_Console.writeToBuffer(pellet.getRealCoords(), "><", 0x09);
 				break;
+			case pellet::P_FLOOR:
+				g_Console.writeToBuffer(pellet.getRealCoords(), "><", 0x09);
+				break;
 			}
 		}
 		else
@@ -726,6 +729,9 @@ void renderPellets()
 				}
 				break;
 			case pellet::P_PLAYER:
+				g_Console.writeToBuffer(pellet.getRealCoords(), "><", 0x04);
+				break;
+			case pellet::P_FLOOR:
 				g_Console.writeToBuffer(pellet.getRealCoords(), "><", 0x04);
 				break;
 			}
@@ -762,7 +768,7 @@ void renderStat()
 	c.Y = 3;
 	g_Console.writeToBuffer(c, ss.str());
 
-	//Rendering player's damage
+	//Rendering player's item count
 	ss.str("");
 	ss << "Items: " << g_sEntities.g_sChar.m_sPlayerItems.ItemCount;
 	c.Y = 4;
@@ -796,6 +802,27 @@ void checkHitPellets()
 			pellet++;
 			continue;
 		}
+		if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[0].m_bHasWeapon) //Index 1 (Heaven Cracker): Doubles the pellet lifespan to 5 seconds.
+		{
+			g_sEntities.g_sChar.m_dRange *= 2; //!Current issue!: if player has weapon, both player and enemy receives the range increase
+			if (pellet->m_dLifespan >= g_sEntities.g_sChar.m_dRange)  //Check if the pellet has reached its lifespan of 5 seconds, if it does, clear the pellet and show the "><" hit effect.
+			{
+				pellet->m_bHit = true;
+				pellet->m_bHitReason = pellet::P_FLOOR;
+				continue;
+			}
+		}
+		else
+		{
+			if (pellet->m_dLifespan >= g_sEntities.g_sChar.m_dRange)
+			{
+				pellet->m_bHit = true;
+				pellet->m_bHitReason = pellet::P_FLOOR;
+				continue;
+			}
+		}
+
+
 
 		// Check collision with wall
 		if ((pellet->m_cLocation.X - 1) % (ROOM_X + 2) == 0 ||
@@ -803,14 +830,22 @@ void checkHitPellets()
 			(pellet->m_cLocation.Y - 1) % (ROOM_Y + 2) == 0 ||
 			pellet->m_cLocation.Y % (ROOM_Y + 2) == 0)
 		{
-			pellet->m_bHit = true;
 			if (g_sLevel.getTile(pellet->m_cLocation) == '$')
 			{
+				pellet->m_bHit = true;
 				pellet->m_bHitReason = pellet::P_DOOR;
 			}
 			else
 			{
-				pellet->m_bHitReason = pellet::P_WALL;
+				//if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[0].m_bHasWeapon) //Index 1 (Heaven Cracker): Player shot pelllets ignore wall collision and appear on the other side of the room
+				//{
+
+				//}
+				//else
+				//{
+					pellet->m_bHit = true;
+					pellet->m_bHitReason = pellet::P_WALL;
+				//}
 			}
 			pellet++;
 			continue;
@@ -822,7 +857,36 @@ void checkHitPellets()
 			pellet->m_bHit = true;
 			pellet->m_bHitReason = pellet::P_PLAYER;
 			
-			g_sEntities.g_sChar.m_iPlayerHealth -= pellet->m_iDamage;
+			if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[3].m_bHasWeapon) //Index 4 (Glass Canon): All Enemies deal 1/2/3/4 more damage to players.
+			{
+				switch (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[3].m_iWeaponLevel)
+				{
+					case 1: //Glass Canon Level 1: All Enemies deal 1 more damage to the player
+						{
+							g_sEntities.g_sChar.m_iPlayerHealth -= (pellet->m_iDamage + 1);
+							break;
+						}
+					case 2: //Glass Canon Level 2: All Enemies deal 2 more damage to the player
+						{
+							g_sEntities.g_sChar.m_iPlayerHealth -= (pellet->m_iDamage + 2);
+							break;
+						}
+					case 3: //Glass Canon Level 3: All Enemies deal 3 more damage to the player
+						{
+							g_sEntities.g_sChar.m_iPlayerHealth -= (pellet->m_iDamage + 3);
+							break;
+						}
+					case 4: //Glass Canon Level 4: All Enemies deal 4 more damage to the player
+						{
+							g_sEntities.g_sChar.m_iPlayerHealth -= (pellet->m_iDamage + 4);
+							break;
+						}
+				}
+			}
+			else
+			{
+				g_sEntities.g_sChar.m_iPlayerHealth -= pellet->m_iDamage;
+			}
 			// TODO: Check for death
 
 			pellet++;

@@ -17,6 +17,7 @@ struct SGameChar
 	int m_iPlayerHealth = 10;
 	int	m_iPlayerDamage = 3;
 	unsigned int m_iPlayerScore = 0;
+	double m_dRange = 2.5;
 	SAllItems m_sPlayerItems;
 
 	COORD getRealCoords();

@@ -23,9 +23,14 @@ COORD SGameChar::getRealCoords()
 	return c;
 }
 
-void SGameChar::AddItem(bool g_bHasWeapon)
+void SGameChar::addItem(bool g_bHasWeapon)
 {
 	this->hasItem(g_bHasWeapon);
+}
+
+void SGameChar::addConsumable(bool g_bHasConsumable, int index)
+{
+	this->hasConsumable(g_bHasConsumable, index);
 }
 
 void SGameChar::hasItem(bool g_bHasWeapon)
@@ -106,6 +111,7 @@ void SGameChar::hasItem(bool g_bHasWeapon)
 				break;
 			}
 		}
+		
 	}
 	else if ((weaponIndex == this->m_sPlayerItems.m_vItemsList[1].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[1].m_bHasWeapon == true))
 	{
@@ -248,7 +254,7 @@ void SGameChar::hasItem(bool g_bHasWeapon)
 	{
 		this->m_iPlayerScore += 50; //If player picks up another Blue Feather, +50 score.
 	}
-
+	this->m_iMaxHealth = this->m_iPlayerHealth;
 }
 
 void SGameChar::minimumScore(int playerScore) //To make sure the minimum score is 0, it should not go to the negatives
@@ -267,5 +273,39 @@ void SGameChar::minimumScore(int playerScore) //To make sure the minimum score i
 	else
 	{
 		m_iPlayerScore += playerScore;
+	}
+}
+
+void SGameChar::hasConsumable(bool g_bHasConsumable, int index)
+{
+	if (g_bHasConsumable == true)
+	{
+		switch (index)
+		{
+		case 1: //Index 1: Minor Health Potion, restores 5 health (maximum hp is 10, potion will not restore any higher than that)
+		{
+			this->m_iPlayerHealth += this->m_sConsumables.m_vConsumableList[0].m_iConsumableHealth;
+			break;
+		}
+		case 2: //Index 1: Minor Health Potion, restores 10 health (maximum hp is 10, potion will not restore any higher than that)
+		{
+			this->m_iPlayerHealth += this->m_sConsumables.m_vConsumableList[1].m_iConsumableHealth;
+			break;
+		}
+		case 3: //Index 1: Small Medal, adds 20 score to the player
+		{
+			this->m_iPlayerScore += this->m_sConsumables.m_vConsumableList[2].m_iConsumableScore;
+			break;
+		}
+		case 4: //Index 1: Large Medal, adds 50 score to the player
+		{
+			this->m_iPlayerScore += this->m_sConsumables.m_vConsumableList[3].m_iConsumableScore;
+			break;
+		}
+		}
+	}
+	if (this->m_iPlayerHealth > this->m_iMaxHealth)
+	{
+		this->m_iPlayerHealth = this->m_iMaxHealth;
 	}
 }

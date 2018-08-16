@@ -60,7 +60,7 @@ void init( void )
 	r_cRenderOffset.X = 1 + g_sEntities.g_sChar.m_cRoom.X * (ROOM_X + 2);
 	r_cRenderOffset.Y = 1 + g_sEntities.g_sChar.m_cRoom.Y * (ROOM_Y + 2);
 	g_mEvent.r_curspos.X = g_Console.getConsoleSize().X / 5;
-	g_mEvent.r_curspos.Y = g_Console.getConsoleSize().Y / 10 * 6;
+	g_mEvent.r_curspos.Y = g_Console.getConsoleSize().Y / 10 * 8;
 	g_sLevel.generateLevel();
 	g_sLevel.floor = 1;
 	COORD c;
@@ -141,6 +141,12 @@ void update(CStopWatch * timer, double missedTime)
 			break;
 		case S_MENU: mainMenu();
 			break;
+		case S_HOWTOPLAY: tutorial();
+			break;
+		case S_SHOP: shop();
+			break;
+		case S_OPTIONS: options();
+			break;
 		case S_GAME: gameplay(); // gameplay logic when we are in the game
 			break;
 	}
@@ -161,6 +167,12 @@ void render(CStopWatch * timer)
 		case S_SPLASHSCREEN: renderSplashScreen();
 			break;
 		case S_MENU: renderMainMenu();
+			break;
+		case S_HOWTOPLAY: renderTutorial();
+			break;
+		case S_SHOP: renderShop();
+			break;
+		case S_OPTIONS: renderOptions();
 			break;
 		case S_GAME: renderGame();
 			break;
@@ -193,6 +205,21 @@ void mainMenu()
 	processMenuEvent();
 }
 
+void tutorial()
+{
+	processUserInput();
+}
+
+void shop()
+{
+	processUserInput();
+}
+
+void options()
+{
+	processUserInput();
+}
+
 void gameplay()            // gameplay logic
 {
 	processUserInput();	// checks if you should change states or do something else with the game, e.g. pause, exit
@@ -213,7 +240,7 @@ void menuNavigate()
 		g_mEvent.r_curspos.Y--;
 		KeyPressed = true;
 	}
-	else if (g_abKeyPressed[K_SHOOTDOWN] && g_mEvent.sh_cursSel < 2 && g_adBounceTime[K_SHOOTDOWN] < g_dElapsedTime)
+	else if (g_abKeyPressed[K_SHOOTDOWN] && g_mEvent.sh_cursSel < 3 && g_adBounceTime[K_SHOOTDOWN] < g_dElapsedTime)
 	{
 		g_mEvent.sh_cursSel++;
 		g_mEvent.r_curspos.Y++;
@@ -227,10 +254,13 @@ void menuNavigate()
 			g_mEvent.bStartGame = true;
 			break;
 		case 1:
-			g_mEvent.bOptions = true;
+			g_mEvent.bHowToPlay = true;
 			break;
 		case 2:
-			g_bQuitGame = !g_bQuitGame;
+			g_mEvent.bShop = true;
+			break;
+		case 3:
+			g_mEvent.bOptions = true;
 			break;
 		default:
 			break;
@@ -400,9 +430,25 @@ void controlPlayer()
 			resetLevel(++g_sLevel.floor);
 			bSomethingHappened = true;
 		}
-		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '%') //When spacebar is pressed when on top of item
+		else if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '%') //When spacebar is pressed on top of an item
 		{
-			g_sEntities.g_sChar.AddItem(true);
+			g_sEntities.g_sChar.addItem(true);
+		}
+		else if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '1')
+		{
+			g_sEntities.g_sChar.addConsumable(true, 1);
+		}
+		else if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '2')
+		{
+			g_sEntities.g_sChar.addConsumable(true, 2);
+		}
+		else if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '3')
+		{
+			g_sEntities.g_sChar.addConsumable(true, 3);
+		}
+		else if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '4')
+		{
+			g_sEntities.g_sChar.addConsumable(true, 4);
 		}
     }
 
@@ -457,12 +503,95 @@ void clearScreen()
 	// Clears the buffer with this colour attribute
 	g_Console.clearBuffer(0x0f);
 }
+void checkHitPellets()
+{
+	for (std::vector<SPellet>::iterator pellet = g_sEntities.m_vPellets.begin(); pellet != g_sEntities.m_vPellets.end(); )
+	{
+		// Check for erasal
+		if (pellet->m_bHit)
+		{
+			if (pellet->m_dTime >= 0.15)
+			{
+				pellet = g_sEntities.m_vPellets.erase(pellet);
+				continue;
+			}
+			pellet++;
+			continue;
+		}
+
+		// Check collision with wall
+		if ((pellet->m_cLocation.X - 1) % (ROOM_X + 2) == 0 ||
+			pellet->m_cLocation.X % (ROOM_X + 2) == 0 ||
+			(pellet->m_cLocation.Y - 1) % (ROOM_Y + 2) == 0 ||
+			pellet->m_cLocation.Y % (ROOM_Y + 2) == 0)
+		{
+			pellet->m_bHit = true;
+			if (g_sLevel.getTile(pellet->m_cLocation) == '$')
+			{
+				pellet->m_bHitReason = pellet::P_DOOR;
+			}
+			else
+			{
+				pellet->m_bHitReason = pellet::P_WALL;
+			}
+			pellet++;
+			continue;
+		}
+
+		// Check collision with player, if enemy pellet
+		if (!pellet->m_bFriendly && pellet->m_cLocation.X == g_sEntities.g_sChar.m_cLocation.X && pellet->m_cLocation.Y == g_sEntities.g_sChar.m_cLocation.Y)
+		{
+			pellet->m_bHit = true;
+			pellet->m_bHitReason = pellet::P_PLAYER;
+
+			g_sEntities.g_sChar.m_iPlayerHealth -= pellet->m_iDamage;
+			// TODO: Check for death
+
+			pellet++;
+			continue;
+		}
+
+		// Check collision with enemy, if player pellet
+		if (pellet->m_bFriendly)
+		{
+			for (auto& enemy : g_sEntities.m_vEnemy)
+			{
+				if (!enemy->isDying() && !enemy->isDead() && pellet->m_cLocation.X == enemy->getLocation().X && pellet->m_cLocation.Y == enemy->getLocation().Y)
+				{
+					pellet->m_bHit = true;
+					pellet->m_bHitReason = pellet::P_ENEMY;
+
+					enemy->takeDamage(pellet->m_iDamage);
+
+					break;
+				}
+			}
+		}
+		pellet++;
+	}
+}
 
 void processMenuEvent()
 {
-	if (g_mEvent.bStartGame == 1)
+	if (g_mEvent.bStartGame == true)
 	{
 		g_eGameState = S_GAME;
+		g_mEvent.bStartGame = false;
+	}
+	if (g_mEvent.bHowToPlay == true)
+	{
+		g_eGameState = S_HOWTOPLAY;
+		g_mEvent.bHowToPlay = false;
+	}
+	if (g_mEvent.bShop == true)
+	{
+		g_eGameState = S_SHOP;
+		g_mEvent.bShop = false;
+	}
+	if (g_mEvent.bOptions == true)
+	{
+		g_eGameState = S_OPTIONS;
+		g_mEvent.bOptions = false;
 	}
 }
 void renderSplashScreen()  // renders the splash screen
@@ -481,10 +610,25 @@ void renderSplashScreen()  // renders the splash screen
 
 void renderMainMenu()
 {
-	renderTitle();
-	renderMenu();
+	g_mEvent.renderTitle();
+	g_mEvent.renderMenu();
+	g_mEvent.renderCursor();
 	renderScore();
-	renderCursor();
+}
+
+void renderTutorial()
+{
+	
+}
+
+void renderShop()
+{
+
+}
+
+void renderOptions()
+{
+
 }
 
 void renderGame()
@@ -496,28 +640,8 @@ void renderGame()
 	renderStat();
 }
 
-void renderTitle()
-{
-	std::string ASCII[7];
-	ASCII[0] = " €€€€€€€€≤∞           €€€€€€≤∞                     €€€€€€€€≤∞                                   ";
-	ASCII[1] = " €≤∞€€≤∞€≤∞          €€≤∞  €€≤∞                     €€≤∞  €≤∞                                   ";
-	ASCII[2] = "    €€≤∞ €≤∞€≤€€€€≤  €€≤∞     €€€≤ €€€€≤∞€€≤∞€€€€   €€≤∞     €€€≤∞€€€≤∞€€≤∞ €€≤∞ €€≤∞€€€≤∞€€€€≤∞";
-	ASCII[3] = "    €€≤∞ €≤∞€≤€≤∞    €€≤∞     €≤∞€≤€≤∞  €≤∞€≤ €     €€€€€€≤∞€≤∞  €≤∞  €≤∞€≤€≤∞€≤€≤∞€≤€≤∞€≤€≤∞   ";
-	ASCII[4] = "    €€≤∞ €€€€≤€€€≤∞  €€≤∞ €€€≤€€€€≤€€€≤∞€€€€≤ €     €€≤∞     €€≤∞€≤∞  €€€€≤€€€≤∞€€€€≤€≤∞€≤€€€≤∞ ";
-	ASCII[5] = "    €€≤∞ €≤∞€≤€≤∞    €€≤∞  €€≤€≤€≤ €≤∞  €≤∞€≤ €     €€≤∞  €≤∞  €≤€≤∞  €≤∞€≤€≤∞  €≤∞€≤€≤∞€≤€≤∞   ";
-	ASCII[6] = "   €€€€≤∞€≤∞€≤€€€€≤   €€€€€€≤∞€≤ €≤€€€€≤€≤∞€≤ €    €€€€€€€€≤€€€≤∞ €€€≤€≤∞€≤€≤∞  €≤∞€≤€€€≤ €€€€≤∞";
-	COORD c = g_Console.getConsoleSize();
-	c.X /= 40;
-	for (int i = 0; i < 7; i++)
-	{
-		c.Y = 2 + i;
-		g_Console.writeToBuffer(c, ASCII[i], 0x64);
-	}
-}
-
 void renderScore() 
 {
-	/*Label*/
 	unsigned int LoadedScore = saveDataStorage.g_iSaveData[0];
 	std::string g_sScore = std::to_string(LoadedScore);
 	COORD c = g_Console.getConsoleSize();
@@ -526,31 +650,6 @@ void renderScore()
 	g_Console.writeToBuffer(c, g_sScore, 0x0f);
 	c.X -= 7;
 	g_Console.writeToBuffer(c, "Score: ", 0x0f);
-}
-
-void renderMenu()
-{
-	COORD c;
-	c.X = g_Console.getConsoleSize().X / 5 + 2;
-	c.Y = g_Console.getConsoleSize().Y / 10 * 6;
-	g_Console.writeToBuffer(c, "PLAY", 0x8f);
-	c.Y++;
-	g_Console.writeToBuffer(c, "OPTIONS", 0x0f);
-	c.Y++;
-	g_Console.writeToBuffer(c, "SHOP", 0x8f);
-}
-
-void renderCursor()
-{
-	COORD c = g_mEvent.r_curspos;
-	g_Console.writeToBuffer(c, ">", 0x0f);
-	if (DEBUG)
-	{
-		c.X -= 2;
-		g_Console.writeToBuffer(c, std::to_string(g_mEvent.r_curspos.Y), 0x0f);
-		c.X -= 2;
-		g_Console.writeToBuffer(c, std::to_string(g_mEvent.sh_cursSel), 0x0f);
-	}
 }
 
 void renderCharacter()
@@ -567,7 +666,7 @@ void renderFramerate()
 	std::ostringstream ss;
 	ss << std::fixed << std::setprecision(3);
 	ss << 1.0 / g_dDeltaTime << "fps";
-	c.X = g_Console.getConsoleSize().X - 9;
+	c.X = g_Console.getConsoleSize().X - 11;
 	c.Y = 0;
 	g_Console.writeToBuffer(c, ss.str());
 
@@ -870,8 +969,8 @@ void renderStat()
 	COORD c;
 	std::ostringstream ss;
 	ss.str("");
-	ss << "HP: " << g_sEntities.g_sChar.m_iPlayerHealth;
-	c.X = g_Console.getConsoleSize().X - 9;
+	ss << "HP: " << g_sEntities.g_sChar.m_iPlayerHealth << " / " << g_sEntities.g_sChar.m_iMaxHealth;
+	c.X = g_Console.getConsoleSize().X - 11;
 	c.Y = 2;
 	g_Console.writeToBuffer(c, ss.str());
 

@@ -60,14 +60,14 @@ void init( void )
 	r_cRenderOffset.X = 1 + g_sEntities.g_sChar.m_cRoom.X * (ROOM_X + 2);
 	r_cRenderOffset.Y = 1 + g_sEntities.g_sChar.m_cRoom.Y * (ROOM_Y + 2);
 	g_mEvent.r_curspos.X = g_Console.getConsoleSize().X / 5;
-	g_mEvent.r_curspos.Y = g_Console.getConsoleSize().Y / 10 * 6;
+	g_mEvent.r_curspos.Y = g_Console.getConsoleSize().Y / 10 * 8;
 	g_sLevel.generateLevel();
 	g_sLevel.floor = 1;
 	COORD c;
 	c.X = (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
 	c.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
-	//g_sEntities.m_vEnemy.push_back(std::move(std::unique_ptr<EnemyMelee>(new EnemyMelee(&g_sLevel, "Test", "tt", c, (WORD)0x09, 10, 3, 0.4, 0.3, 0.1, 0.3))));
-	g_sEntities.m_vEnemy.push_back(std::move(std::unique_ptr<EnemyRanged> (new EnemyRanged(&g_sLevel, &g_sEntities.m_vPellets, "Test", "tt", c, (WORD)0x09, 10, 3, 0.4, 0.3, 0.1, 0.3, false, 0.25))));
+	g_sEntities.m_vEnemy.push_back(std::move(std::unique_ptr<EnemyMelee>(new EnemyMelee(&g_sLevel, "Test", "tt", c, (WORD)0x09, 10, 3, 0.4, 0.3, 0.1, 0.3))));
+	//g_sEntities.m_vEnemy.push_back(std::move(std::unique_ptr<EnemyRanged> (new EnemyRanged(&g_sLevel, &g_sEntities.m_vPellets, "Test", "tt", c, (WORD)0x09, 10, 3, 0.4, 0.3, 0.1, 0.3, false, 0.25))));
     // sets the width, height and the font name to use in the console
     g_Console.setConsoleFont(0, 16, L"Consolas");
 	g_LoadFromSave(saveDataStorage.g_iSaveData);
@@ -141,6 +141,12 @@ void update(CStopWatch * timer, double missedTime)
 			break;
 		case S_MENU: mainMenu();
 			break;
+		case S_HOWTOPLAY: tutorial();
+			break;
+		case S_SHOP: shop();
+			break;
+		case S_OPTIONS: options();
+			break;
 		case S_GAME: gameplay(); // gameplay logic when we are in the game
 			break;
 	}
@@ -161,6 +167,12 @@ void render(CStopWatch * timer)
 		case S_SPLASHSCREEN: renderSplashScreen();
 			break;
 		case S_MENU: renderMainMenu();
+			break;
+		case S_HOWTOPLAY: renderTutorial();
+			break;
+		case S_SHOP: renderShop();
+			break;
+		case S_OPTIONS: renderOptions();
 			break;
 		case S_GAME: renderGame();
 			break;
@@ -193,6 +205,21 @@ void mainMenu()
 	processMenuEvent();
 }
 
+void tutorial()
+{
+	processUserInput();
+}
+
+void shop()
+{
+	processUserInput();
+}
+
+void options()
+{
+	processUserInput();
+}
+
 void gameplay()            // gameplay logic
 {
 	processUserInput();	// checks if you should change states or do something else with the game, e.g. pause, exit
@@ -213,7 +240,7 @@ void menuNavigate()
 		g_mEvent.r_curspos.Y--;
 		KeyPressed = true;
 	}
-	else if (g_abKeyPressed[K_SHOOTDOWN] && g_mEvent.sh_cursSel < 2 && g_adBounceTime[K_SHOOTDOWN] < g_dElapsedTime)
+	else if (g_abKeyPressed[K_SHOOTDOWN] && g_mEvent.sh_cursSel < 3 && g_adBounceTime[K_SHOOTDOWN] < g_dElapsedTime)
 	{
 		g_mEvent.sh_cursSel++;
 		g_mEvent.r_curspos.Y++;
@@ -227,10 +254,13 @@ void menuNavigate()
 			g_mEvent.bStartGame = true;
 			break;
 		case 1:
-			g_mEvent.bOptions = true;
+			g_mEvent.bHowToPlay = true;
 			break;
 		case 2:
-			g_bQuitGame = !g_bQuitGame;
+			g_mEvent.bShop = true;
+			break;
+		case 3:
+			g_mEvent.bOptions = true;
 			break;
 		default:
 			break;
@@ -239,9 +269,9 @@ void menuNavigate()
 	if (KeyPressed)
 	{
 		if (g_abKeyPressed[K_SHOOTUP])
-			g_adBounceTime[K_SHOOTUP] = g_dElapsedTime + 0.25;
+			g_adBounceTime[K_SHOOTUP] = g_dElapsedTime + 0.125;
 		if (g_abKeyPressed[K_SHOOTDOWN]) 
-			g_adBounceTime[K_SHOOTDOWN] = g_dElapsedTime + 0.25;
+			g_adBounceTime[K_SHOOTDOWN] = g_dElapsedTime + 0.125;
 	}
 }
 
@@ -485,9 +515,25 @@ void clearScreen()
 
 void processMenuEvent()
 {
-	if (g_mEvent.bStartGame == 1)
+	if (g_mEvent.bStartGame == true)
 	{
 		g_eGameState = S_GAME;
+		g_mEvent.bStartGame = false;
+	}
+	if (g_mEvent.bHowToPlay == true)
+	{
+		g_eGameState = S_HOWTOPLAY;
+		g_mEvent.bHowToPlay = false;
+	}
+	if (g_mEvent.bShop == true)
+	{
+		g_eGameState = S_SHOP;
+		g_mEvent.bShop = false;
+	}
+	if (g_mEvent.bOptions == true)
+	{
+		g_eGameState = S_OPTIONS;
+		g_mEvent.bOptions = false;
 	}
 }
 void renderSplashScreen()  // renders the splash screen
@@ -506,10 +552,25 @@ void renderSplashScreen()  // renders the splash screen
 
 void renderMainMenu()
 {
-	renderTitle();
-	renderMenu();
+	g_mEvent.renderTitle();
+	g_mEvent.renderMenu();
+	g_mEvent.renderCursor();
 	renderScore();
-	renderCursor();
+}
+
+void renderTutorial()
+{
+	
+}
+
+void renderShop()
+{
+
+}
+
+void renderOptions()
+{
+
 }
 
 void renderGame()
@@ -521,28 +582,8 @@ void renderGame()
 	renderStat();
 }
 
-void renderTitle()
-{
-	std::string ASCII[7];
-	ASCII[0] = " ÛÛÛÛÛÛÛÛ²°           ÛÛÛÛÛÛ²°                     ÛÛÛÛÛÛÛÛ²°                                   ";
-	ASCII[1] = " Û²°ÛÛ²°Û²°          ÛÛ²°  ÛÛ²°                     ÛÛ²°  Û²°                                   ";
-	ASCII[2] = "    ÛÛ²° Û²°Û²ÛÛÛÛ²  ÛÛ²°     ÛÛÛ² ÛÛÛÛ²°ÛÛ²°ÛÛÛÛ   ÛÛ²°     ÛÛÛ²°ÛÛÛ²°ÛÛ²° ÛÛ²° ÛÛ²°ÛÛÛ²°ÛÛÛÛ²°";
-	ASCII[3] = "    ÛÛ²° Û²°Û²Û²°    ÛÛ²°     Û²°Û²Û²°  Û²°Û² Û     ÛÛÛÛÛÛ²°Û²°  Û²°  Û²°Û²Û²°Û²Û²°Û²Û²°Û²Û²°   ";
-	ASCII[4] = "    ÛÛ²° ÛÛÛÛ²ÛÛÛ²°  ÛÛ²° ÛÛÛ²ÛÛÛÛ²ÛÛÛ²°ÛÛÛÛ² Û     ÛÛ²°     ÛÛ²°Û²°  ÛÛÛÛ²ÛÛÛ²°ÛÛÛÛ²Û²°Û²ÛÛÛ²° ";
-	ASCII[5] = "    ÛÛ²° Û²°Û²Û²°    ÛÛ²°  ÛÛ²Û²Û² Û²°  Û²°Û² Û     ÛÛ²°  Û²°  Û²Û²°  Û²°Û²Û²°  Û²°Û²Û²°Û²Û²°   ";
-	ASCII[6] = "   ÛÛÛÛ²°Û²°Û²ÛÛÛÛ²   ÛÛÛÛÛÛ²°Û² Û²ÛÛÛÛ²Û²°Û² Û    ÛÛÛÛÛÛÛÛ²ÛÛÛ²° ÛÛÛ²Û²°Û²Û²°  Û²°Û²ÛÛÛ² ÛÛÛÛ²°";
-	COORD c = g_Console.getConsoleSize();
-	c.X /= 40;
-	for (int i = 0; i < 7; i++)
-	{
-		c.Y = 2 + i;
-		g_Console.writeToBuffer(c, ASCII[i], 0x64);
-	}
-}
-
 void renderScore() 
 {
-	/*Label*/
 	unsigned int LoadedScore = saveDataStorage.g_iSaveData[0];
 	std::string g_sScore = std::to_string(LoadedScore);
 	COORD c = g_Console.getConsoleSize();
@@ -551,31 +592,6 @@ void renderScore()
 	g_Console.writeToBuffer(c, g_sScore, 0x0f);
 	c.X -= 7;
 	g_Console.writeToBuffer(c, "Score: ", 0x0f);
-}
-
-void renderMenu()
-{
-	COORD c;
-	c.X = g_Console.getConsoleSize().X / 5 + 2;
-	c.Y = g_Console.getConsoleSize().Y / 10 * 6;
-	g_Console.writeToBuffer(c, "PLAY", 0x8f);
-	c.Y++;
-	g_Console.writeToBuffer(c, "OPTIONS", 0x0f);
-	c.Y++;
-	g_Console.writeToBuffer(c, "SHOP", 0x8f);
-}
-
-void renderCursor()
-{
-	COORD c = g_mEvent.r_curspos;
-	g_Console.writeToBuffer(c, ">", 0x0f);
-	if (DEBUG)
-	{
-		c.X -= 2;
-		g_Console.writeToBuffer(c, std::to_string(g_mEvent.r_curspos.Y), 0x0f);
-		c.X -= 2;
-		g_Console.writeToBuffer(c, std::to_string(g_mEvent.sh_cursSel), 0x0f);
-	}
 }
 
 void renderCharacter()

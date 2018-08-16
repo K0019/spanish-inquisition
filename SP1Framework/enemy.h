@@ -28,6 +28,7 @@ protected:
 	bool m_bHit; // If enemy has been hit and m_dStunTime has not expired
 	int m_iStrength; // Damage enemy deals to player
 	SLevel * levelPointer; // Access to level
+	bool m_bAttacked; // If enemy has attacked this attack cycle
 
 	const std::string m_sName; // Name of enemy
 	const double m_dLengthOfAttack; // Length of time of attack
@@ -61,10 +62,14 @@ public:
 
 class EnemyMelee : public Enemy
 {
+protected:
+	int attackDirection; // Up Right Down Left
 public:
 	EnemyMelee(SLevel * levelPointer, std::string name, std::string indicator, COORD location, WORD color, int HP, int damage, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration);
 
 	void update(SGameChar * player);
+	void setAttackDirection(SGameChar * player);
+	void strikeAttack(SGameChar * player);
 	bool updateMovement(SGameChar * player); // Updates enemy movement, returns true or false depending on whether the enemy should attack or not
 };
 

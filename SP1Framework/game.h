@@ -38,7 +38,9 @@ enum EGAMESTATES
 {
     S_SPLASHSCREEN,
 	S_MENU,
+	S_SHOP,
 	S_OPTIONS,
+	S_HOWTOPLAY,
     S_GAME,
     S_COUNT
 };
@@ -57,6 +59,9 @@ void shutdown    ( void );      // do clean up, free memory
 
 void splashScreenWait();	// waits for time to pass in splash screen
 void mainMenu();			// main menu logic
+void tutorial();			// how to play screen logic
+void shop();				// shop logic
+void options();				// options logic
 void playerShoot();			// allows the player to shoot
 void gameplay();			// gameplay logic
 void menuNavigate();		// Navigation of menu
@@ -73,17 +78,17 @@ void processMenuEvent();
 
 void renderSplashScreen();	// renders the splash screen
 void renderMainMenu();		// renders the main menu
+void renderTutorial();
+void renderShop();
+void renderOptions();
 void renderGame();			// renders the game stuff
-void renderTitle();
-void renderMenu();
 void renderScore();			// render the current score from
-void renderCursor();
 void renderCharacter();		// renders the character into the buffer
 void renderFramerate();		// renders debug information, frame rate, elapsed time, etc
 void renderToScreen();		// dump the contents of the buffer to the screen, one frame worth of game
 void renderLevel();			// renders the borders of the rooms
 void renderPellets();		// render pellets to buffer
-void renderEnemy(); // renders all enemies to the buffer
-void renderStat();   //renders the player stats on the right side of the console
+void renderEnemy();			// renders all enemies to the buffer
+void renderStat();			//renders the player stats on the right side of the console
 
 #endif // _GAME_H

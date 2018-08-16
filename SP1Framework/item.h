@@ -23,7 +23,7 @@ struct SItem //Struct that holds item information
 	SItem(std::string name, int index, int damage, int healthGiven, float attackSpeed, float velocity, float moveSpeed, bool hasWeapon, int weaponLevel);
 };
 
-struct SAllItems //Struct that holds all items 
+struct SAllItems //Struct that holds all items as indiviual items
 {
 	std::vector<SItem> m_vItemsList;
 	std::vector<bool> m_vItemsObtained;
@@ -33,4 +33,4 @@ struct SAllItems //Struct that holds all items
 	void addItem(SItem item);
 };
 
-#endif
+#endif //!ITEMHEAD

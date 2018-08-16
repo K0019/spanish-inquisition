@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-struct SConsumable
+struct SConsumable //Struct that holds all consumable information
 {
 	std::string m_sName;
 	int m_iConsumableIndex;
@@ -16,7 +16,7 @@ struct SConsumable
 	SConsumable(std::string name, int index, int health, int score);
 };
 
-struct SAllConsumables
+struct SAllConsumables //Struct that holds all consumables as individual consumables
 {
 	std::vector<SConsumable> m_vConsumableList;
 

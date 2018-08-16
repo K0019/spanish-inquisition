@@ -17,7 +17,7 @@ int		r_iMoveDirection;
 double	r_dMoveTime;
 
 // Console object
-Console g_Console(100, 40, "The Great Escapade");
+Console g_Console(120, 30, "The Great Escapade");
 
 // Game specific variables here
 EGAMESTATES			g_eGameState = S_SPLASHSCREEN;
@@ -61,13 +61,13 @@ void init( void )
 	r_cRenderOffset.Y = 1 + g_sEntities.g_sChar.m_cRoom.Y * (ROOM_Y + 2);
 	g_mEvent.r_curspos.X = g_Console.getConsoleSize().X / 5;
 	g_mEvent.r_curspos.Y = g_Console.getConsoleSize().Y / 10 * 8;
-	g_sLevel.generateLevel();
 	g_sLevel.floor = 1;
+	g_sLevel.generateLevel();
 	COORD c;
 	c.X = (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
 	c.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
-	g_sEntities.m_vEnemy.push_back(std::move(std::unique_ptr<EnemyMelee>(new EnemyMelee(&g_sLevel, "Test", "tt", c, (WORD)0x09, 10, 3, 0.4, 0.3, 0.1, 0.3))));
-	g_sEntities.m_vEnemy.push_back(std::move(std::unique_ptr<EnemyRanged> (new EnemyRanged(&g_sLevel, &g_sEntities.m_vPellets, "Test", "tt", c, (WORD)0x09, 10, 3, 0.4, 0.3, 0.1, 0.3, false, 0.25))));
+	g_sEntities.m_vEnemy.push_back(std::move(std::unique_ptr<EnemyMelee>(new EnemyMelee(&g_sLevel, "Test", "RRRR", "RRRR", c, (WORD)0x0E, 10, 3, 0.4, 0.3, 0.1, 0.3))));
+	g_sEntities.m_vEnemy.push_back(std::move(std::unique_ptr<EnemyRanged> (new EnemyRanged(&g_sLevel, &g_sEntities.m_vPellets, "Test", "MMMM", "MMMM", c, (WORD)0x0E, 10, 3, 0.4, 0.3, 0.1, 0.3, false, 0.25))));
     // sets the width, height and the font name to use in the console
     g_Console.setConsoleFont(0, 16, L"Consolas");
 	g_LoadFromSave(saveDataStorage.g_iSaveData);
@@ -290,8 +290,9 @@ void controlPlayer()
 	if (g_abKeyPressed[K_UP] && g_sEntities.g_sChar.m_cLocation.X > 0 && g_adBounceTime[K_UP] < g_dElapsedTime)
 	{
 		g_sEntities.g_sChar.m_cLocation.X--;
-		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '#' ||
-			(g_sEntities.g_sChar.m_bInBattle && g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '$'))
+		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != ' ' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '&' &&
+	(g_sEntities.g_sChar.m_bInBattle || g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '$'))
 		{
 			g_sEntities.g_sChar.m_cLocation.X++;
 		}
@@ -324,8 +325,9 @@ void controlPlayer()
     if (g_abKeyPressed[K_LEFT] && g_sEntities.g_sChar.m_cLocation.Y > 0 && g_adBounceTime[K_LEFT] < g_dElapsedTime)
     {
 		g_sEntities.g_sChar.m_cLocation.Y--;
-		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '#' ||
-			(g_sEntities.g_sChar.m_bInBattle && g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '$'))
+		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != ' ' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '&' &&
+			(g_sEntities.g_sChar.m_bInBattle || g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '$'))
 		{
 			g_sEntities.g_sChar.m_cLocation.Y++;
 		}
@@ -358,8 +360,9 @@ void controlPlayer()
     if (g_abKeyPressed[K_DOWN] && g_adBounceTime[K_DOWN] < g_dElapsedTime)
     {
 		g_sEntities.g_sChar.m_cLocation.X++;
-		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '#' ||
-			(g_sEntities.g_sChar.m_bInBattle && g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '$'))
+		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != ' ' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '&' &&
+			(g_sEntities.g_sChar.m_bInBattle || g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '$'))
 		{
 			g_sEntities.g_sChar.m_cLocation.X--;
 		}
@@ -392,8 +395,9 @@ void controlPlayer()
     if (g_abKeyPressed[K_RIGHT] && g_adBounceTime[K_RIGHT] < g_dElapsedTime)
     {
 		g_sEntities.g_sChar.m_cLocation.Y++;
-		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '#' ||
-			(g_sEntities.g_sChar.m_bInBattle && g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '$'))
+		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != ' ' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '&' &&
+			(g_sEntities.g_sChar.m_bInBattle || g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '$'))
 		{
 			g_sEntities.g_sChar.m_cLocation.Y--;
 		}
@@ -467,7 +471,7 @@ void controlPlayer()
 		{
 			if (g_abKeyPressed[i])
 			{
-				g_adBounceTime[i] = g_dElapsedTime + 0.225;
+				g_adBounceTime[i] = g_dElapsedTime + 0.150;
 				if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_bHasWeapon) // Index 7 (Blue Feather): Decrease movement delay by 10/20/30/40%
 				{
 					switch (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_iWeaponLevel)
@@ -598,7 +602,10 @@ void renderCharacter()
 {
 	// Draw the location of the character
 	WORD charColor = 0x0A;
-	g_Console.writeToBuffer(g_sEntities.g_sChar.getRealCoords(), "@@", charColor);
+	COORD c = g_sEntities.g_sChar.getRealCoords();
+	g_Console.writeToBuffer(c, "@@@@", charColor);
+	c.Y++;
+	g_Console.writeToBuffer(c, "@@@@", charColor);
 }
 
 void renderFramerate()
@@ -778,30 +785,31 @@ void renderLevel()
 	{
 		for (int column = r_cRenderOffset.Y; column < r_cRenderOffset.Y + ROOM_Y + 2; column++)
 		{
+			c.X = 1 + ((column - r_cRenderOffset.Y) << 2);
 			switch (g_sLevel.level[row][column])
 			{
 			case '#':
-				c.X = 1 + ((column - r_cRenderOffset.Y) << 1);
-				g_Console.writeToBuffer(c, "  ", 0x80);
+				render(c, "    ", "    ", 0x80);
 				break;
 			case '$':
-				c.X = 1 + ((column - r_cRenderOffset.Y) << 1);
 				if (g_sEntities.g_sChar.m_bInBattle)
 				{
-					g_Console.writeToBuffer(c, "  ", 0x40);
+					render(c, "    ", "    ", 0x40);
 				}
 				else
 				{
-					g_Console.writeToBuffer(c, "  ", 0x90);
+					render(c, "    ", "    ", 0x90);
 				}
 				break;
+			case '*':
+				render(c, "    ", "    ", 0x70);
+				break;
 			case '&':
-				c.X = 1 + ((column - r_cRenderOffset.Y) << 1);
-				g_Console.writeToBuffer(c, "&_", 0x09);
+				render(c, "#&  ", "##&_", 0x09);
 				break;
 			}
 		}
-		c.Y++;
+		c.Y += 2;
 	}
 	//else
 	//{
@@ -837,29 +845,27 @@ void renderPellets()
 			switch (pellet.m_bHitReason)
 			{
 			case pellet::P_WALL:
-				g_Console.writeToBuffer(pellet.getRealCoords(), "><", 0x89);
+				render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x89);
 				break;
 			case pellet::P_DOOR:
 				if (g_sEntities.g_sChar.m_bInBattle)
 				{
-					g_Console.writeToBuffer(pellet.getRealCoords(), "><", 0x49);
+					render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x49);
 				}
 				else
 				{
-					g_Console.writeToBuffer(pellet.getRealCoords(), "><", 0x99);
+					render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x99);
 				}
 				break;
 			case pellet::P_ENEMY:
-				g_Console.writeToBuffer(pellet.getRealCoords(), "><", 0x09);
-				break;
 			case pellet::P_FLOOR:
-				g_Console.writeToBuffer(pellet.getRealCoords(), "><", 0x09);
+				render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x09);
 				break;
 			}
 		}
 		else
 		{
-			g_Console.writeToBuffer(pellet.getRealCoords(), "<>", 0x03);
+			render(pellet.getRealCoords(), PELLET_CHARACTER_TOP, PELLET_CHARACTER_BOTTOM, 0x03);
 		}
 	}
 	for (auto& pellet : g_sEntities.m_vPellets)
@@ -870,29 +876,27 @@ void renderPellets()
 			switch (pellet.m_bHitReason)
 			{
 			case pellet::P_WALL:
-				g_Console.writeToBuffer(pellet.getRealCoords(), "><", 0x84);
+				render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x84);
 				break;
 			case pellet::P_DOOR:
 				if (g_sEntities.g_sChar.m_bInBattle)
 				{
-					g_Console.writeToBuffer(pellet.getRealCoords(), "><", 0x44);
+					render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x44);
 				}
 				else
 				{
-					g_Console.writeToBuffer(pellet.getRealCoords(), "><", 0x94);
+					render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x94);
 				}
 				break;
 			case pellet::P_PLAYER:
-				g_Console.writeToBuffer(pellet.getRealCoords(), "><", 0x04);
-				break;
 			case pellet::P_FLOOR:
-				g_Console.writeToBuffer(pellet.getRealCoords(), "><", 0x04);
+				render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x04);
 				break;
 			}
 		}
 		else
 		{
-			g_Console.writeToBuffer(pellet.getRealCoords(), "<>", 0x0C);
+			render(pellet.getRealCoords(), PELLET_CHARACTER_TOP, PELLET_CHARACTER_BOTTOM, 0x0C);
 		}
 	}
 }
@@ -901,7 +905,7 @@ void renderEnemy()
 {
 	for (auto& enemy : g_sEntities.m_vEnemy)
 	{
-		g_Console.writeToBuffer(enemy->getRealLocation(), enemy->getIdentifier(), enemy->getColor());
+		render(enemy->getRealLocation(), enemy->getIdentifier()[0], enemy->getIdentifier()[1], enemy->getColor());
 	}
 }
 
@@ -1066,4 +1070,18 @@ void checkHitPellets()
 
 		pellet++;
 	}
+}
+
+void render(COORD c, LPCSTR text, LPCSTR text2, WORD color)
+{
+	g_Console.writeToBuffer(c, text, color);
+	c.Y++;
+	g_Console.writeToBuffer(c, text2, color);
+}
+
+void render(COORD c, std::string& text, std::string& text2, WORD color)
+{
+	g_Console.writeToBuffer(c, text.c_str(), color);
+	c.Y++;
+	g_Console.writeToBuffer(c, text2.c_str(), color);
 }

@@ -92,5 +92,7 @@ void renderLevel();			// renders the borders of the rooms
 void renderPellets();		// render pellets to buffer
 void renderEnemy();			// renders all enemies to the buffer
 void renderStat();			//renders the player stats on the right side of the console
+void render(COORD c, LPCSTR text, LPCSTR text2, WORD color);
+void render(COORD c, std::string& text, std::string& text2, WORD color);
 
 #endif // _GAME_H

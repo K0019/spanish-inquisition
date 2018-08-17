@@ -101,17 +101,21 @@ void shutdown( void )
 //--------------------------------------------------------------
 void getInput( void )
 {
-	g_abKeyPressed[K_UP]     = isKeyPressed(0x57);
-	g_abKeyPressed[K_DOWN]   = isKeyPressed(0x53);
-	g_abKeyPressed[K_LEFT]   = isKeyPressed(0x41);
-	g_abKeyPressed[K_RIGHT]  = isKeyPressed(0x44);
-	g_abKeyPressed[K_SHOOTUP] = isKeyPressed(VK_UP);
-	g_abKeyPressed[K_SHOOTRIGHT] = isKeyPressed(VK_RIGHT);
-	g_abKeyPressed[K_SHOOTDOWN] = isKeyPressed(VK_DOWN);
-	g_abKeyPressed[K_SHOOTLEFT] = isKeyPressed(VK_LEFT);
-	g_abKeyPressed[K_SPACE]  = isKeyPressed(VK_SPACE);
-	g_abKeyPressed[K_ESCAPE] = isKeyPressed(VK_ESCAPE);
-	g_abKeyPressed[K_ENTER] = isKeyPressed(VK_RETURN);
+	HWND currentWindow = GetForegroundWindow();
+	if (currentWindow == g_Console.consoleWindow)
+	{
+		g_abKeyPressed[K_UP]     = isKeyPressed(0x57);
+		g_abKeyPressed[K_DOWN]   = isKeyPressed(0x53);
+		g_abKeyPressed[K_LEFT]   = isKeyPressed(0x41);
+		g_abKeyPressed[K_RIGHT]  = isKeyPressed(0x44);
+		g_abKeyPressed[K_SHOOTUP] = isKeyPressed(VK_UP);
+		g_abKeyPressed[K_SHOOTRIGHT] = isKeyPressed(VK_RIGHT);
+		g_abKeyPressed[K_SHOOTDOWN] = isKeyPressed(VK_DOWN);
+		g_abKeyPressed[K_SHOOTLEFT] = isKeyPressed(VK_LEFT);
+		g_abKeyPressed[K_SPACE]  = isKeyPressed(VK_SPACE);
+		g_abKeyPressed[K_ESCAPE] = isKeyPressed(VK_ESCAPE);
+		g_abKeyPressed[K_ENTER] = isKeyPressed(VK_RETURN);
+	}
 }
 
 //--------------------------------------------------------------
@@ -147,6 +151,8 @@ void update(CStopWatch * timer, double missedTime)
 			break;
 		case S_OPTIONS: options();
 			break;
+		case S_CREDITS: credits();
+			break;
 		case S_GAME: gameplay(); // gameplay logic when we are in the game
 			break;
 	}
@@ -161,7 +167,7 @@ void update(CStopWatch * timer, double missedTime)
 //--------------------------------------------------------------
 void render(CStopWatch * timer)
 {
-	clearScreen();      // clears the current screen and draw from scratch 
+	clearScreen();		// clears the current screen and draw from scratch 
 	switch (g_eGameState)
 	{
 		case S_SPLASHSCREEN: renderSplashScreen();
@@ -174,11 +180,13 @@ void render(CStopWatch * timer)
 			break;
 		case S_OPTIONS: renderOptions();
 			break;
+		case S_CREDITS: renderCredits();
+			break;
 		case S_GAME: renderGame();
 			break;
 	}
-    renderFramerate();  // renders debug information, frame rate, elapsed time, etc
-    renderToScreen();   // dump the contents of the buffer to the screen, one frame worth of game
+    renderFramerate();	// renders debug information, frame rate, elapsed time, etc
+    renderToScreen();	// dump the contents of the buffer to the screen, one frame worth of game
 	
 	// Count average frames
 	g_iCurrentFrameCount++;
@@ -191,7 +199,7 @@ void render(CStopWatch * timer)
 	}
 }
 
-void splashScreenWait()    // waits for time to pass in splash screen
+void splashScreenWait()		// waits for time to pass in splash screen
 {
 	processUserInput(); // checks if you should change states or do something else with the game, e.g. pause, exit
 	if (g_dAccurateElapsedTime > 3.0) // wait for 3 seconds to switch to game mode, else do nothing
@@ -222,6 +230,13 @@ void options()
 	processUserInput();
 }
 
+void credits()
+{
+	processUserInput();
+	goBack();
+	processMenuEvent();
+}
+
 void gameplay()            // gameplay logic
 {
 	processUserInput();	// checks if you should change states or do something else with the game, e.g. pause, exit
@@ -242,7 +257,7 @@ void menuNavigate()
 		g_mEvent.r_curspos.Y--;
 		KeyPressed = true;
 	}
-	else if (g_abKeyPressed[K_SHOOTDOWN] && g_mEvent.sh_cursSel < 3 && g_adBounceTime[K_SHOOTDOWN] < g_dElapsedTime)
+	else if (g_abKeyPressed[K_SHOOTDOWN] && g_mEvent.sh_cursSel < 4 && g_adBounceTime[K_SHOOTDOWN] < g_dElapsedTime)
 	{
 		g_mEvent.sh_cursSel++;
 		g_mEvent.r_curspos.Y++;
@@ -264,6 +279,8 @@ void menuNavigate()
 		case 3:
 			g_mEvent.bOptions = true;
 			break;
+		case 4:
+			g_mEvent.bCredits = true;
 		default:
 			break;
 		}
@@ -284,6 +301,7 @@ void goBack()
 		g_mEvent.bMenu = true;
 	}
 }
+
 
 void resetLevel(int floor)
 {
@@ -529,30 +547,38 @@ void clearScreen()
 
 void processMenuEvent()
 {
-	if (g_mEvent.bStartGame == true)
+	if (g_abKeyPressed[K_ENTER] == false)
 	{
-		g_eGameState = S_GAME;
-		g_mEvent.bStartGame = false;
-	}
-	if (g_mEvent.bHowToPlay == true)
-	{
-		g_eGameState = S_HOWTOPLAY;
-		g_mEvent.bHowToPlay = false;
-	}
-	if (g_mEvent.bShop == true)
-	{
-		g_eGameState = S_SHOP;
-		g_mEvent.bShop = false;
-	}
-	if (g_mEvent.bOptions == true)
-	{
-		g_eGameState = S_OPTIONS;
-		g_mEvent.bOptions = false;
-	}
-	if (g_mEvent.bMenu == true)
-	{
-		g_eGameState = S_MENU;
-		g_mEvent.bMenu = false;
+		if (g_mEvent.bStartGame == true)
+		{
+			g_eGameState = S_GAME;
+			g_mEvent.bStartGame = false;
+		}
+		if (g_mEvent.bHowToPlay == true)
+		{
+			g_eGameState = S_HOWTOPLAY;
+			g_mEvent.bHowToPlay = false;
+		}
+		if (g_mEvent.bShop == true)
+		{
+			g_eGameState = S_SHOP;
+			g_mEvent.bShop = false;
+		}
+		if (g_mEvent.bOptions == true)
+		{
+			g_eGameState = S_OPTIONS;
+			g_mEvent.bOptions = false;
+		}
+		if (g_mEvent.bMenu == true)
+		{
+			g_eGameState = S_MENU;
+			g_mEvent.bMenu = false;
+		}
+		if (g_mEvent.bCredits == true)
+		{
+			g_eGameState = S_CREDITS;
+			g_mEvent.bCredits = false;
+		}
 	}
 }
 void renderSplashScreen()  // renders the splash screen
@@ -590,6 +616,10 @@ void renderShop()
 void renderOptions()
 {
 
+}
+
+void renderCredits()
+{
 }
 
 void renderGame()

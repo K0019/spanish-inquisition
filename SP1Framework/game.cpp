@@ -553,7 +553,7 @@ void controlPlayer()
 		{
 			if (g_abKeyPressed[i])
 			{
-				g_adBounceTime[i] = g_dElapsedTime + 0.250;
+				g_adBounceTime[i] = g_dElapsedTime + 0.20; //0.250
 				if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_bHasWeapon) // Index 7 (Blue Feather): Decrease movement delay by 20/30/40/50%
 				{
 					switch (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_iWeaponLevel)
@@ -1304,13 +1304,13 @@ bool loadEnemiesFromRoom()
 			COORD c = fastCoord(row, column);
 			switch (g_sLevel.level[row][column])
 			{
-			case 'y':
-				addEnemy(UNIQUE_ENEMY_MELEETEST);
+			case 'b':
+				addEnemy(UNIQUE_ENEMY_BANDIT);
 				roomHasEnemies = true;
 				g_sLevel.level[row][column] = ' ';
 				break;
-			case 'z':
-				addEnemy(UNIQUE_ENEMY_RANGEDTEST);
+			case 'm':
+				addEnemy(UNIQUE_ENEMY_MAGE);
 				roomHasEnemies = true;
 				g_sLevel.level[row][column] = ' ';
 				break;

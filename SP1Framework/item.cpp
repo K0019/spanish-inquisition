@@ -19,12 +19,12 @@ SItem::SItem(std::string name, int index, int damage, int healthGiven, float att
 SAllItems::SAllItems() //Constructor to initialise each unique item and their stats.
 {
 	this->addItem(SItem("Heaven Cracker", 0, 0, 0, 0.0, 0.0, 0.0, false, 1));
-	this->addItem(SItem("Enchanted Sword", 1, 2, 1, 0.0, 0.0, 0.0, false, 1));
-	this->addItem(SItem("Health Potion", 2, 0, 2, 0.0, 0.0, 0.0, false, 1));
-	this->addItem(SItem("Glass Canon", 3, 1, 0, 0.0, 0.0, 0.0, false, 1));
-	this->addItem(SItem("Magic Potion", 4, 0, 0, (float)0.9, 0.0, 0.0, false, 1));
+	this->addItem(SItem("Enchanted Sword", 1, 2, 3, 0.0, 0.0, 0.0, false, 1));
+	this->addItem(SItem("Health Potion", 2, 0, 5, 0.0, 0.0, 0.0, false, 1));
+	this->addItem(SItem("Glass Canon", 3, 4, 0, 0.0, 0.0, 0.0, false, 1));
+	this->addItem(SItem("Magic Potion", 4, 0, 0, (float)1.0, (float)1.0, 0.0, false, 1));
 	this->addItem(SItem("Bonus!", 5, 0, 0, 0.0, 0.0, 0.0, false, 1));
-	this->addItem(SItem("Blue Feather", 6, 0, 0, 0.0, 0.0, (float)0.9, false, 1));
+	this->addItem(SItem("Blue Feather", 6, 0, 0, 0.0, 0.0, (float)1.0, false, 1));
 }
 
 

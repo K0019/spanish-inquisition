@@ -20,6 +20,7 @@ struct SGameChar
 	int	m_iPlayerDamage = 3;
 	unsigned int m_iPlayerScore = 0;
 	double m_dRange = 2.5;
+	double m_dVelocity = SHOOTVELOCITY;
 	SAllItems m_sPlayerItems;
 	SAllConsumables m_sConsumables;
 	std::string m_sLastItem = ""; //Storing last item picked up

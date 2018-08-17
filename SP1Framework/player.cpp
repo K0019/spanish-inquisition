@@ -54,32 +54,32 @@ void SGameChar::hasItem(bool g_bHasWeapon)
 
 	if ((weaponIndex == this->m_sPlayerItems.m_vItemsList[0].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[0].m_bHasWeapon == false)) //Checking if randomized weaponIndex gives the Heaven Cracker
 	{
-		switch (this->m_sPlayerItems.m_vItemsList[0].m_iWeaponLevel) //Index 1 (Heaven Cracker): Increase player damage by 0/1/2/3
+		switch (this->m_sPlayerItems.m_vItemsList[0].m_iWeaponLevel) //Index 1 (Heaven Cracker): Increase player damage by 0/2/3/4
 		{
-		case 1: //Heaven Cracker Level 1: Increase player damage by 0
+		case 1: //Heaven Cracker Level 1: Increase player damage by 0.
 			{
 				this->m_iPlayerDamage += this->m_sPlayerItems.m_vItemsList[0].m_iWeaponDamage;
 				this->m_sPlayerItems.m_vItemsList[0].m_bHasWeapon = true;
 				this->m_sPlayerItems.ItemCount++;
 				break;
 			}
-		case 2: //Heaven Cracker Level 2: Increase player damage by 1
-			{
-				this->m_iPlayerDamage += (this->m_sPlayerItems.m_vItemsList[0].m_iWeaponDamage + 1);
-				this->m_sPlayerItems.m_vItemsList[0].m_bHasWeapon = true;
-				this->m_sPlayerItems.ItemCount++;
-				break;
-			}
-		case 3: //Heaven Cracker Level 3: Increase player damage by 2
+		case 2: //Heaven Cracker Level 2: Increase player damage by 2.
 			{
 				this->m_iPlayerDamage += (this->m_sPlayerItems.m_vItemsList[0].m_iWeaponDamage + 2);
 				this->m_sPlayerItems.m_vItemsList[0].m_bHasWeapon = true;
 				this->m_sPlayerItems.ItemCount++;
 				break;
 			}
-		case 4: //Heaven Cracker Level 4: Increase player damage by 3
+		case 3: //Heaven Cracker Level 3: Increase player damage by 3.
 			{
 				this->m_iPlayerDamage += (this->m_sPlayerItems.m_vItemsList[0].m_iWeaponDamage + 3);
+				this->m_sPlayerItems.m_vItemsList[0].m_bHasWeapon = true;
+				this->m_sPlayerItems.ItemCount++;
+				break;
+			}
+		case 4: //Heaven Cracker Level 4: Increase player damage by 4.
+			{
+				this->m_iPlayerDamage += (this->m_sPlayerItems.m_vItemsList[0].m_iWeaponDamage + 4);
 				this->m_sPlayerItems.m_vItemsList[0].m_bHasWeapon = true;
 				this->m_sPlayerItems.ItemCount++;
 				break;
@@ -89,9 +89,9 @@ void SGameChar::hasItem(bool g_bHasWeapon)
 
 	else if ((weaponIndex == this->m_sPlayerItems.m_vItemsList[1].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[1].m_bHasWeapon == false)) //Checking if randomized weaponIndex gives the Enchanted Sword
 	{
-		switch (this->m_sPlayerItems.m_vItemsList[1].m_iWeaponLevel) //Index 2 (Enchanted Sword): Increase player health by 1/2/3/4, increase player damage by 2/3/4/5
+		switch (this->m_sPlayerItems.m_vItemsList[1].m_iWeaponLevel) //Index 2 (Enchanted Sword): Increase player health by 3/4/5/6, increase player damage by 2/3/4/5
 		{
-		case 1: //Enchanted Sword level 1: Increase player health by 1, increase player damage by 2.
+		case 1: //Enchanted Sword level 1: Increase player health by 3, increase player damage by 2.
 			{
 				this->m_iPlayerHealth += this->m_sPlayerItems.m_vItemsList[1].m_iWeaponHealthGiven;
 				this->m_iPlayerDamage += this->m_sPlayerItems.m_vItemsList[1].m_iWeaponDamage;
@@ -99,7 +99,7 @@ void SGameChar::hasItem(bool g_bHasWeapon)
 				this->m_sPlayerItems.ItemCount++;
 				break;
 			}
-		case 2: //Enchanted Sword level 2: Increase player health by 2, increase player damage by 3.
+		case 2: //Enchanted Sword level 2: Increase player health by 4, increase player damage by 3.
 			{
 				this->m_iPlayerHealth += (this->m_sPlayerItems.m_vItemsList[1].m_iWeaponHealthGiven + 1);
 				this->m_iPlayerDamage += (this->m_sPlayerItems.m_vItemsList[1].m_iWeaponDamage + 1);
@@ -107,7 +107,7 @@ void SGameChar::hasItem(bool g_bHasWeapon)
 				this->m_sPlayerItems.ItemCount++;
 				break;
 			}
-		case 3: //Enchanted Sword level 3: Increase player health by 3, increase player damage by 4.
+		case 3: //Enchanted Sword level 3: Increase player health by 5, increase player damage by 4.
 			{
 				this->m_iPlayerHealth += (this->m_sPlayerItems.m_vItemsList[1].m_iWeaponHealthGiven + 2);
 				this->m_iPlayerDamage += (this->m_sPlayerItems.m_vItemsList[1].m_iWeaponDamage + 2);
@@ -115,7 +115,7 @@ void SGameChar::hasItem(bool g_bHasWeapon)
 				this->m_sPlayerItems.ItemCount++;
 				break;
 			}
-		case 4: //Enchanted Sword level 4: Increase player health by 4, increase player damage by 5.
+		case 4: //Enchanted Sword level 4: Increase player health by 6, increase player damage by 5.
 			{
 				this->m_iPlayerHealth += (this->m_sPlayerItems.m_vItemsList[1].m_iWeaponHealthGiven + 2);
 				this->m_iPlayerDamage += (this->m_sPlayerItems.m_vItemsList[1].m_iWeaponDamage + 2);
@@ -129,30 +129,30 @@ void SGameChar::hasItem(bool g_bHasWeapon)
 
 	else if ((weaponIndex == this->m_sPlayerItems.m_vItemsList[2].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[2].m_bHasWeapon == false)) //Checking if randomized weaponIndex gives the Health Potion
 	{
-		switch (this->m_sPlayerItems.m_vItemsList[2].m_iWeaponLevel) //Index 3 (Health Potion): Increase player health by 2/4/6/8
+		switch (this->m_sPlayerItems.m_vItemsList[2].m_iWeaponLevel) //Index 3 (Health Potion): Increase player health by 5/7/9/11
 		{
-		case 1: //Health Potion level 1: Increase player health by 2.
+		case 1: //Health Potion level 1: Increase player health by 5.
 			{
 				this->m_iPlayerHealth += this->m_sPlayerItems.m_vItemsList[2].m_iWeaponHealthGiven;
 				this->m_sPlayerItems.m_vItemsList[2].m_bHasWeapon = true;
 				this->m_sPlayerItems.ItemCount++;
 				break;
 			}
-		case 2: //Health Potion level 2: Increase player health by 4.
+		case 2: //Health Potion level 2: Increase player health by 7.
 			{
 				this->m_iPlayerHealth += (this->m_sPlayerItems.m_vItemsList[2].m_iWeaponHealthGiven + 2);
 				this->m_sPlayerItems.m_vItemsList[2].m_bHasWeapon = true;
 				this->m_sPlayerItems.ItemCount++;
 				break;
 			}
-		case 3: //Health Potion level 3: Increase player health by 6.
+		case 3: //Health Potion level 3: Increase player health by 9.
 			{
 				this->m_iPlayerHealth += (this->m_sPlayerItems.m_vItemsList[2].m_iWeaponHealthGiven + 4);
 				this->m_sPlayerItems.m_vItemsList[2].m_bHasWeapon = true;
 				this->m_sPlayerItems.ItemCount++;
 				break;
 			}
-		case 4: //Health Potion level 4: Increase player health by 8.
+		case 4: //Health Potion level 4: Increase player health by 11.
 			{
 				this->m_iPlayerHealth += (this->m_sPlayerItems.m_vItemsList[2].m_iWeaponHealthGiven + 6);
 				this->m_sPlayerItems.m_vItemsList[2].m_bHasWeapon = true;
@@ -164,30 +164,30 @@ void SGameChar::hasItem(bool g_bHasWeapon)
 
 	else if ((weaponIndex == this->m_sPlayerItems.m_vItemsList[3].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[3].m_bHasWeapon == false)) //Checking if randomized weaponIndex gives the Glass Canon
 	{
-		switch (this->m_sPlayerItems.m_vItemsList[3].m_iWeaponLevel) //Index 4 (Glass Canon): Increase player's damage by 1/2/3/4.
+		switch (this->m_sPlayerItems.m_vItemsList[3].m_iWeaponLevel) //Index 4 (Glass Canon): Increase player's damage by 4/5/6/7.
 		{
-			case 1: //Glass Canon Level 1: Player deals 1 more damage to enemies
+			case 1: //Glass Canon Level 1: Player deals 4 more damage to enemies
 				{
 					this->m_iPlayerDamage += this->m_sPlayerItems.m_vItemsList[3].m_iWeaponDamage;
 					this->m_sPlayerItems.m_vItemsList[3].m_bHasWeapon = true;
 					this->m_sPlayerItems.ItemCount++;
 					break;
 				}
-			case 2: //Glass Canon Level 2: Player deals 2 more damage to enemies
+			case 2: //Glass Canon Level 2: Player deals 5 more damage to enemies
 				{
 					this->m_iPlayerDamage += (this->m_sPlayerItems.m_vItemsList[3].m_iWeaponDamage + 1);
 					this->m_sPlayerItems.m_vItemsList[3].m_bHasWeapon = true;
 					this->m_sPlayerItems.ItemCount++;
 					break;
 				}
-			case 3: //Glass Canon Level 3: Player deals 3 more damage to enemies
+			case 3: //Glass Canon Level 3: Player deals 6 more damage to enemies
 				{
 					this->m_iPlayerDamage += (this->m_sPlayerItems.m_vItemsList[3].m_iWeaponDamage + 2);
 					this->m_sPlayerItems.m_vItemsList[3].m_bHasWeapon = true;
 					this->m_sPlayerItems.ItemCount++;
 					break;
 				}
-			case 4: //Glass Canon Level 4: Player deals 4 more damage to enemies
+			case 4: //Glass Canon Level 4: Player deals 7 more damage to enemies
 				{
 					this->m_iPlayerDamage += (this->m_sPlayerItems.m_vItemsList[3].m_iWeaponDamage + 3);
 					this->m_sPlayerItems.m_vItemsList[3].m_bHasWeapon = true;
@@ -199,8 +199,37 @@ void SGameChar::hasItem(bool g_bHasWeapon)
 
 	else if ((weaponIndex == this->m_sPlayerItems.m_vItemsList[4].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[4].m_bHasWeapon == false)) //Checking if randomized weaponIndex gives the Magic Potion
 	{
-		this->m_sPlayerItems.m_vItemsList[4].m_bHasWeapon = true;
-		this->m_sPlayerItems.ItemCount++;
+		switch (this->m_sPlayerItems.m_vItemsList[5].m_iWeaponLevel) //Index 4 (Magic Potion): Increase pellet velocity by 20%/30%/40%/50%
+		{
+			case 1: //Magic Potion Level 1: Pellet velocity increased by 20%
+				{
+					this->m_dVelocity *= (this->m_sPlayerItems.m_vItemsList[4].m_fWeaponVelocity - 0.20);
+					this->m_sPlayerItems.m_vItemsList[4].m_bHasWeapon = true;
+					this->m_sPlayerItems.ItemCount++;
+					break;
+				}
+			case 2: //Magic Potion Level 1: Pellet velocity increased by 30%
+				{
+					this->m_dVelocity *= (this->m_sPlayerItems.m_vItemsList[4].m_fWeaponVelocity - 0.30);
+					this->m_sPlayerItems.m_vItemsList[4].m_bHasWeapon = true;
+					this->m_sPlayerItems.ItemCount++;
+					break;
+				}
+			case 3: //Magic Potion Level 1: Pellet velocity increased by 40%
+				{
+					this->m_dVelocity *= (this->m_sPlayerItems.m_vItemsList[4].m_fWeaponVelocity - 0.40);
+					this->m_sPlayerItems.m_vItemsList[4].m_bHasWeapon = true;
+					this->m_sPlayerItems.ItemCount++;
+					break;
+				}
+			case 4: //Magic Potion Level 1: Pellet velocity increased by 50%
+				{
+					this->m_dVelocity *= (this->m_sPlayerItems.m_vItemsList[4].m_fWeaponVelocity - 0.50);
+					this->m_sPlayerItems.m_vItemsList[4].m_bHasWeapon = true;
+					this->m_sPlayerItems.ItemCount++;
+					break;
+				}
+		}
 	}
 
 	else if ((weaponIndex == this->m_sPlayerItems.m_vItemsList[5].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[5].m_bHasWeapon == false)) //Checking if randomized weaponIndex gives the Bonus!
@@ -277,12 +306,12 @@ void SGameChar::hasConsumable(bool g_bHasConsumable, int index)
 	{
 		switch (index)
 		{
-		case 1: //Index 1: Minor Health Potion, restores 5 health (maximum hp is 10, potion will not restore any higher than that)
+		case 1: //Index 1: Minor Health Potion, restores 5 health (potion will not restore any higher than maximum hp)
 		{
 			this->m_iPlayerHealth += this->m_sConsumables.m_vConsumableList[0].m_iConsumableHealth;
 			break;
 		}
-		case 2: //Index 1: Minor Health Potion, restores 10 health (maximum hp is 10, potion will not restore any higher than that)
+		case 2: //Index 1: Greater Health Potion, restores 10 health (potion will not restore any higher than maximum hp)
 		{
 			this->m_iPlayerHealth += this->m_sConsumables.m_vConsumableList[1].m_iConsumableHealth;
 			break;

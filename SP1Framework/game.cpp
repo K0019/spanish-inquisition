@@ -66,8 +66,8 @@ void init( void )
 	COORD c;
 	c.X = (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
 	c.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
-	g_sEntities.m_vEnemy.push_back(std::move(std::unique_ptr<EnemyMelee>(new EnemyMelee(&g_sLevel, "Test", "RRRR", "RRRR", c, (WORD)0x0E, 10, 3, 0.4, 0.3, 0.1, 0.3))));
-	g_sEntities.m_vEnemy.push_back(std::move(std::unique_ptr<EnemyRanged> (new EnemyRanged(&g_sLevel, &g_sEntities.m_vPellets, "Test", "MMMM", "MMMM", c, (WORD)0x0E, 10, 3, 0.4, 0.3, 0.1, 0.3, false, 0.25))));
+	addEnemy(UNIQUE_ENEMY_MELEETEST);
+	addEnemy(UNIQUE_ENEMY_RANGEDTEST);
     // sets the width, height and the font name to use in the console
     g_Console.setConsoleFont(0, 16, L"Consolas");
 	g_LoadFromSave(saveDataStorage.g_iSaveData);
@@ -320,7 +320,8 @@ void controlPlayer()
 		g_sEntities.g_sChar.m_cLocation.X--;
 		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != ' ' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '&' &&
-	(g_sEntities.g_sChar.m_bInBattle || g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '$'))
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '\0' &&
+			(g_sEntities.g_sChar.m_bInBattle || g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '$'))
 		{
 			g_sEntities.g_sChar.m_cLocation.X++;
 		}
@@ -346,6 +347,8 @@ void controlPlayer()
 					g_sEntities.g_sChar.m_cLocation.X--;
 					g_sEntities.clearPellets();
 					g_sEntities.clearEnemies();
+					if (loadEnemiesFromRoom())
+						g_sEntities.g_sChar.m_bInBattle = true;
 				}
 			}
 		}
@@ -355,6 +358,7 @@ void controlPlayer()
 		g_sEntities.g_sChar.m_cLocation.Y--;
 		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != ' ' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '&' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '\0' &&
 			(g_sEntities.g_sChar.m_bInBattle || g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '$'))
 		{
 			g_sEntities.g_sChar.m_cLocation.Y++;
@@ -381,6 +385,8 @@ void controlPlayer()
 					g_sEntities.g_sChar.m_cLocation.Y--;
 					g_sEntities.clearPellets();
 					g_sEntities.clearEnemies();
+					if (loadEnemiesFromRoom())
+						g_sEntities.g_sChar.m_bInBattle = true;
 				}
 			}
 		}
@@ -390,6 +396,7 @@ void controlPlayer()
 		g_sEntities.g_sChar.m_cLocation.X++;
 		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != ' ' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '&' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '\0' &&
 			(g_sEntities.g_sChar.m_bInBattle || g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '$'))
 		{
 			g_sEntities.g_sChar.m_cLocation.X--;
@@ -416,6 +423,8 @@ void controlPlayer()
 					g_sEntities.g_sChar.m_cLocation.X++;
 					g_sEntities.clearPellets();
 					g_sEntities.clearEnemies();
+					if (loadEnemiesFromRoom())
+						g_sEntities.g_sChar.m_bInBattle = true;
 				}
 			}
 		}
@@ -425,6 +434,7 @@ void controlPlayer()
 		g_sEntities.g_sChar.m_cLocation.Y++;
 		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != ' ' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '&' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '\0' &&
 			(g_sEntities.g_sChar.m_bInBattle || g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '$'))
 		{
 			g_sEntities.g_sChar.m_cLocation.Y--;
@@ -451,6 +461,8 @@ void controlPlayer()
 					g_sEntities.g_sChar.m_cLocation.Y++;
 					g_sEntities.clearPellets();
 					g_sEntities.clearEnemies();
+					if (loadEnemiesFromRoom())
+						g_sEntities.g_sChar.m_bInBattle = true;
 				}
 			}
 		}
@@ -1129,4 +1141,39 @@ void render(COORD c, std::string& text, std::string& text2, WORD color)
 	g_Console.writeToBuffer(c, text.c_str(), color);
 	c.Y++;
 	g_Console.writeToBuffer(c, text2.c_str(), color);
+}
+
+bool loadEnemiesFromRoom()
+{
+	bool roomHasEnemies = false;
+	for (int row = r_cRenderOffset.X; row < r_cRenderOffset.X + ROOM_X + 2; row++)
+	{
+		for (int column = r_cRenderOffset.Y; column < r_cRenderOffset.Y + ROOM_Y + 2; column++)
+		{
+			COORD c = fastCoord(row, column);
+			switch (g_sLevel.level[row][column])
+			{
+			case 'y':
+				addEnemy(UNIQUE_ENEMY_MELEETEST);
+				roomHasEnemies = true;
+				g_sLevel.level[row][column] = ' ';
+				break;
+			case 'z':
+				addEnemy(UNIQUE_ENEMY_RANGEDTEST);
+				roomHasEnemies = true;
+				g_sLevel.level[row][column] = ' ';
+				break;
+			}
+		}
+	}
+	return roomHasEnemies;
+}
+
+void addEnemy(EnemyMelee * enemy)
+{
+	g_sEntities.m_vEnemy.push_back(std::move(std::unique_ptr<EnemyMelee>(enemy)));
+}
+void addEnemy(EnemyRanged * enemy)
+{
+	g_sEntities.m_vEnemy.push_back(std::move(std::unique_ptr<EnemyRanged>(enemy)));
 }

@@ -302,6 +302,7 @@ void controlPlayer()
 		g_sEntities.g_sChar.m_cLocation.X--;
 		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != ' ' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '&' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '\0' &&
 	(g_sEntities.g_sChar.m_bInBattle || g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '$'))
 		{
 			g_sEntities.g_sChar.m_cLocation.X++;
@@ -337,6 +338,7 @@ void controlPlayer()
 		g_sEntities.g_sChar.m_cLocation.Y--;
 		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != ' ' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '&' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '\0' &&
 			(g_sEntities.g_sChar.m_bInBattle || g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '$'))
 		{
 			g_sEntities.g_sChar.m_cLocation.Y++;
@@ -372,6 +374,7 @@ void controlPlayer()
 		g_sEntities.g_sChar.m_cLocation.X++;
 		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != ' ' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '&' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '\0' &&
 			(g_sEntities.g_sChar.m_bInBattle || g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '$'))
 		{
 			g_sEntities.g_sChar.m_cLocation.X--;
@@ -407,6 +410,7 @@ void controlPlayer()
 		g_sEntities.g_sChar.m_cLocation.Y++;
 		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != ' ' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '&' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '\0' &&
 			(g_sEntities.g_sChar.m_bInBattle || g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '$'))
 		{
 			g_sEntities.g_sChar.m_cLocation.Y--;

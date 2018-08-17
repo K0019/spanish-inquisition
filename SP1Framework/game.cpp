@@ -718,7 +718,11 @@ void renderShop()
 void renderOptions()
 {
 	g_mEvent.renderDoomButton();
-	g_mEvent.renderGoomButtonBrackets();
+	if (g_mEvent.sh_optionSel == 0)
+	{
+		g_mEvent.renderGoomButtonBrackets();
+	}
+	g_mEvent.renderOtherOptions();
 }
 
 void renderCredits()
@@ -753,6 +757,7 @@ void renderCharacter()
 {
 	// Draw the location of the character
 	WORD charColor = g_mEvent.wPlayerColor;
+	//WORD charColor = 0x0A;
 	COORD c = g_sEntities.g_sChar.getRealCoords();
 	g_Console.writeToBuffer(c, "@@@@", charColor);
 	c.Y++;

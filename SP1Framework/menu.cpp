@@ -305,10 +305,29 @@ void MenuEvent::renderGoomButtonBrackets()
 	RightBracket[5] = "  лл";
 	RightBracket[6] = "лллл";
 	COORD c = this->mainConsole->getConsoleSize();
-	(c.X /= 10) -= 6;
+	(c.X /= 10) -= 4;
 	(c.Y /= 4) -= 1;
 	for (int i = 0; i < 7; i++)
 	{
 		this->mainConsole->writeToBuffer(c, LeftBracket[i], 0x08);
+		c.Y++;
 	}
+	c = this->mainConsole->getConsoleSize();
+	(c.X /= 10) += 10;
+	(c.Y /= 4) -= 1;
+	for (int i = 0; i < 7; i++)
+	{
+		this->mainConsole->writeToBuffer(c, RightBracket[i], 0x08);
+		c.Y++;
+	}
+}
+
+void MenuEvent::renderColourOption()
+{
+
+}
+
+void MenuEvent::renderOtherOptions()
+{
+
 }

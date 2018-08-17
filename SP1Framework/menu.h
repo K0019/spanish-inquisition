@@ -7,7 +7,7 @@ struct MenuEvent
 {
 	Console* mainConsole;
 	COORD r_curspos;
-	WORD wPlayerColor;
+	WORD wPlayerColor = 0x0A;
 	bool bStartGame = false;
 	bool bOptions = false;
 	bool bShop = false;
@@ -40,5 +40,7 @@ struct MenuEvent
 
 	void renderDoomButton();
 	void renderGoomButtonBrackets();
+	void renderColourOption();
+	void renderOtherOptions();
 };
 #endif // !_MENU_H

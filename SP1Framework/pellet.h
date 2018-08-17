@@ -15,7 +15,8 @@ namespace pellet
 		P_DOOR,
 		P_PLAYER,
 		P_ENEMY,
-		P_FLOOR
+		P_FLOOR,
+		P_ROCK
 	};
 }
 

@@ -14,11 +14,12 @@ void SLevel::generateLevel()
 
 	// RESET MEMBER VARIABLES
 	this->roomSelections.clear();
+	if (this->miniMap != nullptr) delete this->miniMap;
 
 	// -----Clear Level-----
 	for (int row = 0; row < (ROOM_X + 2) * GRID_X + 2; row++)
 	{
-		for (int column = 0; column < (ROOM_Y + 2) * GRID_X + 2; column++)
+		for (int column = 0; column < (ROOM_Y + 2) * GRID_Y + 2; column++)
 		{
 			this->level[row][column] = ' ';
 		}
@@ -38,6 +39,7 @@ void SLevel::generateLevel()
 		this->exitRoom.Y >= this->playerStartRoom.Y - 1 &&
 		this->exitRoom.Y <= this->playerStartRoom.Y + 1);
 
+	// Generate level
 	for (int gridRow = 0; gridRow < GRID_X; gridRow++)
 	{
 		for (int gridColumn = 0; gridColumn < GRID_Y; gridColumn++)
@@ -61,49 +63,6 @@ void SLevel::generateLevel()
 			}
 		}
 	}
-
-	//// -----Borders and Padding-----
-	//// Add the top border
-	//for (int i = 0; i < 2; i++)
-	//{
-	//	for (int gridColumn = 0; gridColumn <= GRID_Y * (ROOM_Y + 1) + GRID_Y + 1; gridColumn++)
-	//	{
-	//		this->level[i] += "#";
-	//	}
-	//}
-
-	//// Add the middle w/ padding
-	//for (int gridRow = 0; gridRow < GRID_X; gridRow++)
-	//{
-	//	for (int cRow = 0; cRow < ROOM_X; cRow++)
-	//	{
-	//		for (int gridColumn = 0; gridColumn <= GRID_Y; gridColumn++)
-	//		{
-	//			this->level[gridRow * ROOM_X + (gridRow << 1) + cRow + 2] += "##";
-	//			if (gridColumn != GRID_Y)
-	//				for (int padding = 0; padding < ROOM_Y; padding++)
-	//					this->level[gridRow * ROOM_X + (gridRow << 1) + cRow + 2] += " ";
-	//		}
-	//	}
-	//	if (gridRow == GRID_X - 1) break;
-	//	for (int i = 0; i < 2; i++)
-	//	{
-	//		for (int gridColumn = 0; gridColumn <= GRID_Y * (ROOM_Y + 1) + GRID_Y + 1; gridColumn++)
-	//		{
-	//			this->level[(gridRow + 1) * (ROOM_X + 1) + i + gridRow + 1] += "#";
-	//		}
-	//	}
-	//}
-
-	//// Add the bottom border
-	//for (int i = 0; i < 2; i++)
-	//{
-	//	for (int gridColumn = 0; gridColumn <= GRID_Y * (ROOM_Y + 1) + GRID_Y + 1; gridColumn++)
-	//	{
-	//		this->level[GRID_X + (ROOM_X + 1) * GRID_X + i] += "#";
-	//	}
-	//}
-
 
 	// -----Required Border Holes-----
 
@@ -143,6 +102,7 @@ void SLevel::generateLevel()
 		this->modifyTile(c, '&');
 	}
 
+	// DEBUG
 	std::ofstream dump("level.txt");
 	for (int row = 0; row < (ROOM_X + 2) * GRID_X + 2; row++)
 	{
@@ -153,9 +113,12 @@ void SLevel::generateLevel()
 		dump << std::endl;
 	}
 	dump.close();
+	// END DEBUG
 
 	// DELETE ALLOCATED STORAGE
 	delete[] roomsHaveExit;
+
+	this->miniMap = new SMiniMap(&this->level, this->playerStartRoom, this->exitRoom);
 }
 
 std::vector<COORD> SLevel::seekToEnd(std::vector<COORD>& returned)
@@ -302,6 +265,146 @@ COORD * SLevel::getCoordinatesForDoor(const SHORT& X, const SHORT& Y, const int&
 		break;
 	}
 	return c;
+}
+
+SMiniMap::SMiniMap(char (*level)[(ROOM_X + 2) * GRID_X + 2][(ROOM_Y + 2) * GRID_Y + 2], COORD playerStartRoom, COORD exitRoom)
+{
+	for (int roomIndex = 0; roomIndex < GRID_X * GRID_Y; roomIndex++)
+	{
+		this->enteredRoom[roomIndex] = false;
+	}
+
+	this->level = level;
+	this->enteredRoom[playerStartRoom.X * GRID_Y + playerStartRoom.Y] = true;
+	this->playerEndRoom = exitRoom;
+}
+
+void SMiniMap::refresh(COORD playerLocation)
+{
+	// Empty map buffer
+	for (int row = 0; row < 1 + (GRID_X << 1); row++)
+	{
+		for (int column = 0; column < 1 + (GRID_Y << 1); column++)
+		{
+			this->map[row][column] = ' ';
+		}
+	}
+
+	// Add exit room if discovered
+	if (this->enteredRoom[this->playerEndRoom.X * GRID_Y + this->playerEndRoom.Y])
+	{
+		this->map[(this->playerEndRoom.X << 1) + 1][(this->playerEndRoom.Y << 1) + 1] = '&';
+	}
+
+	// Buffer all of the uncovered minimap
+	for (int roomIndex = 0; roomIndex < GRID_X * GRID_Y; roomIndex++)
+	{
+		if (this->enteredRoom[roomIndex])
+		{
+			for (int column = (roomIndex % GRID_Y) << 1; column <= (roomIndex % GRID_Y + 1) << 1; column++)
+			{
+				this->map[(roomIndex / GRID_Y) << 1][column] = '#';
+			}
+			this->map[((roomIndex / GRID_Y) << 1) + 1][(roomIndex % GRID_Y) << 1] = '#';
+			if ((playerLocation.X - 1) / (ROOM_X + 2) * GRID_Y + (playerLocation.Y - 1) / (ROOM_Y + 2) == roomIndex)
+			{
+				this->map[((roomIndex / GRID_Y) << 1) + 1][((roomIndex % GRID_Y) << 1) + 1] = '!';
+			}
+			this->map[((roomIndex / GRID_Y) << 1) + 1][((roomIndex % GRID_Y) << 1) + 2] = '#';
+			for (int column = (roomIndex % GRID_Y) << 1; column <= (roomIndex % GRID_Y + 1) << 1; column++)
+			{
+				this->map[((roomIndex / GRID_Y) << 1) + 2][column] = '#';
+			}
+
+			if (this->hasDoor(roomIndex, 0))
+			{
+				if (this->hasExplored(roomIndex, 0))
+				{
+					this->map[(roomIndex / GRID_Y) << 1][((roomIndex % GRID_Y) << 1) + 1] = '$';
+				}
+				else
+				{
+					this->map[(roomIndex / GRID_Y) << 1][((roomIndex % GRID_Y) << 1) + 1] = '@';
+				}
+			}
+			if (this->hasDoor(roomIndex, 1))
+			{
+				if (this->hasExplored(roomIndex, 1))
+				{
+					this->map[((roomIndex / GRID_Y) << 1) + 1][(roomIndex % GRID_Y + 1) << 1] = '$';
+				}
+				else
+				{
+					this->map[((roomIndex / GRID_Y) << 1) + 1][(roomIndex % GRID_Y + 1) << 1] = '@';
+				}
+			}
+			if (this->hasDoor(roomIndex, 2))
+			{
+				if (this->hasExplored(roomIndex, 2))
+				{
+					this->map[(roomIndex / GRID_Y + 1) << 1][((roomIndex % GRID_Y) << 1) + 1] = '$';
+				}
+				else
+				{
+					this->map[(roomIndex / GRID_Y + 1) << 1][((roomIndex % GRID_Y) << 1) + 1] = '@';
+				}
+			}
+			if (this->hasDoor(roomIndex, 3))
+			{
+				if (this->hasExplored(roomIndex, 3))
+				{
+					this->map[((roomIndex / GRID_Y) << 1) + 1][(roomIndex % GRID_Y) << 1] = '$';
+				}
+				else
+				{
+					this->map[((roomIndex / GRID_Y) << 1) + 1][(roomIndex % GRID_Y) << 1] = '@';
+				}
+			}
+		}
+	}
+}
+
+bool SMiniMap::hasDoor(int roomIndex, int direction)
+{
+	switch (direction)
+	{
+	case 0: // Up
+		if ((roomIndex / GRID_Y) - 1 < 0) return false;
+		if ((*this->level)[(roomIndex / GRID_Y) * (ROOM_X + 2)][(roomIndex % GRID_Y) * (ROOM_Y + 2) + (ROOM_Y >> 1) + 2] == '$') return true;
+		break;
+	case 1: // Right
+		if ((roomIndex % GRID_Y) + 1 < 0) return false;
+		if ((*this->level)[(roomIndex / GRID_Y) * (ROOM_X + 2) + (ROOM_X >> 1) + 2][(roomIndex % GRID_Y + 1) * (ROOM_Y + 2)] == '$') return true;
+		break;
+	case 2: // Down
+		if ((roomIndex / GRID_Y) + 1 >= GRID_X) return false;
+		if ((*this->level)[(roomIndex / GRID_Y + 1) * (ROOM_X + 2)][(roomIndex % GRID_Y) * (ROOM_Y + 2) + (ROOM_Y >> 1) + 2] == '$') return true;
+		break;
+	case 3: // Left
+		if ((roomIndex % GRID_Y) - 1 >= GRID_Y) return false;
+		if ((*this->level)[(roomIndex / GRID_Y) * (ROOM_X + 2) + (ROOM_X >> 1) + 2][(roomIndex % GRID_Y) * (ROOM_Y + 2)] == '$') return true;
+		break;
+	}
+	return false;
+}
+
+bool SMiniMap::hasExplored(int roomIndex, int direction)
+{
+	switch (direction)
+	{
+	case 0:
+		if (this->enteredRoom[roomIndex - GRID_Y]) return true;
+		break;
+	case 1:
+		if (this->enteredRoom[roomIndex + 1]) return true;
+		break;
+	case 2:
+		if (this->enteredRoom[roomIndex + GRID_Y]) return true;
+		break;
+	case 3:
+		if (this->enteredRoom[roomIndex - 1]) return true;
+	}
+	return false;
 }
 
 COORD fastCoord(int& x, int& y)

@@ -101,7 +101,7 @@ void MenuEvent::renderMenu()
 	COORD c;
 	c.X = this->mainConsole->getConsoleSize().X / 5 + 2;
 	c.Y = this->mainConsole->getConsoleSize().Y / 10 * 8;
-	this->mainConsole->writeToBuffer(c, ">PLAY<", 0x0c);
+	this->mainConsole->writeToBuffer(c, "PLAY", 0x0f);
 	c.Y++;
 	this->mainConsole->writeToBuffer(c, "HOW TO PLAY", 0x0f);
 	c.Y++;
@@ -201,4 +201,114 @@ void MenuEvent::renderTutorialDetails()
 	c.X -= 4;
 	c.Y++;
 	this->mainConsole->writeToBuffer(c, "##&_ ", 0x01);
+}
+
+void MenuEvent::renderCreditsRollAnimation()
+{
+	//COORD c = this->mainConsole->getConsoleSize();
+
+	//if (uiCreditsRollTime > 1000)
+	//{
+	//	(c.X >>= 1) -= 9;
+	//	c.Y >>= 1;
+	//	this->mainConsole->writeToBuffer(c, "Press [Enter] to go back", 0x0f);
+	//}
+	//if (!(uiCreditsRollTime % 10))
+	//{
+	//	CreditsOffsetY += 1;
+	//}
+	//if (uiCreditsRollTime == 4294967294)
+	//{
+	//	uiCreditsRollTime = 0;
+	//}
+	//uiCreditsRollTime++;
+}
+
+void MenuEvent::renderCreditsRollText()
+{
+	COORD c = this->mainConsole->getConsoleSize();
+	c.X /= 10;
+	c.Y = (c.Y >> 1) * 0.5;
+	this->mainConsole->writeToBuffer(c, "Credits", 0x0f);
+	c.Y += 2;
+	this->mainConsole->writeToBuffer(c, "Kendrick Sim", 0x0f);
+	c.Y++;
+	this->mainConsole->writeToBuffer(c, "Lim Yan Quan", 0x0f);
+	c.Y++;
+	this->mainConsole->writeToBuffer(c, "Winston Ngoui", 0x0f);
+	c.Y++;
+	this->mainConsole->writeToBuffer(c, "Pi Jo Chu", 0x0f);
+}
+
+void MenuEvent::renderItemTitleSelected()
+{
+
+}
+
+void MenuEvent::renderItemPriceSelected()
+{
+
+}
+
+void MenuEvent::renderItemDescSelected()
+{
+
+}
+
+void MenuEvent::renderItemCurrTSelected()
+{
+
+}
+
+void MenuEvent::renderItemNextTSelected()
+{
+
+}
+
+void MenuEvent::renderDoomButton()
+{
+	std::string Button[5];
+	Button[0] = " лллллллл ";
+	Button[1] = "лллллллллл";
+	Button[2] = "лллллллллл";
+	Button[3] = "лллллллллл";
+	Button[4] = " лллллллл ";
+	COORD c = this->mainConsole->getConsoleSize();
+	c.X /= 10;
+	c.Y /= 4;
+	for (int i = 0; i < 5; i++)
+	{
+		this->mainConsole->writeToBuffer(c, Button[i], 0x0c);
+		c.Y++;
+	}
+	c.X++;
+	c.Y++;
+	this->mainConsole->writeToBuffer(c, "Prestige", 0x0f);
+}
+
+void MenuEvent::renderGoomButtonBrackets()
+{
+	std::string LeftBracket[7];
+	std::string RightBracket[7];
+	LeftBracket[0] = "лллл";
+	LeftBracket[1] = "лл";
+	LeftBracket[2] = "лл";
+	LeftBracket[3] = "лл";
+	LeftBracket[4] = "лл";
+	LeftBracket[5] = "лл";
+	LeftBracket[6] = "лллл";
+	RightBracket[0] = "лллл";
+	RightBracket[1] = "  лл";
+	RightBracket[2] = "  лл";
+	RightBracket[3] = "  лл";
+	RightBracket[4] = "  лл";
+	RightBracket[5] = "  лл";
+	RightBracket[6] = "лллл";
+	COORD c = this->mainConsole->getConsoleSize();
+	(c.X /= 10) -= 6;
+	(c.Y /= 4) -= 1;
+	for (int i = 0; i < 7; i++)
+	{
+		this->mainConsole->writeToBuffer(c, LeftBracket[i], 0x08);
+	}
 }

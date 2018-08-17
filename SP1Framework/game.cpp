@@ -228,6 +228,7 @@ void shop()
 void options()
 {
 	processUserInput();
+	doomButton();
 }
 
 void credits()
@@ -263,7 +264,7 @@ void menuNavigate()
 		g_mEvent.r_curspos.Y++;
 		KeyPressed = true;
 	}
-	if (g_abKeyPressed[K_ENTER])
+	if (g_abKeyPressed[K_ENTER] && g_mEvent.bHasPressedButton == false)
 	{
 		switch (g_mEvent.sh_cursSel)
 		{
@@ -299,9 +300,9 @@ void goBack()
 	if (g_abKeyPressed[K_ENTER] == true)
 	{
 		g_mEvent.bMenu = true;
+		g_mEvent.uiCreditsRollTime = 0;
 	}
 }
-
 
 void resetLevel(int floor)
 {
@@ -559,40 +560,86 @@ void clearScreen()
 
 void processMenuEvent()
 {
-	if (g_abKeyPressed[K_ENTER] == false)
+	if (g_mEvent.bHasPressedButton == false)
 	{
-		if (g_mEvent.bStartGame == true)
+		if (g_abKeyPressed[K_ENTER] == false)
 		{
-			g_eGameState = S_GAME;
-			g_mEvent.bStartGame = false;
-		}
-		if (g_mEvent.bHowToPlay == true)
-		{
-			g_eGameState = S_HOWTOPLAY;
-			g_mEvent.bHowToPlay = false;
-		}
-		if (g_mEvent.bShop == true)
-		{
-			g_eGameState = S_SHOP;
-			g_mEvent.bShop = false;
-		}
-		if (g_mEvent.bOptions == true)
-		{
-			g_eGameState = S_OPTIONS;
-			g_mEvent.bOptions = false;
-		}
-		if (g_mEvent.bMenu == true)
-		{
-			g_eGameState = S_MENU;
-			g_mEvent.bMenu = false;
-		}
-		if (g_mEvent.bCredits == true)
-		{
-			g_eGameState = S_CREDITS;
-			g_mEvent.bCredits = false;
+			if (g_mEvent.bStartGame == true)
+			{
+				g_eGameState = S_GAME;
+				g_mEvent.bStartGame = false;
+			}
+			if (g_mEvent.bHowToPlay == true)
+			{
+				g_eGameState = S_HOWTOPLAY;
+				g_mEvent.bHowToPlay = false;
+			}
+			if (g_mEvent.bShop == true)
+			{
+				g_eGameState = S_SHOP;
+				g_mEvent.bShop = false;
+			}
+			if (g_mEvent.bOptions == true)
+			{
+				g_eGameState = S_OPTIONS;
+				g_mEvent.bOptions = false;
+			}
+			if (g_mEvent.bMenu == true)
+			{
+				g_eGameState = S_MENU;
+				g_mEvent.bMenu = false;
+			}
+			if (g_mEvent.bCredits == true)
+			{
+				g_eGameState = S_CREDITS;
+				g_mEvent.bCredits = false;
+			}
 		}
 	}
+	else
+	{
+		if (g_abKeyPressed[K_ENTER] == true)
+		{
+			g_mEvent.bHasPressedButton = true;
+		}
+		else
+			g_mEvent.bHasPressedButton = false;
+	}
 }
+
+void doomButton()
+{
+	if (g_abKeyPressed[K_ENTER] && g_mEvent.sh_optionSel == 0)
+	{
+		if (g_mEvent.uiActivateDoomButton < 1000)
+		{
+			g_mEvent.uiActivateDoomButton++;
+		}
+		else
+		{
+			g_mEvent.uiActivateDoomButton = 0;
+			unsigned int NukedSaveData[9];
+			for (int i = 0; i < 9; i++)
+			{
+				NukedSaveData[i] = 0;
+			}
+			g_SaveToSave(NukedSaveData);
+			g_eGameState = S_MENU;
+			g_mEvent.bHasPressedButton = true;
+			g_LoadFromSave(saveDataStorage.g_iSaveData);
+		}
+	}
+	else
+	{
+		g_mEvent.uiActivateDoomButton = 0;
+	}
+}
+
+void processOptionsEvent()
+{
+	
+}
+
 void renderSplashScreen()  // renders the splash screen
 {
 	COORD c = g_Console.getConsoleSize();
@@ -622,16 +669,21 @@ void renderTutorial()
 
 void renderShop()
 {
-
+	g_mEvent.renderItemTitleSelected();
+	g_mEvent.renderItemPriceSelected();
+	g_mEvent.renderItemDescSelected();
 }
 
 void renderOptions()
 {
-
+	g_mEvent.renderDoomButton();
+	g_mEvent.renderGoomButtonBrackets();
 }
 
 void renderCredits()
 {
+	g_mEvent.renderCreditsRollAnimation();
+	g_mEvent.renderCreditsRollText();
 }
 
 void renderGame()
@@ -658,7 +710,7 @@ void renderScore()
 void renderCharacter()
 {
 	// Draw the location of the character
-	WORD charColor = 0x0A;
+	WORD charColor = g_mEvent.wPlayerColor;
 	COORD c = g_sEntities.g_sChar.getRealCoords();
 	g_Console.writeToBuffer(c, "@@@@", charColor);
 	c.Y++;

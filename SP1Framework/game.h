@@ -76,6 +76,8 @@ void processUserInput();	// checks if you should change states or do something e
 void clearScreen();			// clears the current screen and draw from scratch 
 void checkHitPellets(); // Check if pellets have hit anything
 void processMenuEvent();
+void doomButton();
+void processOptionsEvent();
 
 /*
 	THE RENDER FUNCTIONS

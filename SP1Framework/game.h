@@ -94,6 +94,7 @@ void renderFramerate();		// renders debug information, frame rate, elapsed time,
 void renderToScreen();		// dump the contents of the buffer to the screen, one frame worth of game
 void renderLevel();			// renders the borders of the rooms
 void renderPellets();		// render pellets to buffer
+void renderMiniMap(); // render minimap to buffer
 void renderEnemy();			// renders all enemies to the buffer
 void renderStat();			//renders the player stats on the right side of the console
 void render(COORD c, LPCSTR text, LPCSTR text2, WORD color); // Render sprite to screen

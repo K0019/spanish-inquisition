@@ -56,18 +56,19 @@ void init( void )
 	g_sLevel.playerStartRoom.X = GRID_X >> 1;
 	g_sLevel.playerStartRoom.Y = GRID_Y >> 1;
 	g_sEntities.g_sChar.m_cRoom = g_sLevel.playerStartRoom;
-	if (DEBUG) g_sEntities.g_sChar.m_bInBattle = true;
+	//if (DEBUG) g_sEntities.g_sChar.m_bInBattle = true;
 	r_cRenderOffset.X = 1 + g_sEntities.g_sChar.m_cRoom.X * (ROOM_X + 2);
 	r_cRenderOffset.Y = 1 + g_sEntities.g_sChar.m_cRoom.Y * (ROOM_Y + 2);
 	g_mEvent.r_curspos.X = g_Console.getConsoleSize().X / 5;
 	g_mEvent.r_curspos.Y = g_Console.getConsoleSize().Y / 10 * 8;
 	g_sLevel.floor = 1;
 	g_sLevel.generateLevel();
+	g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
 	COORD c;
 	c.X = (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
 	c.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
-	addEnemy(UNIQUE_ENEMY_MELEETEST);
-	addEnemy(UNIQUE_ENEMY_RANGEDTEST);
+	//addEnemy(UNIQUE_ENEMY_MELEETEST);
+	//addEnemy(UNIQUE_ENEMY_RANGEDTEST);
     // sets the width, height and the font name to use in the console
     g_Console.setConsoleFont(0, 16, L"Consolas");
 	g_LoadFromSave(saveDataStorage.g_iSaveData);
@@ -307,6 +308,7 @@ void resetLevel(int floor)
 {
 	g_sLevel.playerStartRoom = g_sLevel.exitRoom;
 	g_sLevel.generateLevel();
+	g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
 }
 
 void controlPlayer()
@@ -354,6 +356,8 @@ void controlPlayer()
 					g_sEntities.clearEnemies();
 					if (loadEnemiesFromRoom())
 						g_sEntities.g_sChar.m_bInBattle = true;
+					g_sLevel.miniMap->enteredRoom[(g_sEntities.g_sChar.m_cLocation.X - 1) / (ROOM_X + 2) * GRID_Y + (g_sEntities.g_sChar.m_cLocation.Y - 1) / (ROOM_Y + 2)] = true;
+					g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
 				}
 			}
 		}
@@ -397,6 +401,8 @@ void controlPlayer()
 					g_sEntities.clearEnemies();
 					if (loadEnemiesFromRoom())
 						g_sEntities.g_sChar.m_bInBattle = true;
+					g_sLevel.miniMap->enteredRoom[(g_sEntities.g_sChar.m_cLocation.X - 1) / (ROOM_X + 2) * GRID_Y + (g_sEntities.g_sChar.m_cLocation.Y - 1) / (ROOM_Y + 2)] = true;
+					g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
 				}
 			}
 		}
@@ -440,6 +446,8 @@ void controlPlayer()
 					g_sEntities.clearEnemies();
 					if (loadEnemiesFromRoom())
 						g_sEntities.g_sChar.m_bInBattle = true;
+					g_sLevel.miniMap->enteredRoom[(g_sEntities.g_sChar.m_cLocation.X - 1) / (ROOM_X + 2) * GRID_Y + (g_sEntities.g_sChar.m_cLocation.Y - 1) / (ROOM_Y + 2)] = true;
+					g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
 				}
 			}
 		}
@@ -483,6 +491,8 @@ void controlPlayer()
 					g_sEntities.clearEnemies();
 					if (loadEnemiesFromRoom())
 						g_sEntities.g_sChar.m_bInBattle = true;
+					g_sLevel.miniMap->enteredRoom[(g_sEntities.g_sChar.m_cLocation.X - 1) / (ROOM_X + 2) * GRID_Y + (g_sEntities.g_sChar.m_cLocation.Y - 1) / (ROOM_Y + 2)] = true;
+					g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
 				}
 			}
 		}
@@ -671,6 +681,7 @@ void renderGame()
 	renderCharacter();    // renders the character into the buffer
 	renderEnemy();
 	renderPellets();
+	renderMiniMap();
 	renderStat();
 }
 
@@ -877,7 +888,15 @@ void renderLevel()
 			switch (g_sLevel.level[row][column])
 			{
 			case '#':
-				render(c, "    ", "    ", 0x80);
+				switch (g_sLevel.floor)
+				{
+				case 1:
+					render(c, "    ", "    ", 0x80);
+					break;
+				case 2:
+					render(c, "    ", "    ", 0x20);
+					break;
+				}
 				break;
 			case '$':
 				if (g_sEntities.g_sChar.m_bInBattle)
@@ -914,28 +933,41 @@ void renderLevel()
 		}
 		c.Y += 2;
 	}
-	//else
-	//{
-	//	// Go through each character inside level and print its respective character
-	//	for (unsigned int row = 0; row < 1 + (ROOM_X + 1) * GRID_X; row++)
-	//	{
-	//		for (unsigned int column = 0; column < g_sLevel.level[row].length(); column++)
-	//		{
-	//			switch (g_sLevel.level[row][column])
-	//			{
-	//			case '#':
-	//				c.X = 1 + (column << 1);
-	//				g_Console.writeToBuffer(c, "  ", 0x80);
-	//				break;
-	//			case '$':
-	//				c.X = 1 + (column << 1);
-	//				g_Console.writeToBuffer(c, "  ", 0x40);
-	//				break;
-	//			}
-	//		}
-	//		c.Y++;
-	//	}
-	//}
+}
+
+void renderMiniMap()
+{
+	COORD c;
+	c.X = g_Console.getConsoleSize().X - ((1 + (GRID_Y << 1)) << 1);
+	c.Y = g_Console.getConsoleSize().Y - (1 + (GRID_X << 1));
+
+	for (int row = 0; row < (GRID_X << 1) + 1; row++)
+	{
+		for (int column = 0; column < (GRID_Y << 1) + 1; column++)
+		{
+			switch (g_sLevel.miniMap->map[row][column])
+			{
+			case '#':
+				g_Console.writeToBuffer(c, "  ", 0x70);
+				break;
+			case '$':
+				g_Console.writeToBuffer(c, "  ", 0x80);
+				break;
+			case '@':
+				g_Console.writeToBuffer(c, "  ", 0x40);
+				break;
+			case '!':
+				g_Console.writeToBuffer(c, "  ", 0x20);
+				break;
+			case '&':
+				g_Console.writeToBuffer(c, "  ", 0x30);
+				break;
+			}
+			c.X += 2;
+		}
+		c.Y++;
+		c.X = g_Console.getConsoleSize().X - ((1 + (GRID_Y << 1)) << 1);
+	}
 }
 
 void renderPellets()
@@ -963,6 +995,9 @@ void renderPellets()
 			case pellet::P_ENEMY:
 			case pellet::P_FLOOR:
 				render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x09);
+				break;
+			case pellet::P_ROCK:
+				render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x79);
 				break;
 			}
 		}
@@ -994,6 +1029,9 @@ void renderPellets()
 			case pellet::P_PLAYER:
 			case pellet::P_FLOOR:
 				render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x04);
+				break;
+			case pellet::P_ROCK:
+				render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x74);
 				break;
 			}
 		}
@@ -1070,6 +1108,9 @@ void checkHitPellets()
 			pellet++;
 			continue;
 		}
+
+
+		// Check for exceed lifespan
 		if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[0].m_bHasWeapon) //Index 1 (Heaven Cracker): Doubles the pellet lifespan to 5 seconds.
 		{
 			g_sEntities.g_sChar.m_dRange *= 2; //!Current issue!: if player has weapon, both player and enemy receives the range increase
@@ -1106,6 +1147,15 @@ void checkHitPellets()
 				pellet->m_bHit = true;
 				pellet->m_bHitReason = pellet::P_WALL;
 			}
+			pellet++;
+			continue;
+		}
+
+		// Check collision with rock
+		if (g_sLevel.getTile(pellet->m_cLocation) == '*')
+		{
+			pellet->m_bHit = true;
+			pellet->m_bHitReason = pellet::P_ROCK;
 			pellet++;
 			continue;
 		}

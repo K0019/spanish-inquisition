@@ -20,12 +20,14 @@ struct SGameChar
 	int	m_iPlayerDamage = 3;
 	unsigned int m_iPlayerScore = 0;
 	double m_dRange = 2.5;
+	double m_dVelocity = SHOOTVELOCITY;
 	SAllItems m_sPlayerItems;
 	SAllConsumables m_sConsumables;
+	std::string m_sLastItem = ""; //Storing last item picked up
 
 	COORD getRealCoords(); // Get console coordinates of the player
 	SGameChar(); // Constructor
-	SGameChar(COORD location, bool active, int playerHealth, int playerDamage, int playerScore); // Constructor
+	SGameChar(COORD location, bool active, int playerHealth, int playerDamage, int playerScore, std::string lastItem); // Constructor
 	void addItem(bool g_bHasWeapon); //Adds an item to the player's inventory when picked up
 	void hasItem(bool g_bHasWeapon);
 	void addConsumable(bool g_bHasConsumable, int index);

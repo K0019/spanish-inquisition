@@ -142,7 +142,13 @@
     <Text Include="..\res\MapData\FloorData\Floor5.txt">
       <Filter>Resource Files\MapData\FloorData</Filter>
     </Text>
-    <Text Include="..\res\MapData\RoomData\0c.txt">
+    <Text Include="..\res\MapData\RoomData\02.txt">
+      <Filter>Resource Files\MapData\RoomData</Filter>
+    </Text>
+    <Text Include="..\res\MapData\RoomData\03.txt">
+      <Filter>Resource Files\MapData\RoomData</Filter>
+    </Text>
+    <Text Include="..\res\MapData\RoomData\04.txt">
       <Filter>Resource Files\MapData\RoomData</Filter>
     </Text>
   </ItemGroup>

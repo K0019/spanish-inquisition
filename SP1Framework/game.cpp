@@ -56,18 +56,19 @@ void init( void )
 	g_sLevel.playerStartRoom.X = GRID_X >> 1;
 	g_sLevel.playerStartRoom.Y = GRID_Y >> 1;
 	g_sEntities.g_sChar.m_cRoom = g_sLevel.playerStartRoom;
-	if (DEBUG) g_sEntities.g_sChar.m_bInBattle = true;
+	//if (DEBUG) g_sEntities.g_sChar.m_bInBattle = true;
 	r_cRenderOffset.X = 1 + g_sEntities.g_sChar.m_cRoom.X * (ROOM_X + 2);
 	r_cRenderOffset.Y = 1 + g_sEntities.g_sChar.m_cRoom.Y * (ROOM_Y + 2);
 	g_mEvent.r_curspos.X = g_Console.getConsoleSize().X / 5;
 	g_mEvent.r_curspos.Y = g_Console.getConsoleSize().Y / 10 * 8;
 	g_sLevel.floor = 1;
 	g_sLevel.generateLevel();
+	g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
 	COORD c;
 	c.X = (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
 	c.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
-	addEnemy(UNIQUE_ENEMY_MELEETEST);
-	addEnemy(UNIQUE_ENEMY_RANGEDTEST);
+	//addEnemy(UNIQUE_ENEMY_MELEETEST);
+	//addEnemy(UNIQUE_ENEMY_RANGEDTEST);
     // sets the width, height and the font name to use in the console
     g_Console.setConsoleFont(0, 16, L"Consolas");
 	g_LoadFromSave(saveDataStorage.g_iSaveData);
@@ -308,6 +309,7 @@ void resetLevel(int floor)
 {
 	g_sLevel.playerStartRoom = g_sLevel.exitRoom;
 	g_sLevel.generateLevel();
+	g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
 }
 
 void controlPlayer()
@@ -322,6 +324,11 @@ void controlPlayer()
 		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != ' ' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '&' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '\0' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '%' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '1' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '2' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '3' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '4' &&
 			(g_sEntities.g_sChar.m_bInBattle || g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '$'))
 		{
 			g_sEntities.g_sChar.m_cLocation.X++;
@@ -350,6 +357,8 @@ void controlPlayer()
 					g_sEntities.clearEnemies();
 					if (loadEnemiesFromRoom())
 						g_sEntities.g_sChar.m_bInBattle = true;
+					g_sLevel.miniMap->enteredRoom[(g_sEntities.g_sChar.m_cLocation.X - 1) / (ROOM_X + 2) * GRID_Y + (g_sEntities.g_sChar.m_cLocation.Y - 1) / (ROOM_Y + 2)] = true;
+					g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
 				}
 			}
 		}
@@ -360,6 +369,11 @@ void controlPlayer()
 		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != ' ' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '&' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '\0' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '%' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '1' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '2' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '3' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '4' &&
 			(g_sEntities.g_sChar.m_bInBattle || g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '$'))
 		{
 			g_sEntities.g_sChar.m_cLocation.Y++;
@@ -388,6 +402,8 @@ void controlPlayer()
 					g_sEntities.clearEnemies();
 					if (loadEnemiesFromRoom())
 						g_sEntities.g_sChar.m_bInBattle = true;
+					g_sLevel.miniMap->enteredRoom[(g_sEntities.g_sChar.m_cLocation.X - 1) / (ROOM_X + 2) * GRID_Y + (g_sEntities.g_sChar.m_cLocation.Y - 1) / (ROOM_Y + 2)] = true;
+					g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
 				}
 			}
 		}
@@ -398,6 +414,11 @@ void controlPlayer()
 		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != ' ' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '&' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '\0' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '%' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '1' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '2' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '3' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '4' &&
 			(g_sEntities.g_sChar.m_bInBattle || g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '$'))
 		{
 			g_sEntities.g_sChar.m_cLocation.X--;
@@ -426,6 +447,8 @@ void controlPlayer()
 					g_sEntities.clearEnemies();
 					if (loadEnemiesFromRoom())
 						g_sEntities.g_sChar.m_bInBattle = true;
+					g_sLevel.miniMap->enteredRoom[(g_sEntities.g_sChar.m_cLocation.X - 1) / (ROOM_X + 2) * GRID_Y + (g_sEntities.g_sChar.m_cLocation.Y - 1) / (ROOM_Y + 2)] = true;
+					g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
 				}
 			}
 		}
@@ -436,6 +459,11 @@ void controlPlayer()
 		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != ' ' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '&' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '\0' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '%' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '1' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '2' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '3' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '4' &&
 			(g_sEntities.g_sChar.m_bInBattle || g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '$'))
 		{
 			g_sEntities.g_sChar.m_cLocation.Y--;
@@ -464,6 +492,8 @@ void controlPlayer()
 					g_sEntities.clearEnemies();
 					if (loadEnemiesFromRoom())
 						g_sEntities.g_sChar.m_bInBattle = true;
+					g_sLevel.miniMap->enteredRoom[(g_sEntities.g_sChar.m_cLocation.X - 1) / (ROOM_X + 2) * GRID_Y + (g_sEntities.g_sChar.m_cLocation.Y - 1) / (ROOM_Y + 2)] = true;
+					g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
 				}
 			}
 		}
@@ -481,29 +511,40 @@ void controlPlayer()
 			case '%': //When spacebar is pressed on top of an item
 			{
 				g_sEntities.g_sChar.addItem(true);
+				COORD c = g_sEntities.g_sChar.m_cLocation;
+				g_sLevel.modifyTile(c, '\0');
 				break;
 			}
 			case '1':
 			{
 				g_sEntities.g_sChar.addConsumable(true, 1);
+				COORD c = g_sEntities.g_sChar.m_cLocation;
+				g_sLevel.modifyTile(c, '\0');
 				break;
 			}
 			case '2':
 			{
 				g_sEntities.g_sChar.addConsumable(true, 2);
+				COORD c = g_sEntities.g_sChar.m_cLocation;
+				g_sLevel.modifyTile(c, '\0');
 				break;
 			}
 			case '3':
 			{
 				g_sEntities.g_sChar.addConsumable(true, 3);
+				COORD c = g_sEntities.g_sChar.m_cLocation;
+				g_sLevel.modifyTile(c, '\0');
 				break;
 			}
 			case '4':
 			{
 				g_sEntities.g_sChar.addConsumable(true, 4);
+				COORD c = g_sEntities.g_sChar.m_cLocation;
+				g_sLevel.modifyTile(c, '\0');
 				break;
 			}
 		}
+		if (g_abKeyPressed[K_SPACE]) g_adBounceTime[K_SPACE] = g_dElapsedTime + 0.250;
     }
 
 	if (bSomethingHappened)
@@ -512,29 +553,29 @@ void controlPlayer()
 		{
 			if (g_abKeyPressed[i])
 			{
-				g_adBounceTime[i] = g_dElapsedTime + 0.150;
-				if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_bHasWeapon) // Index 7 (Blue Feather): Decrease movement delay by 10/20/30/40%
+				g_adBounceTime[i] = g_dElapsedTime + 0.250;
+				if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_bHasWeapon) // Index 7 (Blue Feather): Decrease movement delay by 20/30/40/50%
 				{
 					switch (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_iWeaponLevel)
 					{
-					case 1: //Blue Feather Level 1: Decrease movement delay by 10%
-						{
-							g_adBounceTime[i] *= g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed;
-							break;
-						}
-					case 2: //Blue Feather Level 2: Decrease movement delay by 20%
-						{
-							g_adBounceTime[i] *= (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.10);
-							break;
-						}
-					case 3: //Blue Feather Level 3: Decrease movement delay by 30%
+					case 1: //Blue Feather Level 1: Decrease movement delay by 20%
 						{
 							g_adBounceTime[i] *= (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.20);
 							break;
 						}
-					case 4: //Blue Feather Level 4: Decrease movement delay by 40%
+					case 2: //Blue Feather Level 2: Decrease movement delay by 30%
 						{
 							g_adBounceTime[i] *= (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.30);
+							break;
+						}
+					case 3: //Blue Feather Level 3: Decrease movement delay by 40%
+						{
+							g_adBounceTime[i] *= (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.40);
+							break;
+						}
+					case 4: //Blue Feather Level 4: Decrease movement delay by 50%
+						{
+							g_adBounceTime[i] *= (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.50);
 							break;
 						}
 					}
@@ -692,6 +733,7 @@ void renderGame()
 	renderCharacter();    // renders the character into the buffer
 	renderEnemy();
 	renderPellets();
+	renderMiniMap();
 	renderStat();
 }
 
@@ -724,7 +766,7 @@ void renderFramerate()
 	std::ostringstream ss;
 	ss << std::fixed << std::setprecision(3);
 	ss << 1.0 / g_dDeltaTime << "fps";
-	c.X = g_Console.getConsoleSize().X - 11;
+	c.X = g_Console.getConsoleSize().X - 15;
 	c.Y = 0;
 	g_Console.writeToBuffer(c, ss.str());
 
@@ -762,26 +804,26 @@ void playerShoot()
 
 	if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_bHasWeapon)
 	{
-		switch (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_iWeaponLevel) // Index 5 (Magic Potion): Decrease attack delay by 10/20/30/40%
+		switch (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_iWeaponLevel) // Index 5 (Magic Potion): Decrease attack delay by 20/30/40/50%
 		{
-		case 1: //Magic Potion Level 1: Decrease attack delay by 10%
+		case 1: //Magic Potion Level 1: Decrease attack delay by 20%
 			{
-				delay = SHOOTSPEED * g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_fWeaponAttackSpeed;
+				delay = SHOOTSPEED * (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_fWeaponAttackSpeed - 0.20);
 				break;
 			}
-		case 2: //Magic Potion Level 2: Decrease attack delay by 20%
+		case 2: //Magic Potion Level 2: Decrease attack delay by 30%
 			{
-				delay = SHOOTSPEED * g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_fWeaponAttackSpeed - 0.10;
+				delay = SHOOTSPEED * (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_fWeaponAttackSpeed - 0.30);
 				break;
 			}
-		case 3: //Magic Potion Level 3: Decrease attack delay by 30%
+		case 3: //Magic Potion Level 3: Decrease attack delay by 40%
 			{
-				delay = SHOOTSPEED * g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_fWeaponAttackSpeed - 0.20;
+				delay = SHOOTSPEED * (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_fWeaponAttackSpeed - 0.40);
 				break;
 			}
-		case 4: //Magic Potion Level 4: Decrease attack delay by 40%
+		case 4: //Magic Potion Level 4: Decrease attack delay by 50%
 			{
-				delay = SHOOTSPEED * g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_fWeaponAttackSpeed - 0.30;
+				delay = SHOOTSPEED * (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_fWeaponAttackSpeed - 0.50);
 				break;
 			}
 		}
@@ -809,7 +851,7 @@ void playerShoot()
 				COORD c = g_sEntities.g_sChar.m_cLocation;
 				c.X--;
 				c.Y--;
-				g_sEntities.m_vPellets.push_back(SPellet(&c, 7, g_sEntities.g_sChar.m_iPlayerDamage ,SHOOTVELOCITY, true));
+				g_sEntities.m_vPellets.push_back(SPellet(&c, 7, g_sEntities.g_sChar.m_iPlayerDamage ,g_sEntities.g_sChar.m_dVelocity, true));
 				g_bHasShot = true;
 				return;
 			}
@@ -818,7 +860,7 @@ void playerShoot()
 				COORD c = g_sEntities.g_sChar.m_cLocation;
 				c.X--;
 				c.Y++;
-				g_sEntities.m_vPellets.push_back(SPellet(&c, 1, g_sEntities.g_sChar.m_iPlayerDamage, SHOOTVELOCITY, true));
+				g_sEntities.m_vPellets.push_back(SPellet(&c, 1, g_sEntities.g_sChar.m_iPlayerDamage, g_sEntities.g_sChar.m_dVelocity, true));
 				g_bHasShot = true;
 				return;
 			}
@@ -826,7 +868,7 @@ void playerShoot()
 			{
 				COORD c = g_sEntities.g_sChar.m_cLocation;
 				c.X--;
-				g_sEntities.m_vPellets.push_back(SPellet(&c, 0, g_sEntities.g_sChar.m_iPlayerDamage, SHOOTVELOCITY, true));
+				g_sEntities.m_vPellets.push_back(SPellet(&c, 0, g_sEntities.g_sChar.m_iPlayerDamage, g_sEntities.g_sChar.m_dVelocity, true));
 				g_bHasShot = true;
 				return;
 			}
@@ -838,7 +880,7 @@ void playerShoot()
 				COORD c = g_sEntities.g_sChar.m_cLocation;
 				c.X++;
 				c.Y--;
-				g_sEntities.m_vPellets.push_back(SPellet(&c, 5, g_sEntities.g_sChar.m_iPlayerDamage, SHOOTVELOCITY, true));
+				g_sEntities.m_vPellets.push_back(SPellet(&c, 5, g_sEntities.g_sChar.m_iPlayerDamage, g_sEntities.g_sChar.m_dVelocity, true));
 				g_bHasShot = true;
 				return;
 			}
@@ -847,7 +889,7 @@ void playerShoot()
 				COORD c = g_sEntities.g_sChar.m_cLocation;
 				c.X++;
 				c.Y++;
-				g_sEntities.m_vPellets.push_back(SPellet(&c, 3, g_sEntities.g_sChar.m_iPlayerDamage, SHOOTVELOCITY, true));
+				g_sEntities.m_vPellets.push_back(SPellet(&c, 3, g_sEntities.g_sChar.m_iPlayerDamage, g_sEntities.g_sChar.m_dVelocity, true));
 				g_bHasShot = true;
 				return;
 			}
@@ -855,7 +897,7 @@ void playerShoot()
 			{
 				COORD c = g_sEntities.g_sChar.m_cLocation;
 				c.X++;
-				g_sEntities.m_vPellets.push_back(SPellet(&c, 4, g_sEntities.g_sChar.m_iPlayerDamage, SHOOTVELOCITY, true));
+				g_sEntities.m_vPellets.push_back(SPellet(&c, 4, g_sEntities.g_sChar.m_iPlayerDamage, g_sEntities.g_sChar.m_dVelocity, true));
 				g_bHasShot = true;
 				return;
 			}
@@ -866,7 +908,7 @@ void playerShoot()
 			{
 				COORD c = g_sEntities.g_sChar.m_cLocation;
 				c.Y--;
-				g_sEntities.m_vPellets.push_back(SPellet(&c, 6, g_sEntities.g_sChar.m_iPlayerDamage, SHOOTVELOCITY, true));
+				g_sEntities.m_vPellets.push_back(SPellet(&c, 6, g_sEntities.g_sChar.m_iPlayerDamage, g_sEntities.g_sChar.m_dVelocity, true));
 				g_bHasShot = true;
 				return;
 			}
@@ -874,7 +916,7 @@ void playerShoot()
 			{
 				COORD c = g_sEntities.g_sChar.m_cLocation;
 				c.Y++;
-				g_sEntities.m_vPellets.push_back(SPellet(&c, 2, g_sEntities.g_sChar.m_iPlayerDamage, SHOOTVELOCITY, true));
+				g_sEntities.m_vPellets.push_back(SPellet(&c, 2, g_sEntities.g_sChar.m_iPlayerDamage, g_sEntities.g_sChar.m_dVelocity, true));
 				g_bHasShot = true;
 				return;
 			}
@@ -898,7 +940,15 @@ void renderLevel()
 			switch (g_sLevel.level[row][column])
 			{
 			case '#':
-				render(c, "    ", "    ", 0x80);
+				switch (g_sLevel.floor)
+				{
+				case 1:
+					render(c, "    ", "    ", 0x80);
+					break;
+				case 2:
+					render(c, "    ", "    ", 0x20);
+					break;
+				}
 				break;
 			case '$':
 				if (g_sEntities.g_sChar.m_bInBattle)
@@ -916,32 +966,60 @@ void renderLevel()
 			case '&':
 				render(c, "#&  ", "##&_", 0x09);
 				break;
+			case '%':
+				render(c, "    ", "    ", 0x60);
+				break;
+			case '1':
+				render(c, " oo ", " oo ", 0x02);
+				break;
+			case '2':
+				render(c, " OO ", " OO ", 0x02);
+				break;
+			case '3':
+				render(c, " ss ", " ss ", 0x02);
+				break;
+			case '4':
+				render(c, " SS ", " SS ", 0x02);
+				break;
 			}
 		}
 		c.Y += 2;
 	}
-	//else
-	//{
-	//	// Go through each character inside level and print its respective character
-	//	for (unsigned int row = 0; row < 1 + (ROOM_X + 1) * GRID_X; row++)
-	//	{
-	//		for (unsigned int column = 0; column < g_sLevel.level[row].length(); column++)
-	//		{
-	//			switch (g_sLevel.level[row][column])
-	//			{
-	//			case '#':
-	//				c.X = 1 + (column << 1);
-	//				g_Console.writeToBuffer(c, "  ", 0x80);
-	//				break;
-	//			case '$':
-	//				c.X = 1 + (column << 1);
-	//				g_Console.writeToBuffer(c, "  ", 0x40);
-	//				break;
-	//			}
-	//		}
-	//		c.Y++;
-	//	}
-	//}
+}
+
+void renderMiniMap()
+{
+	COORD c;
+	c.X = g_Console.getConsoleSize().X - ((1 + (GRID_Y << 1)) << 1);
+	c.Y = g_Console.getConsoleSize().Y - (1 + (GRID_X << 1));
+
+	for (int row = 0; row < (GRID_X << 1) + 1; row++)
+	{
+		for (int column = 0; column < (GRID_Y << 1) + 1; column++)
+		{
+			switch (g_sLevel.miniMap->map[row][column])
+			{
+			case '#':
+				g_Console.writeToBuffer(c, "  ", 0x70);
+				break;
+			case '$':
+				g_Console.writeToBuffer(c, "  ", 0x80);
+				break;
+			case '@':
+				g_Console.writeToBuffer(c, "  ", 0x40);
+				break;
+			case '!':
+				g_Console.writeToBuffer(c, "  ", 0x20);
+				break;
+			case '&':
+				g_Console.writeToBuffer(c, "  ", 0x30);
+				break;
+			}
+			c.X += 2;
+		}
+		c.Y++;
+		c.X = g_Console.getConsoleSize().X - ((1 + (GRID_Y << 1)) << 1);
+	}
 }
 
 void renderPellets()
@@ -969,6 +1047,9 @@ void renderPellets()
 			case pellet::P_ENEMY:
 			case pellet::P_FLOOR:
 				render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x09);
+				break;
+			case pellet::P_ROCK:
+				render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x79);
 				break;
 			}
 		}
@@ -1001,6 +1082,9 @@ void renderPellets()
 			case pellet::P_FLOOR:
 				render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x04);
 				break;
+			case pellet::P_ROCK:
+				render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x74);
+				break;
 			}
 		}
 		else
@@ -1025,7 +1109,7 @@ void renderStat()
 	std::ostringstream ss;
 	ss.str("");
 	ss << "HP: " << g_sEntities.g_sChar.m_iPlayerHealth << " / " << g_sEntities.g_sChar.m_iMaxHealth;
-	c.X = g_Console.getConsoleSize().X - 11;
+	c.X = g_Console.getConsoleSize().X - 15;
 	c.Y = 2;
 	g_Console.writeToBuffer(c, ss.str());
 
@@ -1052,6 +1136,13 @@ void renderStat()
 	ss << "Floor: " << g_sLevel.floor;
 	c.Y = 6;
 	g_Console.writeToBuffer(c, ss.str());
+
+	//Rendering player's last item
+	ss.str("");
+	ss << "Last Item: " << g_sEntities.g_sChar.m_sLastItem;
+	c.X = g_Console.getConsoleSize().X - 83;
+	c.Y = 27;
+	g_Console.writeToBuffer(c, ss.str());
 }
 
 void checkHitPellets()
@@ -1069,6 +1160,9 @@ void checkHitPellets()
 			pellet++;
 			continue;
 		}
+
+
+		// Check for exceed lifespan
 		if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[0].m_bHasWeapon) //Index 1 (Heaven Cracker): Doubles the pellet lifespan to 5 seconds.
 		{
 			g_sEntities.g_sChar.m_dRange *= 2; //!Current issue!: if player has weapon, both player and enemy receives the range increase
@@ -1089,8 +1183,6 @@ void checkHitPellets()
 			}
 		}
 
-
-
 		// Check collision with wall
 		if ((pellet->m_cLocation.X - 1) % (ROOM_X + 2) == 0 ||
 			pellet->m_cLocation.X % (ROOM_X + 2) == 0 ||
@@ -1104,16 +1196,18 @@ void checkHitPellets()
 			}
 			else
 			{
-				//if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[0].m_bHasWeapon) //Index 1 (Heaven Cracker): Player shot pelllets ignore wall collision and appear on the other side of the room
-				//{
-
-				//}
-				//else
-				//{
-					pellet->m_bHit = true;
-					pellet->m_bHitReason = pellet::P_WALL;
-				//}
+				pellet->m_bHit = true;
+				pellet->m_bHitReason = pellet::P_WALL;
 			}
+			pellet++;
+			continue;
+		}
+
+		// Check collision with rock
+		if (g_sLevel.getTile(pellet->m_cLocation) == '*')
+		{
+			pellet->m_bHit = true;
+			pellet->m_bHitReason = pellet::P_ROCK;
 			pellet++;
 			continue;
 		}
@@ -1124,28 +1218,28 @@ void checkHitPellets()
 			pellet->m_bHit = true;
 			pellet->m_bHitReason = pellet::P_PLAYER;
 			
-			if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[3].m_bHasWeapon) //Index 4 (Glass Canon): All Enemies deal 1/2/3/4 more damage to players.
+			if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[3].m_bHasWeapon) //Index 4 (Glass Canon): All Enemies deal 2/3/4/5 more damage to players.
 			{
 				switch (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[3].m_iWeaponLevel)
 				{
-					case 1: //Glass Canon Level 1: All Enemies deal 1 more damage to the player
-						{
-							g_sEntities.g_sChar.m_iPlayerHealth -= (pellet->m_iDamage + 1);
-							break;
-						}
-					case 2: //Glass Canon Level 2: All Enemies deal 2 more damage to the player
+					case 1: //Glass Canon Level 1: All Enemies deal 2 more damage to the player
 						{
 							g_sEntities.g_sChar.m_iPlayerHealth -= (pellet->m_iDamage + 2);
 							break;
 						}
-					case 3: //Glass Canon Level 3: All Enemies deal 3 more damage to the player
+					case 2: //Glass Canon Level 2: All Enemies deal 3 more damage to the player
 						{
 							g_sEntities.g_sChar.m_iPlayerHealth -= (pellet->m_iDamage + 3);
 							break;
 						}
-					case 4: //Glass Canon Level 4: All Enemies deal 4 more damage to the player
+					case 3: //Glass Canon Level 3: All Enemies deal 4 more damage to the player
 						{
 							g_sEntities.g_sChar.m_iPlayerHealth -= (pellet->m_iDamage + 4);
+							break;
+						}
+					case 4: //Glass Canon Level 4: All Enemies deal 5 more damage to the player
+						{
+							g_sEntities.g_sChar.m_iPlayerHealth -= (pellet->m_iDamage + 5);
 							break;
 						}
 				}

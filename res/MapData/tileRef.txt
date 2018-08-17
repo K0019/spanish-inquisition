@@ -1,4 +1,8 @@
-% = Rock
+% = Item
 # = Wall
 $ = Door
 & = Stairs
+1 = Minor Health Pack
+2 = Greater Health Pack
+3 = Small Medal
+4 = Large Medal

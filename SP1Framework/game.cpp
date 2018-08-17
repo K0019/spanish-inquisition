@@ -303,6 +303,7 @@ void controlPlayer()
 		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != ' ' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '&' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '\0' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '%' &&
 	(g_sEntities.g_sChar.m_bInBattle || g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '$'))
 		{
 			g_sEntities.g_sChar.m_cLocation.X++;
@@ -339,6 +340,7 @@ void controlPlayer()
 		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != ' ' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '&' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '\0' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '%' &&
 			(g_sEntities.g_sChar.m_bInBattle || g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '$'))
 		{
 			g_sEntities.g_sChar.m_cLocation.Y++;
@@ -375,6 +377,7 @@ void controlPlayer()
 		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != ' ' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '&' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '\0' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '%' &&
 			(g_sEntities.g_sChar.m_bInBattle || g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '$'))
 		{
 			g_sEntities.g_sChar.m_cLocation.X--;
@@ -411,6 +414,7 @@ void controlPlayer()
 		if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != ' ' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '&' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '\0' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '%' &&
 			(g_sEntities.g_sChar.m_bInBattle || g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '$'))
 		{
 			g_sEntities.g_sChar.m_cLocation.Y--;
@@ -454,6 +458,8 @@ void controlPlayer()
 			case '%': //When spacebar is pressed on top of an item
 			{
 				g_sEntities.g_sChar.addItem(true);
+				COORD c = g_sEntities.g_sChar.m_cLocation;
+				g_sLevel.modifyTile(c, '\0');
 				break;
 			}
 			case '1':
@@ -477,6 +483,7 @@ void controlPlayer()
 				break;
 			}
 		}
+		if (g_abKeyPressed[K_SPACE]) g_adBounceTime[K_SPACE] = g_dElapsedTime + 0.250;
     }
 
 	if (bSomethingHappened)
@@ -634,7 +641,7 @@ void renderFramerate()
 	std::ostringstream ss;
 	ss << std::fixed << std::setprecision(3);
 	ss << 1.0 / g_dDeltaTime << "fps";
-	c.X = g_Console.getConsoleSize().X - 11;
+	c.X = g_Console.getConsoleSize().X - 15;
 	c.Y = 0;
 	g_Console.writeToBuffer(c, ss.str());
 
@@ -826,6 +833,9 @@ void renderLevel()
 			case '&':
 				render(c, "#&  ", "##&_", 0x09);
 				break;
+			case '%':
+				render(c, "    ", "    ", 0x60);
+				break;
 			}
 		}
 		c.Y += 2;
@@ -935,7 +945,7 @@ void renderStat()
 	std::ostringstream ss;
 	ss.str("");
 	ss << "HP: " << g_sEntities.g_sChar.m_iPlayerHealth << " / " << g_sEntities.g_sChar.m_iMaxHealth;
-	c.X = g_Console.getConsoleSize().X - 11;
+	c.X = g_Console.getConsoleSize().X - 15;
 	c.Y = 2;
 	g_Console.writeToBuffer(c, ss.str());
 
@@ -961,6 +971,13 @@ void renderStat()
 	ss.str("");
 	ss << "Floor: " << g_sLevel.floor;
 	c.Y = 6;
+	g_Console.writeToBuffer(c, ss.str());
+
+	//Rendering player's last item
+	ss.str("");
+	ss << "Last Item: " << g_sEntities.g_sChar.m_sLastItem;
+	c.X = g_Console.getConsoleSize().X - 83;
+	c.Y = 27;
 	g_Console.writeToBuffer(c, ss.str());
 }
 

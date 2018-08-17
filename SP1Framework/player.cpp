@@ -4,11 +4,12 @@ SGameChar::SGameChar()
 {
 }
 
-SGameChar::SGameChar(COORD location, bool active, int playerHealth, int playerDamage, int playerScore)
+SGameChar::SGameChar(COORD location, bool active, int playerHealth, int playerDamage, int playerScore, std::string lastItem)
 {
 	this->m_iPlayerHealth = playerHealth;
 	this->m_iPlayerDamage = playerDamage;
 	this->m_iPlayerScore = playerScore;
+	this->m_sLastItem = lastItem;
 }
 
 COORD SGameChar::getRealCoords()
@@ -37,8 +38,19 @@ void SGameChar::addConsumable(bool g_bHasConsumable, int index)
 void SGameChar::hasItem(bool g_bHasWeapon)
 {
 	//RNG to choose 1 of the 7 items when an item is picked up.
-	int weaponIndex;
-	weaponIndex = rand() % 6 + 1;
+	int weaponIndex = 0;
+	
+
+	//If player already has item, re-do the weaponIndex selection process
+	do
+	{
+		if ((this->m_sPlayerItems.ItemCount >= 7) && (g_bHasWeapon == true))
+		{
+			this->m_iPlayerScore += 50;
+			break;
+		}
+		weaponIndex = rand() % 7;
+	} while (this->m_sPlayerItems.m_vItemsList[weaponIndex].m_bHasWeapon);
 
 	if ((weaponIndex == this->m_sPlayerItems.m_vItemsList[0].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[0].m_bHasWeapon == false)) //Checking if randomized weaponIndex gives the Heaven Cracker
 	{
@@ -49,30 +61,30 @@ void SGameChar::hasItem(bool g_bHasWeapon)
 				this->m_iPlayerDamage += this->m_sPlayerItems.m_vItemsList[0].m_iWeaponDamage;
 				this->m_sPlayerItems.m_vItemsList[0].m_bHasWeapon = true;
 				this->m_sPlayerItems.ItemCount++;
+				break;
 			}
 		case 2: //Heaven Cracker Level 2: Increase player damage by 1
 			{
 				this->m_iPlayerDamage += (this->m_sPlayerItems.m_vItemsList[0].m_iWeaponDamage + 1);
 				this->m_sPlayerItems.m_vItemsList[0].m_bHasWeapon = true;
 				this->m_sPlayerItems.ItemCount++;
+				break;
 			}
 		case 3: //Heaven Cracker Level 3: Increase player damage by 2
 			{
 				this->m_iPlayerDamage += (this->m_sPlayerItems.m_vItemsList[0].m_iWeaponDamage + 2);
 				this->m_sPlayerItems.m_vItemsList[0].m_bHasWeapon = true;
 				this->m_sPlayerItems.ItemCount++;
+				break;
 			}
 		case 4: //Heaven Cracker Level 4: Increase player damage by 3
 			{
 				this->m_iPlayerDamage += (this->m_sPlayerItems.m_vItemsList[0].m_iWeaponDamage + 3);
 				this->m_sPlayerItems.m_vItemsList[0].m_bHasWeapon = true;
 				this->m_sPlayerItems.ItemCount++;
+				break;
 			}
 		}
-	}
-	else if ((weaponIndex == this->m_sPlayerItems.m_vItemsList[0].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[0].m_bHasWeapon == true))
-	{
-		this->m_iPlayerScore += 50; //If player picks up another Heaven Cracker, +50 score.
 	}
 
 	else if ((weaponIndex == this->m_sPlayerItems.m_vItemsList[1].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[1].m_bHasWeapon == false)) //Checking if randomized weaponIndex gives the Enchanted Sword
@@ -114,10 +126,6 @@ void SGameChar::hasItem(bool g_bHasWeapon)
 		}
 		
 	}
-	else if ((weaponIndex == this->m_sPlayerItems.m_vItemsList[1].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[1].m_bHasWeapon == true))
-	{
-		this->m_iPlayerScore += 50; //If player picks up another Enchanted Sword, +50 score.
-	}
 
 	else if ((weaponIndex == this->m_sPlayerItems.m_vItemsList[2].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[2].m_bHasWeapon == false)) //Checking if randomized weaponIndex gives the Health Potion
 	{
@@ -153,14 +161,10 @@ void SGameChar::hasItem(bool g_bHasWeapon)
 			}
 		}
 	}
-	else if ((weaponIndex == this->m_sPlayerItems.m_vItemsList[2].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[2].m_bHasWeapon == true))
-	{
-		this->m_iPlayerScore += 50; //If player picks up another Health Potion, +50 score.
-	}
 
 	else if ((weaponIndex == this->m_sPlayerItems.m_vItemsList[3].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[3].m_bHasWeapon == false)) //Checking if randomized weaponIndex gives the Glass Canon
 	{
-		switch (this->m_sPlayerItems.m_vItemsList[3].m_iWeaponLevel)
+		switch (this->m_sPlayerItems.m_vItemsList[3].m_iWeaponLevel) //Index 4 (Glass Canon): Increase player's damage by 1/2/3/4.
 		{
 			case 1: //Glass Canon Level 1: Player deals 1 more damage to enemies
 				{
@@ -192,19 +196,11 @@ void SGameChar::hasItem(bool g_bHasWeapon)
 				}
 		}
 	}
-	else if ((weaponIndex == this->m_sPlayerItems.m_vItemsList[3].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[3].m_bHasWeapon == true))
-	{
-		this->m_iPlayerScore += 50; //If player picks up another Glass Canon, +50 score.
-	}
 
 	else if ((weaponIndex == this->m_sPlayerItems.m_vItemsList[4].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[4].m_bHasWeapon == false)) //Checking if randomized weaponIndex gives the Magic Potion
 	{
 		this->m_sPlayerItems.m_vItemsList[4].m_bHasWeapon = true;
 		this->m_sPlayerItems.ItemCount++;
-	}
-	else if ((weaponIndex == this->m_sPlayerItems.m_vItemsList[4].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[4].m_bHasWeapon == true))
-	{
-		this->m_iPlayerScore += 50; //If player picks up another Magic Potion, +50 score.
 	}
 
 	else if ((weaponIndex == this->m_sPlayerItems.m_vItemsList[5].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[5].m_bHasWeapon == false)) //Checking if randomized weaponIndex gives the Bonus!
@@ -241,21 +237,19 @@ void SGameChar::hasItem(bool g_bHasWeapon)
 				}
 		}
 	}
-	else if ((weaponIndex == this->m_sPlayerItems.m_vItemsList[5].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[5].m_bHasWeapon == true))
-	{
-		this->m_iPlayerScore *= 2; //If player picks up another BONUS!, multiply score by 2.
-	}
 
 	else if ((weaponIndex == this->m_sPlayerItems.m_vItemsList[6].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[6].m_bHasWeapon == false)) //Checking if randomized weaponIndex gives the Blue Feather
 	{
 		this->m_sPlayerItems.m_vItemsList[6].m_bHasWeapon = true;
 		this->m_sPlayerItems.ItemCount++;
 	}
-	else if ((weaponIndex == this->m_sPlayerItems.m_vItemsList[6].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[6].m_bHasWeapon == true))
+
+	if (this->m_iPlayerHealth > this->m_iMaxHealth)
 	{
-		this->m_iPlayerScore += 50; //If player picks up another Blue Feather, +50 score.
+		this->m_iMaxHealth = this->m_iPlayerHealth;
 	}
-	this->m_iMaxHealth = this->m_iPlayerHealth;
+
+	this->m_sLastItem = this->m_sPlayerItems.m_vItemsList[weaponIndex].m_sName;
 }
 
 void SGameChar::minimumScore(int playerScore) //To make sure the minimum score is 0, it should not go to the negatives

@@ -70,6 +70,8 @@ class Console
         void writeToBuffer(SHORT x, SHORT y, std::string& s, WORD attribute = 0x0F);
         void writeToBuffer(SHORT x, SHORT y, char ch, WORD attribute = 0x0F);
         
+		HWND consoleWindow = GetConsoleWindow();
+
         //===================================================================================================
         // These are for your eyes only, don't bother to try to call the following functions.
     private:

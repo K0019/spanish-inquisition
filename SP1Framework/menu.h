@@ -12,6 +12,7 @@ struct MenuEvent
 	bool bShop = false;
 	bool bHowToPlay = false;
 	bool bMenu = false;
+	bool bCredits = false;
 	short sh_cursSel = 0;
 	MenuEvent(Console* mainConsole);
 

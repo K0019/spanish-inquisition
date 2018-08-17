@@ -43,6 +43,7 @@ enum EGAMESTATES /* FRAMEWORK */
 	S_SHOP,
 	S_OPTIONS,
 	S_HOWTOPLAY,
+	S_CREDITS,
     S_GAME,
     S_COUNT
 };
@@ -68,6 +69,7 @@ void playerShoot();			// allows the player to shoot
 void gameplay();			// gameplay logic
 void menuNavigate();		// Navigation of menu
 void goBack();
+void credits();
 void resetLevel(int floor); // Generate a new map, with input floor for what to put inside the rooms
 void controlPlayer();		// moves the character, collision detection, physics, etc
 void processUserInput();	// checks if you should change states or do something else with the game, e.g. pause, exit
@@ -84,6 +86,7 @@ void renderMainMenu();		// renders the main menu
 void renderTutorial();
 void renderShop();
 void renderOptions();
+void renderCredits();
 void renderGame();			// renders the game stuff
 void renderScore();			// render the current score from
 void renderCharacter();		// renders the character into the buffer
@@ -93,7 +96,10 @@ void renderLevel();			// renders the borders of the rooms
 void renderPellets();		// render pellets to buffer
 void renderEnemy();			// renders all enemies to the buffer
 void renderStat();			//renders the player stats on the right side of the console
-void render(COORD c, LPCSTR text, LPCSTR text2, WORD color);
-void render(COORD c, std::string& text, std::string& text2, WORD color);
+void render(COORD c, LPCSTR text, LPCSTR text2, WORD color); // Render sprite to screen
+void render(COORD c, std::string& text, std::string& text2, WORD color); // Render sprite to screen
+bool loadEnemiesFromRoom(); // Load all enemies from the room that the player entered
+void addEnemy(EnemyMelee * enemy); // Add an enemy to the enemy list
+void addEnemy(EnemyRanged * enemy); // Add an enemy to the enemy list
 
 #endif // _GAME_H

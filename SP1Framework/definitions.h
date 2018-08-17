@@ -19,4 +19,7 @@
 #define PELLET_CHARACTER_HIT_TOP "\\/"
 #define PELLET_CHARACTER_HIT_BOTTOM "/\\"
 
+#define UNIQUE_ENEMY_MELEETEST new EnemyMelee(&g_sLevel, "Test", "RRRR", "RRRR", c, (WORD)0x0E, 10, 3, 0.4, 0.3, 0.1, 0.3)
+#define UNIQUE_ENEMY_RANGEDTEST new EnemyRanged(&g_sLevel, &g_sEntities.m_vPellets, "Test", "MMMM", "MMMM", c, (WORD)0x0E, 10, 3, 0.4, 0.3, 0.1, 0.3, false, 0.25)
+
 #endif // !DEFINITIONSHEAD

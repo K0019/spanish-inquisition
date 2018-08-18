@@ -553,29 +553,29 @@ void controlPlayer()
 		{
 			if (g_abKeyPressed[i])
 			{
-				g_adBounceTime[i] = g_dElapsedTime + 0.20; //0.250
+				g_adBounceTime[i] = g_dElapsedTime + 0.250; //0.250 acts as the movement delay of the player, decreasing it makes the player go faster
 				if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_bHasWeapon) // Index 7 (Blue Feather): Decrease movement delay by 20/30/40/50%
 				{
 					switch (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_iWeaponLevel)
 					{
 					case 1: //Blue Feather Level 1: Decrease movement delay by 20%
 						{
-							g_adBounceTime[i] *= (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.20);
+							g_adBounceTime[i] = g_dElapsedTime + ((g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.20) * 0.250);
 							break;
 						}
 					case 2: //Blue Feather Level 2: Decrease movement delay by 30%
 						{
-							g_adBounceTime[i] *= (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.30);
+						g_adBounceTime[i] = g_dElapsedTime + ((g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.30) * 0.250);
 							break;
 						}
 					case 3: //Blue Feather Level 3: Decrease movement delay by 40%
 						{
-							g_adBounceTime[i] *= (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.40);
+						g_adBounceTime[i] = g_dElapsedTime + ((g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.40) * 0.250);
 							break;
 						}
 					case 4: //Blue Feather Level 4: Decrease movement delay by 50%
 						{
-							g_adBounceTime[i] *= (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.50);
+						g_adBounceTime[i] = g_dElapsedTime + ((g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.50) * 0.250);
 							break;
 						}
 					}
@@ -752,7 +752,8 @@ void renderScore()
 void renderCharacter()
 {
 	// Draw the location of the character
-	WORD charColor = g_mEvent.wPlayerColor;
+	//WORD charColor = g_mEvent.wPlayerColor;
+	WORD charColor = 0x0a;
 	COORD c = g_sEntities.g_sChar.getRealCoords();
 	g_Console.writeToBuffer(c, "@@@@", charColor);
 	c.Y++;

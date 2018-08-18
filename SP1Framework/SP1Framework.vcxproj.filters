@@ -157,6 +157,33 @@
     <Text Include="..\res\MapData\RoomData\0c.txt">
       <Filter>Resource Files\MapData\RoomData</Filter>
     </Text>
+    <Text Include="..\res\MapData\RoomData\06.txt">
+      <Filter>Resource Files\MapData\RoomData</Filter>
+    </Text>
+    <Text Include="..\res\MapData\RoomData\07.txt">
+      <Filter>Resource Files\MapData\RoomData</Filter>
+    </Text>
+    <Text Include="..\res\MapData\RoomData\08.txt">
+      <Filter>Resource Files\MapData\RoomData</Filter>
+    </Text>
+    <Text Include="..\res\MapData\RoomData\09.txt">
+      <Filter>Resource Files\MapData\RoomData</Filter>
+    </Text>
+    <Text Include="..\res\MapData\RoomData\0d.txt">
+      <Filter>Resource Files\MapData\RoomData</Filter>
+    </Text>
+    <Text Include="..\res\MapData\RoomData\0e.txt">
+      <Filter>Resource Files\MapData\RoomData</Filter>
+    </Text>
+    <Text Include="..\res\MapData\RoomData\0f.txt">
+      <Filter>Resource Files\MapData\RoomData</Filter>
+    </Text>
+    <Text Include="..\res\MapData\RoomData\0a.txt">
+      <Filter>Resource Files\MapData\RoomData</Filter>
+    </Text>
+    <Text Include="..\res\MapData\RoomData\0b.txt">
+      <Filter>Resource Files\MapData\RoomData</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\res\SaveData\saves.SAVE">

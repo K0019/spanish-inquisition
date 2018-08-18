@@ -154,6 +154,9 @@
     <Text Include="..\res\MapData\RoomData\05.txt">
       <Filter>Resource Files\MapData\RoomData</Filter>
     </Text>
+    <Text Include="..\res\MapData\RoomData\0c.txt">
+      <Filter>Resource Files\MapData\RoomData</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\res\SaveData\saves.SAVE">

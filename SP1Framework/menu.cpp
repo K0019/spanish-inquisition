@@ -1,12 +1,15 @@
 #include "menu.h"
 
+//creates a pointer to the main game console
 MenuEvent::MenuEvent(Console* mainConsole)
 {
 	this->mainConsole = mainConsole;
 }
 
+// title banner
 void MenuEvent::renderTitle()
 {
+	//main event
 	std::string ASCII[13];
 	ASCII[0] = "°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°";
 	ASCII[1] = "                                                                                                    ";
@@ -22,6 +25,7 @@ void MenuEvent::renderTitle()
 	ASCII[11] = "±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±";
 	ASCII[12] = "²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²";
 	COORD c = this->mainConsole->getConsoleSize();
+	// This part here is meant to make the banner flexible (i.e. can fill any width higher than its own
 	for (int i = 0; i < 13; i++)
 	{
 		c.X = 0;
@@ -96,6 +100,7 @@ void MenuEvent::renderTitle()
 	}
 }
 
+// as annotated: menu options
 void MenuEvent::renderMenu()
 {
 	COORD c;
@@ -112,6 +117,7 @@ void MenuEvent::renderMenu()
 	this->mainConsole->writeToBuffer(c, "CREDITS", 0x0f);
 }
 
+// the cursor in the main menu
 void MenuEvent::renderCursor()
 {
 	COORD c = r_curspos;
@@ -125,6 +131,7 @@ void MenuEvent::renderCursor()
 	}
 }
 
+// i really dont like the tutorial screen but it is what it is
 void MenuEvent::renderTutorialDetails()
 {
 	COORD c = this->mainConsole->getConsoleSize();
@@ -203,6 +210,7 @@ void MenuEvent::renderTutorialDetails()
 	this->mainConsole->writeToBuffer(c, "##&_ ", 0x01);
 }
 
+// ye... scrapped :/
 void MenuEvent::renderCreditsRollAnimation()
 {
 	//COORD c = this->mainConsole->getConsoleSize();
@@ -224,11 +232,12 @@ void MenuEvent::renderCreditsRollAnimation()
 	//uiCreditsRollTime++;
 }
 
+// static text of credits
 void MenuEvent::renderCreditsRollText()
 {
 	COORD c = this->mainConsole->getConsoleSize();
 	c.X /= 10;
-	c.Y = (c.Y >> 1) * 0.5;
+	c.Y = (c.Y >> 1) >> 1;
 	this->mainConsole->writeToBuffer(c, "Credits", 0x0f);
 	c.Y += 2;
 	this->mainConsole->writeToBuffer(c, "Kendrick Sim", 0x0f);
@@ -240,31 +249,37 @@ void MenuEvent::renderCreditsRollText()
 	this->mainConsole->writeToBuffer(c, "Pi Jo Chu", 0x0f);
 }
 
+//UNDONE
 void MenuEvent::renderItemTitleSelected()
 {
 
 }
 
+//UNDONE
 void MenuEvent::renderItemPriceSelected()
 {
 
 }
 
+//UNDONE
 void MenuEvent::renderItemDescSelected()
 {
 
 }
 
+//UNDONE
 void MenuEvent::renderItemCurrTSelected()
 {
 
 }
 
+//UNDONE
 void MenuEvent::renderItemNextTSelected()
 {
 
 }
 
+// heehee
 void MenuEvent::renderDoomButton()
 {
 	std::string Button[5];
@@ -286,7 +301,8 @@ void MenuEvent::renderDoomButton()
 	this->mainConsole->writeToBuffer(c, "Prestige", 0x0f);
 }
 
-void MenuEvent::renderGoomButtonBrackets()
+// heehee's brackets
+void MenuEvent::renderDoomButtonBrackets()
 {
 	std::string LeftBracket[7];
 	std::string RightBracket[7];
@@ -305,10 +321,31 @@ void MenuEvent::renderGoomButtonBrackets()
 	RightBracket[5] = "  ÛÛ";
 	RightBracket[6] = "ÛÛÛÛ";
 	COORD c = this->mainConsole->getConsoleSize();
-	(c.X /= 10) -= 6;
+	(c.X /= 10) -= 4;
 	(c.Y /= 4) -= 1;
 	for (int i = 0; i < 7; i++)
 	{
 		this->mainConsole->writeToBuffer(c, LeftBracket[i], 0x08);
+		c.Y++;
 	}
+	c = this->mainConsole->getConsoleSize();
+	(c.X /= 10) += 10;
+	(c.Y /= 4) -= 1;
+	for (int i = 0; i < 7; i++)
+	{
+		this->mainConsole->writeToBuffer(c, RightBracket[i], 0x08);
+		c.Y++;
+	}
+}
+
+//UNDONE
+void MenuEvent::renderColourOption()
+{
+
+}
+
+//UNDONE
+void MenuEvent::renderOtherOptions()
+{
+
 }

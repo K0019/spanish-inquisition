@@ -45,6 +45,7 @@ enum EGAMESTATES /* FRAMEWORK */
 	S_HOWTOPLAY,
 	S_CREDITS,
     S_GAME,
+	S_PAUSED,
     S_COUNT
 };
 //	DO NOT DELETE: IMPORTANT
@@ -73,6 +74,8 @@ void checkHitPellets();		// Check if pellets have hit anything
 void processMenuEvent();	// processes what the player has done in Menu
 void doomButton();			// heehee
 void processOptionsEvent();	// processes what the player has done in Options
+void detectPauseMenuProc();
+void pauseScreen();
 void changedRoomUpdate(); // Stuff to do when the player exits current room
 bool loadEnemiesFromRoom(); // Load all enemies from the room that the player entered
 void addEnemy(EnemyMelee * enemy); // Add an enemy to the enemy list
@@ -90,6 +93,7 @@ void renderShop();			// renders the shop
 void renderOptions();		// renders the options items
 void renderCredits();		// renders credits
 void renderGame();			// renders the game stuff
+void renderPause();
 void renderScore();			// render the current score from
 void renderCharacter();		// renders the character into the buffer
 void renderFramerate();		// renders debug information, frame rate, elapsed time, etc

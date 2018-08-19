@@ -163,6 +163,8 @@ void update(CStopWatch * timer, double missedTime)
 			break;
 		case S_GAME: gameplay(); // gameplay logic when we are in the game
 			break;
+		case S_PAUSED: pauseScreen();
+			break;
 	}
 }
 //--------------------------------------------------------------
@@ -191,6 +193,8 @@ void render(CStopWatch * timer)
 		case S_CREDITS: renderCredits();
 			break;
 		case S_GAME: renderGame();
+			break;
+		case S_PAUSED: renderPause();
 			break;
 	}
     renderFramerate();	// renders debug information, frame rate, elapsed time, etc
@@ -247,7 +251,7 @@ void credits()
 void gameplay()            // gameplay logic
 {
 	//processUserInput();	// checks if you should change states or do something else with the game, e.g. pause, exit
-	//detectPauseMenuProc();
+	detectPauseMenuProc();
 	controlPlayer();	// moves the character, collision detection, physics, etc
 	playerShoot(); // checks if the player should shoot
 	g_sEntities.updatePellets(); // update locations of pellets
@@ -265,7 +269,7 @@ void menuNavigate()
 		g_mEvent.r_curspos.Y--;
 		KeyPressed = true;
 	}
-	else if (g_abKeyPressed[K_SHOOTDOWN] && g_mEvent.sh_cursSel < 4 && g_adBounceTime[K_SHOOTDOWN] < g_dElapsedTime)
+	else if (g_abKeyPressed[K_SHOOTDOWN] && g_mEvent.sh_cursSel < 5 && g_adBounceTime[K_SHOOTDOWN] < g_dElapsedTime)
 	{
 		g_mEvent.sh_cursSel++;
 		g_mEvent.r_curspos.Y++;
@@ -289,6 +293,10 @@ void menuNavigate()
 			break;
 		case 4:
 			g_mEvent.bCredits = true;
+			break;
+		case 5:
+			g_mEvent.bQuitGame = true;
+			break;
 		default:
 			break;
 		}
@@ -670,7 +678,26 @@ void doomButton()
 
 void processOptionsEvent()
 {
-	
+
+}
+
+void detectPauseMenuProc()
+{
+	if (g_abKeyPressed[K_ESCAPE])
+	{
+		g_mEvent.bPausedGame = !g_mEvent.bPausedGame;
+	}
+	if (g_mEvent.bPausedGame)
+	{
+		g_eGameState = S_PAUSED;
+	}
+	else
+		g_eGameState = S_GAME;
+}
+
+void pauseScreen()
+{
+	detectPauseMenuProc();
 }
 
 void renderSplashScreen()  // renders the splash screen
@@ -731,6 +758,21 @@ void renderGame()
 	renderPellets();
 	renderMiniMap();
 	renderStat();
+}
+
+void renderPause()
+{
+	COORD c;
+	c.X = 0;
+	c.Y = 0;
+	for (; c.X < g_Console.getConsoleSize().X; c.X++)
+	{
+		for (; c.Y < g_Console.getConsoleSize().Y; c.Y++)
+		{
+			g_Console.writeToBuffer(c, " ", 0x40);
+		}
+		c.Y = 0;
+	}
 }
 
 void renderScore() 
@@ -1159,7 +1201,6 @@ void checkHitPellets()
 			pellet++;
 			continue;
 		}
-
 
 		// Check for exceed lifespan
 		if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[0].m_bHasWeapon) //Index 1 (Heaven Cracker): Doubles the pellet lifespan to 5 seconds.

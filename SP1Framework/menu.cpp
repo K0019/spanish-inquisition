@@ -106,22 +106,27 @@ void MenuEvent::renderMenu()
 	COORD c;
 	c.X = this->mainConsole->getConsoleSize().X / 5 + 2;
 	c.Y = this->mainConsole->getConsoleSize().Y / 10 * 8 - 1;
-	this->mainConsole->writeToBuffer(c, "PLAY", 0x0f);
+	this->mainConsole->writeToBuffer(c, "   PLAY    ", 0x0f);
 	c.Y++;
 	this->mainConsole->writeToBuffer(c, "HOW TO PLAY", 0x0f);
 	c.Y++;
-	this->mainConsole->writeToBuffer(c, "SHOP", 0x0f);
+	this->mainConsole->writeToBuffer(c, "   SHOP    ", 0x0f);
 	c.Y++;
-	this->mainConsole->writeToBuffer(c, "OPTIONS", 0x0f);
+	this->mainConsole->writeToBuffer(c, "  OPTIONS  ", 0x0f);
 	c.Y++;
-	this->mainConsole->writeToBuffer(c, "CREDITS", 0x0f);
+	this->mainConsole->writeToBuffer(c, "  CREDITS  ", 0x0f);
+	c.Y++;
+	this->mainConsole->writeToBuffer(c, "   QUIT    ", 0x0f);
 }
 
 // the cursor in the main menu
 void MenuEvent::renderCursor()
 {
 	COORD c = r_curspos;
-	this->mainConsole->writeToBuffer(c, ">", 0x0f);
+	this->mainConsole->writeToBuffer(c, "[", 0x0f);
+	c.X += 14;
+	this->mainConsole->writeToBuffer(c, "]", 0x0f);
+	c.X -= 14;
 	if (DEBUG)
 	{
 		c.X -= 2;
@@ -192,15 +197,24 @@ void MenuEvent::renderTutorialDetails()
 	c.Y = this->mainConsole->getConsoleSize().Y / 10 + 2;
 	this->mainConsole->writeToBuffer(c, "In-game", 0x0f);
 	c.Y += 2;
-	this->mainConsole->writeToBuffer(c, "@@", 0x0A);
+	this->mainConsole->writeToBuffer(c, "@", 0x0A);
 	c.X += 2;
 	this->mainConsole->writeToBuffer(c, " - You", 0x0f);
 	c.X -= 2;
 	c.Y++;
-	this->mainConsole->writeToBuffer(c, "tt", 0x01);
+	this->mainConsole->writeToBuffer(c, "b", 0x01);
 	c.X += 2;
-	this->mainConsole->writeToBuffer(c, " - Enemy", 0x0f);
+	this->mainConsole->writeToBuffer(c, " - Bandit", 0x0f);
 	c.X -= 2;
+	c.Y++;
+	this->mainConsole->writeToBuffer(c, "(Melee Enemies)", 0x0f);
+	c.Y++;
+	this->mainConsole->writeToBuffer(c, "M", 0x01);
+	c.X += 2;
+	this->mainConsole->writeToBuffer(c, " - Mage", 0x0f);
+	c.X -= 2;
+	c.Y++;
+	this->mainConsole->writeToBuffer(c, " - Ranged Enemy", 0x0f);
 	c.Y++;
 	this->mainConsole->writeToBuffer(c, "#&_ ", 0x01);
 	c.X += 4;

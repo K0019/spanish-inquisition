@@ -15,7 +15,9 @@ struct MenuEvent
 	bool bHowToPlay = false;				// event processor: if player selected tutorial
 	bool bMenu = false;						// event processor: if player backed into menu
 	bool bCredits = false;					// event processor: if player selected credits
+	bool bQuitGame = false;
 	bool bHasPressedButton = false;			// event processor: the button has been pressed
+	bool bPausedGame = false;
 	bool bMinimap = true;					// event processor: if the minimap option is toggled
 	unsigned int uiCreditsRollTime = 0;		// scrapped idea: animation timer for credits
 	unsigned int uiActivateDoomButton = 0;	// heehee

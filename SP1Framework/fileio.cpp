@@ -78,4 +78,17 @@ void g_LoadFromRoom(std::string *RoomNumber, char (*Level)[(ROOM_X + 2) * GRID_X
 void g_LoadOptions(unsigned short* OptionsDataArray)
 {
 	std::ifstream PlayerOptions("../res/SaveData/options.txt");
+	if (PlayerOptions.is_open())
+	{
+
+	}
+}
+
+void g_SaveOptions(unsigned short* OptionsDataArray)
+{
+	std::ofstream PlayerOptions("../res/SaveData/options.txt");
+	if (PlayerOptions.is_open())
+	{
+
+	}
 }

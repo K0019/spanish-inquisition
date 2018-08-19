@@ -56,7 +56,14 @@ void init( void )
 	g_sLevel.playerStartRoom.X = GRID_X >> 1;
 	g_sLevel.playerStartRoom.Y = GRID_Y >> 1;
 	g_sEntities.g_sChar.m_cRoom = g_sLevel.playerStartRoom;
-	//if (DEBUG) g_sEntities.g_sChar.m_bInBattle = true;
+	/*if (DEBUG)
+	{
+		COORD c;
+		c.X = g_sEntities.g_sChar.m_cLocation.X - 3;
+		c.Y = g_sEntities.g_sChar.m_cLocation.Y;
+		addEnemy(UNIQUE_ENEMY_TESTRANGEDMOBILE);
+		g_sEntities.g_sChar.m_bInBattle = true;
+	}*/
 	r_cRenderOffset.X = 1 + g_sEntities.g_sChar.m_cRoom.X * (ROOM_X + 2);
 	r_cRenderOffset.Y = 1 + g_sEntities.g_sChar.m_cRoom.Y * (ROOM_Y + 2);
 	g_mEvent.r_curspos.X = g_Console.getConsoleSize().X / 5;
@@ -352,12 +359,7 @@ void controlPlayer()
 				{
 					r_cRenderOffset.X -= (ROOM_X + 2);
 					g_sEntities.g_sChar.m_cLocation.X--;
-					g_sEntities.clearPellets();
-					g_sEntities.clearEnemies();
-					if (loadEnemiesFromRoom())
-						g_sEntities.g_sChar.m_bInBattle = true;
-					g_sLevel.miniMap->enteredRoom[(g_sEntities.g_sChar.m_cLocation.X - 1) / (ROOM_X + 2) * GRID_Y + (g_sEntities.g_sChar.m_cLocation.Y - 1) / (ROOM_Y + 2)] = true;
-					g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
+					changedRoomUpdate();
 				}
 			}
 		}
@@ -397,12 +399,7 @@ void controlPlayer()
 				{
 					r_cRenderOffset.Y -= (ROOM_Y + 2);
 					g_sEntities.g_sChar.m_cLocation.Y--;
-					g_sEntities.clearPellets();
-					g_sEntities.clearEnemies();
-					if (loadEnemiesFromRoom())
-						g_sEntities.g_sChar.m_bInBattle = true;
-					g_sLevel.miniMap->enteredRoom[(g_sEntities.g_sChar.m_cLocation.X - 1) / (ROOM_X + 2) * GRID_Y + (g_sEntities.g_sChar.m_cLocation.Y - 1) / (ROOM_Y + 2)] = true;
-					g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
+					changedRoomUpdate();
 				}
 			}
 		}
@@ -442,12 +439,7 @@ void controlPlayer()
 				{
 					r_cRenderOffset.X += (ROOM_X + 2);
 					g_sEntities.g_sChar.m_cLocation.X++;
-					g_sEntities.clearPellets();
-					g_sEntities.clearEnemies();
-					if (loadEnemiesFromRoom())
-						g_sEntities.g_sChar.m_bInBattle = true;
-					g_sLevel.miniMap->enteredRoom[(g_sEntities.g_sChar.m_cLocation.X - 1) / (ROOM_X + 2) * GRID_Y + (g_sEntities.g_sChar.m_cLocation.Y - 1) / (ROOM_Y + 2)] = true;
-					g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
+					changedRoomUpdate();
 				}
 			}
 		}
@@ -487,12 +479,7 @@ void controlPlayer()
 				{
 					r_cRenderOffset.Y += (ROOM_Y + 2);
 					g_sEntities.g_sChar.m_cLocation.Y++;
-					g_sEntities.clearPellets();
-					g_sEntities.clearEnemies();
-					if (loadEnemiesFromRoom())
-						g_sEntities.g_sChar.m_bInBattle = true;
-					g_sLevel.miniMap->enteredRoom[(g_sEntities.g_sChar.m_cLocation.X - 1) / (ROOM_X + 2) * GRID_Y + (g_sEntities.g_sChar.m_cLocation.Y - 1) / (ROOM_Y + 2)] = true;
-					g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
+					changedRoomUpdate();
 				}
 			}
 		}
@@ -503,8 +490,15 @@ void controlPlayer()
 		{
 			case '&':
 			{
-				resetLevel(++g_sLevel.floor);
-				bSomethingHappened = true;
+				if (++g_sLevel.floor > FINAL_FLOOR)
+				{
+					// YAN QUAN TODO: End game stuff
+				}
+				else
+				{
+					resetLevel(g_sLevel.floor);
+					bSomethingHappened = true;
+				}
 				break;
 			}
 			case '%': //When spacebar is pressed on top of an item
@@ -581,7 +575,6 @@ void controlPlayer()
 				}
 			}
 		}
-		if (g_abKeyPressed[K_SPACE]) g_adBounceTime[K_SPACE] = g_dElapsedTime + 0.225;
 	}
 }
 
@@ -1293,6 +1286,16 @@ void render(COORD c, std::string& text, std::string& text2, WORD color)
 	g_Console.writeToBuffer(c, text.c_str(), color);
 	c.Y++;
 	g_Console.writeToBuffer(c, text2.c_str(), color);
+}
+
+void changedRoomUpdate()
+{
+	g_sEntities.clearPellets();
+	g_sEntities.clearEnemies();
+	if (loadEnemiesFromRoom())
+		g_sEntities.g_sChar.m_bInBattle = true;
+	g_sLevel.miniMap->enteredRoom[(g_sEntities.g_sChar.m_cLocation.X - 1) / (ROOM_X + 2) * GRID_Y + (g_sEntities.g_sChar.m_cLocation.Y - 1) / (ROOM_Y + 2)] = true;
+	g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
 }
 
 bool loadEnemiesFromRoom()

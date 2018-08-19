@@ -10,6 +10,7 @@
 #define GRID_Y 5
 #define ROOM_X 11
 #define ROOM_Y 19
+#define FINAL_FLOOR 3
 #define SPECIAL_ROOMS_COUNT 2
 #define SHOOTSPEED 0.35
 #define SHOOTVELOCITY 0.3
@@ -21,5 +22,6 @@
 
 #define UNIQUE_ENEMY_BANDIT new EnemyMelee(&g_sLevel, "Bandit", "BBBB", "BBBB", c, (WORD)0x0E, 15, 3, 0.3, 0.3, 0.1, 0.3)
 #define UNIQUE_ENEMY_MAGE new EnemyRanged(&g_sLevel, &g_sEntities.m_vPellets, "Mage", "MMMM", "MMMM", c, (WORD)0x0E, 10, 3, 0.4, 0.3, 0.1, 0.3, false, 0.25)
+#define UNIQUE_ENEMY_TESTRANGEDMOBILE new EnemyRanged(&g_sLevel, &g_sEntities.m_vPellets, "TestRangedMobile", "TTTT", "TTTT", c, (WORD)0x0E, 20, 2, 0.35, 0.4, 0.0, 0.2, true, 0.2)
 
 #endif // !DEFINITIONSHEAD

@@ -22,7 +22,7 @@ Console g_Console(120, 30, "The Great Escapade");
 // Game specific variables here
 EGAMESTATES			g_eGameState = S_SPLASHSCREEN;
 SLevel				g_sLevel;
-SaveDataStorage		saveDataStorage;
+DataStorage			currDataStorage;
 SAllEntities		g_sEntities; // Hold all entities in the level
 MenuEvent			g_mEvent(&g_Console);
 double				g_adBounceTime[K_COUNT]; // this is to prevent key bouncing, so we won't trigger keypresses more than once
@@ -60,7 +60,7 @@ void init( void )
 	r_cRenderOffset.X = 1 + g_sEntities.g_sChar.m_cRoom.X * (ROOM_X + 2);
 	r_cRenderOffset.Y = 1 + g_sEntities.g_sChar.m_cRoom.Y * (ROOM_Y + 2);
 	g_mEvent.r_curspos.X = g_Console.getConsoleSize().X / 5;
-	g_mEvent.r_curspos.Y = g_Console.getConsoleSize().Y / 10 * 8;
+	g_mEvent.r_curspos.Y = g_Console.getConsoleSize().Y / 10 * 8 - 1;
 	g_sLevel.floor = 1;
 	g_sLevel.generateLevel();
 	g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
@@ -71,7 +71,7 @@ void init( void )
 	//addEnemy(UNIQUE_ENEMY_RANGEDTEST);
     // sets the width, height and the font name to use in the console
     g_Console.setConsoleFont(0, 16, L"Consolas");
-	g_LoadFromSave(saveDataStorage.g_iSaveData);
+	g_LoadFromSave(currDataStorage.g_iSaveData);
 }
 
 //--------------------------------------------------------------
@@ -202,14 +202,14 @@ void render(CStopWatch * timer)
 
 void splashScreenWait()		// waits for time to pass in splash screen
 {
-	processUserInput(); // checks if you should change states or do something else with the game, e.g. pause, exit
+	//processUserInput(); // checks if you should change states or do something else with the game, e.g. pause, exit
 	if (g_dAccurateElapsedTime > 3.0) // wait for 3 seconds to switch to game mode, else do nothing
 		g_eGameState = S_MENU;
 }
 
 void mainMenu()
 {
-	processUserInput(); // checks if you should change states or do something else with the game, e.g. pause, exit
+	//processUserInput(); // checks if you should change states or do something else with the game, e.g. pause, exit
 	menuNavigate();
 	processMenuEvent();
 }
@@ -222,7 +222,7 @@ void tutorial()
 
 void shop()
 {
-	processUserInput();
+	//processUserInput();
 }
 
 void options()
@@ -239,7 +239,8 @@ void credits()
 
 void gameplay()            // gameplay logic
 {
-	processUserInput();	// checks if you should change states or do something else with the game, e.g. pause, exit
+	//processUserInput();	// checks if you should change states or do something else with the game, e.g. pause, exit
+	//detectPauseMenuProc();
 	controlPlayer();	// moves the character, collision detection, physics, etc
 	playerShoot(); // checks if the player should shoot
 	g_sEntities.updatePellets(); // update locations of pellets
@@ -665,7 +666,7 @@ void doomButton()
 			g_SaveToSave(NukedSaveData);
 			g_eGameState = S_MENU;
 			g_mEvent.bHasPressedButton = true;
-			g_LoadFromSave(saveDataStorage.g_iSaveData);
+			g_LoadFromSave(currDataStorage.g_iSaveData);
 		}
 	}
 	else
@@ -741,7 +742,7 @@ void renderGame()
 
 void renderScore() 
 {
-	unsigned int LoadedScore = saveDataStorage.g_iSaveData[0];
+	unsigned int LoadedScore = currDataStorage.g_iSaveData[0];
 	std::string g_sScore = std::to_string(LoadedScore);
 	COORD c = g_Console.getConsoleSize();
 	c.X -= (SHORT)g_sScore.length();

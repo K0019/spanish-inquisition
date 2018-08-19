@@ -74,6 +74,7 @@ void checkHitPellets();		// Check if pellets have hit anything
 void processMenuEvent();	// processes what the player has done in Menu
 void doomButton();			// heehee
 void processOptionsEvent();	// processes what the player has done in Options
+void detectPauseMenuProc();
 
 /*
 	THE RENDER FUNCTIONS

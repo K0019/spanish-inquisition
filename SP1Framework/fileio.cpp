@@ -2,7 +2,7 @@
 
 void g_LoadFromSave(unsigned int* SaveDataArray)
 {
-	std::ifstream SaveFileData("../res/SaveData/saves.SAVE");
+	std::ifstream SaveFileData("../res/SaveData/saves.txt");
 	if (SaveFileData.is_open())
 	{
 		int i = 0;
@@ -13,11 +13,24 @@ void g_LoadFromSave(unsigned int* SaveDataArray)
 		}
 		SaveFileData.close();
 	}
+	else
+	{
+		std::ofstream SaveFileData("../res/SaveData/saves.txt");
+		if (SaveFileData.is_open())
+		{
+			for (int i = 0; i < 9; i++)
+			{
+				SaveFileData << 0 << '\n';
+			}
+			SaveFileData.close();
+		}
+		g_LoadFromSave(SaveDataArray);
+	}
 }
 
 void g_SaveToSave(unsigned int* SaveDataArray)
 {
-	std::ofstream SaveFileData("../res/SaveData/saves.SAVE");
+	std::ofstream SaveFileData("../res/SaveData/saves.txt");
 	if (SaveFileData.is_open())
 	{
 		for (int i = 0; i < 9 ; i++)
@@ -60,4 +73,9 @@ void g_LoadFromRoom(std::string *RoomNumber, char (*Level)[(ROOM_X + 2) * GRID_X
 		}
 		RoomFileData.close();
 	}
+}
+
+void g_LoadOptions(unsigned short* OptionsDataArray)
+{
+	std::ifstream PlayerOptions("../res/SaveData/options.txt");
 }

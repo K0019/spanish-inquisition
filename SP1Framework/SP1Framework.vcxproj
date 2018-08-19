@@ -121,6 +121,16 @@
     <Text Include="..\res\MapData\RoomData\03.txt" />
     <Text Include="..\res\MapData\RoomData\04.txt" />
     <Text Include="..\res\MapData\RoomData\05.txt" />
+    <Text Include="..\res\MapData\RoomData\06.txt" />
+    <Text Include="..\res\MapData\RoomData\07.txt" />
+    <Text Include="..\res\MapData\RoomData\08.txt" />
+    <Text Include="..\res\MapData\RoomData\09.txt" />
+    <Text Include="..\res\MapData\RoomData\0a.txt" />
+    <Text Include="..\res\MapData\RoomData\0b.txt" />
+    <Text Include="..\res\MapData\RoomData\0c.txt" />
+    <Text Include="..\res\MapData\RoomData\0d.txt" />
+    <Text Include="..\res\MapData\RoomData\0e.txt" />
+    <Text Include="..\res\MapData\RoomData\0f.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\res\SaveData\saves.SAVE" />

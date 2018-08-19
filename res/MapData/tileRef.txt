@@ -2,6 +2,9 @@
 # = Wall
 $ = Door
 & = Stairs
+* = Stone
+b = Bandit (melee enemy)
+m = Mage (ranged enemy)
 1 = Minor Health Pack
 2 = Greater Health Pack
 3 = Small Medal

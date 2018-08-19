@@ -223,7 +223,6 @@ void mainMenu()
 
 void tutorial()
 {
-	processUserInput();
 	goBack();
 	processMenuEvent();
 }
@@ -235,13 +234,12 @@ void shop()
 
 void options()
 {
-	processUserInput();
 	doomButton();
+	processOptionsEvent();
 }
 
 void credits()
 {
-	processUserInput();
 	goBack();
 	processMenuEvent();
 }
@@ -305,7 +303,7 @@ void menuNavigate()
 
 void goBack()
 {
-	if (g_abKeyPressed[K_ENTER] == true)
+	if (g_abKeyPressed[K_ENTER] == true || g_abKeyPressed[K_ESCAPE] == true)
 	{
 		g_mEvent.bMenu = true;
 		g_mEvent.uiCreditsRollTime = 0;
@@ -547,29 +545,29 @@ void controlPlayer()
 		{
 			if (g_abKeyPressed[i])
 			{
-				g_adBounceTime[i] = g_dElapsedTime + 0.20; //0.250
+				g_adBounceTime[i] = g_dElapsedTime + 0.250; //0.250 acts as the movement delay of the player, decreasing it makes the player go faster
 				if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_bHasWeapon) // Index 7 (Blue Feather): Decrease movement delay by 20/30/40/50%
 				{
 					switch (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_iWeaponLevel)
 					{
 					case 1: //Blue Feather Level 1: Decrease movement delay by 20%
 						{
-							g_adBounceTime[i] *= (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.20);
+							g_adBounceTime[i] = g_dElapsedTime + ((g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.20) * 0.250);
 							break;
 						}
 					case 2: //Blue Feather Level 2: Decrease movement delay by 30%
 						{
-							g_adBounceTime[i] *= (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.30);
+						g_adBounceTime[i] = g_dElapsedTime + ((g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.30) * 0.250);
 							break;
 						}
 					case 3: //Blue Feather Level 3: Decrease movement delay by 40%
 						{
-							g_adBounceTime[i] *= (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.40);
+						g_adBounceTime[i] = g_dElapsedTime + ((g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.40) * 0.250);
 							break;
 						}
 					case 4: //Blue Feather Level 4: Decrease movement delay by 50%
 						{
-							g_adBounceTime[i] *= (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.50);
+						g_adBounceTime[i] = g_dElapsedTime + ((g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.50) * 0.250);
 							break;
 						}
 					}
@@ -713,7 +711,7 @@ void renderOptions()
 	g_mEvent.renderDoomButton();
 	if (g_mEvent.sh_optionSel == 0)
 	{
-		g_mEvent.renderGoomButtonBrackets();
+		g_mEvent.renderDoomButtonBrackets();
 	}
 	g_mEvent.renderOtherOptions();
 }
@@ -749,9 +747,9 @@ void renderScore()
 void renderCharacter()
 {
 	// Draw the location of the character
+	COORD c = g_sEntities.g_sChar.getRealCoords();
 	WORD charColor = g_mEvent.wPlayerColor;
 	//WORD charColor = 0x0A;
-	COORD c = g_sEntities.g_sChar.getRealCoords();
 	g_Console.writeToBuffer(c, "@@@@", charColor);
 	c.Y++;
 	g_Console.writeToBuffer(c, "@@@@", charColor);
@@ -990,33 +988,35 @@ void renderMiniMap()
 	COORD c;
 	c.X = g_Console.getConsoleSize().X - ((1 + (GRID_Y << 1)) << 1);
 	c.Y = g_Console.getConsoleSize().Y - (1 + (GRID_X << 1));
-
-	for (int row = 0; row < (GRID_X << 1) + 1; row++)
+	if (g_mEvent.bMinimap)
 	{
-		for (int column = 0; column < (GRID_Y << 1) + 1; column++)
+		for (int row = 0; row < (GRID_X << 1) + 1; row++)
 		{
-			switch (g_sLevel.miniMap->map[row][column])
+			for (int column = 0; column < (GRID_Y << 1) + 1; column++)
 			{
-			case '#':
-				g_Console.writeToBuffer(c, "  ", 0x70);
-				break;
-			case '$':
-				g_Console.writeToBuffer(c, "  ", 0x80);
-				break;
-			case '@':
-				g_Console.writeToBuffer(c, "  ", 0x40);
-				break;
-			case '!':
-				g_Console.writeToBuffer(c, "  ", 0x20);
-				break;
-			case '&':
-				g_Console.writeToBuffer(c, "  ", 0x30);
-				break;
+				switch (g_sLevel.miniMap->map[row][column])
+				{
+				case '#':
+					g_Console.writeToBuffer(c, "  ", 0x70);
+					break;
+				case '$':
+					g_Console.writeToBuffer(c, "  ", 0x80);
+					break;
+				case '@':
+					g_Console.writeToBuffer(c, "  ", 0x40);
+					break;
+				case '!':
+					g_Console.writeToBuffer(c, "  ", 0x20);
+					break;
+				case '&':
+					g_Console.writeToBuffer(c, "  ", 0x30);
+					break;
+				}
+				c.X += 2;
 			}
-			c.X += 2;
+			c.Y++;
+			c.X = g_Console.getConsoleSize().X - ((1 + (GRID_Y << 1)) << 1);
 		}
-		c.Y++;
-		c.X = g_Console.getConsoleSize().X - ((1 + (GRID_Y << 1)) << 1);
 	}
 }
 

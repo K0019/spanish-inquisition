@@ -683,9 +683,20 @@ void processOptionsEvent()
 
 void detectPauseMenuProc()
 {
-	if (g_abKeyPressed[K_ESCAPE])
+	if (g_abKeyPressed[K_ESCAPE] && !g_mEvent.bHasPaused)
 	{
-		g_mEvent.bPausedGame = !g_mEvent.bPausedGame;
+		g_mEvent.bHasPaused = true;
+		//g_mEvent.bPausedGame = !g_mEvent.bPausedGame;
+	}
+	else if (!g_abKeyPressed[K_ESCAPE] && g_mEvent.bHasPaused)
+	{
+		g_mEvent.bPausedGame = true;
+	}
+	else if (g_abKeyPressed[K_ESCAPE] && g_mEvent.bHasPaused)
+	{
+		g_eGameState = S_GAME;
+		g_mEvent.bPausedGame = false;
+		g_mEvent.bHasPaused = false;
 	}
 	if (g_mEvent.bPausedGame)
 	{

@@ -505,6 +505,7 @@ void controlPlayer()
 				else
 				{
 					resetLevel(g_sLevel.floor);
+					g_sEntities.g_sChar.m_iPlayerScore += 50; //Give player 50 score for completing a level
 					bSomethingHappened = true;
 				}
 				break;
@@ -1299,6 +1300,13 @@ void checkHitPellets()
 			{
 				g_sEntities.g_sChar.m_iPlayerHealth -= pellet->m_iDamage;
 			}
+
+			//If player takes damage from a pellet, -5 score. If score is already 0, do not minus.
+			if (g_sEntities.g_sChar.m_iPlayerScore != 0)
+			{
+				g_sEntities.g_sChar.m_iPlayerScore -= 5;
+			}
+
 			// TODO: Check for death
 
 			pellet++;

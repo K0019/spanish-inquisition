@@ -31,6 +31,8 @@ protected:
 	int m_iStrength; // Damage enemy deals to player
 	SLevel * levelPointer; // Access to level
 	bool m_bAttacked; // If enemy has attacked this attack cycle
+	int m_iScoreGiven; //The amount of score the enemy gives to the player upon being killed
+	int m_iEnemyID; //The index of the enemy for reference purposes
 
 	const std::string m_sName; // Name of enemy
 	const double m_dLengthOfAttack; // Length of time of attack
@@ -39,7 +41,7 @@ protected:
 	const double m_iMoveDuration; // Duration this enemy should be delayed by before moving again
 
 public:
-	Enemy(SLevel * levelPointer, std::string name, std::string indicator, std::string indicator2, COORD location, WORD color,  int HP, int damage, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration); // Constructor
+	Enemy(SLevel * levelPointer, std::string name, std::string indicator, std::string indicator2, COORD location, WORD color,  int HP, int damage, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration, int scoreGiven, int enemyID); // Constructor
 
 	virtual void update(SGameChar * player) =0; // Update everything about enemy
 	virtual bool updateMovement(SGameChar * player) =0; // Update the movement
@@ -60,6 +62,7 @@ public:
 	void takeDamage(int amount); // Deal damage to this enemy
 	bool move(int direction); // Move, only if location is clear of obstacles
 	bool checkOutOfBounds(); // Check if location is clear of obstacles
+	void scoreGiven(SGameChar * player);
 };
 
 class EnemyMelee : public Enemy
@@ -67,7 +70,7 @@ class EnemyMelee : public Enemy
 protected:
 	int attackDirection; // Up Right Down Left
 public:
-	EnemyMelee(SLevel * levelPointer, std::string name, std::string indicator, std::string indicator2, COORD location, WORD color, int HP, int damage, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration);
+	EnemyMelee(SLevel * levelPointer, std::string name, std::string indicator, std::string indicator2, COORD location, WORD color, int HP, int damage, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration, int scoreGiven, int enemyID);
 
 	void update(SGameChar * player);
 	void setAttackDirection(SGameChar * player); // Target a tile to attack
@@ -83,7 +86,7 @@ protected:
 	std::vector<SPellet> * m_vPelletList; // Pointer to the list of pellets, to add pellets of the enemy's
 
 public:
-	EnemyRanged(SLevel * levelPointer, std::vector<SPellet> * pellets, std::string name, std::string indicator, std::string indicator2, COORD location, WORD color, int HP, int damage, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration, bool isMobile, double pelletVelocity);
+	EnemyRanged(SLevel * levelPointer, std::vector<SPellet> * pellets, std::string name, std::string indicator, std::string indicator2, COORD location, WORD color, int HP, int damage, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration, bool isMobile, double pelletVelocity, int scoreGiven, int enemyID);
 
 	void update(SGameChar * player);
 	bool updateMovement(SGameChar * player); // Updates enemy movement, returns true or false depending on whether the enemy should attack or not

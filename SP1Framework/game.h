@@ -40,10 +40,6 @@ enum EGAMESTATES /* FRAMEWORK */
 {
     S_SPLASHSCREEN,
 	S_MENU,
-	S_SHOP,
-	S_OPTIONS,
-	S_HOWTOPLAY,
-	S_CREDITS,
     S_GAME,
 	S_PAUSED,
     S_COUNT
@@ -58,22 +54,15 @@ void shutdown    ( void ); /* FRAMEWORK */ // do clean up, free memory
 	THE UPDATE FUNCTIONS
 */
 void splashScreenWait();	// waits for time to pass in splash screen
-void mainMenu();			// main menu logic
-void tutorial();			// how to play screen logic
-void shop();				// shop logic
-void options();				// options logic
 void playerShoot();			// allows the player to shoot
 void gameplay();			// gameplay logic
-void menuNavigate();		// Navigation of menu
+void menuLogic();
 void goBack();				// press enter to go back
-void credits();				// credits logic
 void resetLevel(int floor); // Generate a new map, with input floor for what to put inside the rooms
 void controlPlayer();		// moves the character, collision detection, physics, etc
 void processUserInput();	// checks if you should change states or do something else with the game, e.g. pause, exit
 void checkHitPellets();		// Check if pellets have hit anything
-void processMenuEvent();	// processes what the player has done in Menu
 void doomButton();			// heehee
-void processOptionsEvent();	// processes what the player has done in Options
 void detectPauseMenuProc();
 void pauseScreen();
 void changedRoomUpdate(); // Stuff to do when the player exits current room
@@ -87,11 +76,7 @@ void addEnemy(EnemyRanged * enemy); // Add an enemy to the enemy list
 
 void clearScreen();			// clears the current screen and draw from scratch 
 void renderSplashScreen();	// renders the splash screen
-void renderMainMenu();		// renders the main menu
-void renderTutorial();		// renders the how to play screen
-void renderShop();			// renders the shop
-void renderOptions();		// renders the options items
-void renderCredits();		// renders credits
+void renderMenu();			// renders the main menu
 void renderGame();			// renders the game stuff
 void renderPause();
 void renderScore();			// render the current score from
@@ -101,7 +86,8 @@ void renderToScreen();		// dump the contents of the buffer to the screen, one fr
 void renderLevel();			// renders the borders of the rooms
 void renderPellets();		// render pellets to buffer
 void renderMiniMap();		// render minimap to buffer
-void renderEnemy();			// renders all enemies to the buffer
+void renderEnemy();			// renders all alive enemies to the buffer
+void renderDeadEnemy(); // renders all dead enemies to the buffer
 void renderStat();			//renders the player stats on the right side of the console
 void render(COORD c, LPCSTR text, LPCSTR text2, WORD color); // Render sprite to screen
 void render(COORD c, std::string& text, std::string& text2, WORD color); // Render sprite to screen

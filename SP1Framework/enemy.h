@@ -61,8 +61,11 @@ public:
 	COORD getRealLocation(); // Get console coordinates of where enemy is
 	void takeDamage(int amount); // Deal damage to this enemy
 	bool move(int direction); // Move, only if location is clear of obstacles
-	bool checkOutOfBounds(); // Check if location is clear of obstacles
 	void scoreGiven(SGameChar * player);
+
+	bool checkOutOfBounds(); // Check if current enemy location is clear of obstacles
+	bool checkOutOfBounds(COORD c); // Check if specific location is clear of obstacles
+
 };
 
 class EnemyMelee : public Enemy

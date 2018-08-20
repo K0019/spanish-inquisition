@@ -26,10 +26,9 @@ struct SMiniMap
 
 struct SLevel
 {
-	COORD playerStartRoom, exitRoom; // Stored in grid coordinates
+	COORD playerStartRoom, exitRoom, itemRoom; // Stored in grid coordinates
 	char level[(ROOM_X + 2) * GRID_X + 2][(ROOM_Y + 2) * GRID_Y + 2]; // Includes borders
 	short floor; // Floor player is in
-	std::vector<std::string> roomSelections; // Room presets available for generation
 	SMiniMap * miniMap; // Hold minimap
 
 	void generateLevel(); // Create a new level
@@ -38,6 +37,7 @@ struct SLevel
 	void modifyTile(COORD c, char ch); // Change a tile on the level, using tile coordinates
 	char getTile(COORD c); // Get what tile is at the coordinate, using tile coordinates
 	COORD * getCoordinatesForDoor(const SHORT& X, const SHORT& Y, const int& direction); // Get console coordinates of a door placement
+	~SLevel();
 };
 
 COORD fastCoord(int& x, int& y); // Quick function to create a COORD

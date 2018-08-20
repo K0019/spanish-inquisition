@@ -3,17 +3,22 @@
 
 extern Console g_Console;
 
+SLevel::~SLevel()
+{
+	if (this->miniMap != nullptr) delete this->miniMap;
+}
+
 void SLevel::generateLevel()
 {
 	// TEMPORARY VARIABLES
 	bool * roomsHaveExit = new bool[GRID_X * GRID_Y];
+	std::vector<std::string> roomSelections, itemRoomSelections;
 
 	// INSTANTIATE VARIABLES
 	for (int index = 0; index < GRID_X * GRID_Y; index++)
 		roomsHaveExit[index] = false;
 
 	// RESET MEMBER VARIABLES
-	this->roomSelections.clear();
 	if (this->miniMap != nullptr) delete this->miniMap;
 
 	// -----Clear Level-----
@@ -26,7 +31,8 @@ void SLevel::generateLevel()
 	}
 
 	// Get possible room selections
-	g_LoadFromFloor(this->floor, &this->roomSelections);
+	g_LoadFromFloor(this->floor, &roomSelections);
+	g_LoadFromFloorItem(this->floor, &itemRoomSelections);
 
 	// -----Borders and Room Contents-----
 	// Set exit room, at least 2 rooms away from entry room
@@ -38,6 +44,13 @@ void SLevel::generateLevel()
 		this->exitRoom.X <= this->playerStartRoom.X + 1 &&
 		this->exitRoom.Y >= this->playerStartRoom.Y - 1 &&
 		this->exitRoom.Y <= this->playerStartRoom.Y + 1);
+	// Set item room somewhere in the level
+	do
+	{
+		this->itemRoom.X = rand() / (RAND_MAX / GRID_X);
+		this->itemRoom.Y = rand() / (RAND_MAX / GRID_Y);
+	} while ((this->exitRoom.X == this->itemRoom.X && this->exitRoom.Y == this->itemRoom.Y) ||
+		(this->playerStartRoom.X == this->itemRoom.X && this->playerStartRoom.Y == this->itemRoom.Y));
 
 	// Generate level
 	for (int gridRow = 0; gridRow < GRID_X; gridRow++)
@@ -57,9 +70,13 @@ void SLevel::generateLevel()
 				for (int wallColumn = 0; wallColumn < ROOM_Y + 2; wallColumn++)
 					this->level[(gridRow + 1) * (ROOM_X + 2)][1 + gridColumn * (ROOM_Y + 2) + wallColumn] = '#';
 			}
+			else if (this->itemRoom.X == gridRow && this->itemRoom.Y == gridColumn)
+			{
+				g_LoadFromItemRoom(&itemRoomSelections[rand() / (RAND_MAX / itemRoomSelections.size())], &this->level, fastCoord(gridRow, gridColumn));
+			}
 			else
 			{
-				g_LoadFromRoom(&this->roomSelections[rand() / (RAND_MAX / this->roomSelections.size())], &this->level, fastCoord(gridRow, gridColumn));
+				g_LoadFromRoom(&roomSelections[rand() / (RAND_MAX / roomSelections.size())], &this->level, fastCoord(gridRow, gridColumn));
 			}
 		}
 	}
@@ -159,6 +176,7 @@ void SLevel::generateLevel()
 	// DELETE ALLOCATED STORAGE
 	delete[] roomsHaveExit;
 
+	// Generate minimap
 	this->miniMap = new SMiniMap(&this->level, this->playerStartRoom, this->exitRoom);
 }
 

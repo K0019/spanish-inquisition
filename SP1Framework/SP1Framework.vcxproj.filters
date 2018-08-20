@@ -184,11 +184,22 @@
     <Text Include="..\res\MapData\RoomData\0b.txt">
       <Filter>Resource Files\MapData\RoomData</Filter>
     </Text>
-    <Text Include="..\res\SaveData\saves.txt">
-      <Filter>Resource Files\SaveData</Filter>
+    <Text Include="..\res\MapData\RoomData\10.txt">
+      <Filter>Resource Files\MapData\RoomData</Filter>
     </Text>
-    <Text Include="..\res\SaveData\options.txt">
-      <Filter>Resource Files\SaveData</Filter>
+    <Text Include="..\res\MapData\RoomData\11.txt">
+      <Filter>Resource Files\MapData\RoomData</Filter>
     </Text>
+    <Text Include="..\res\MapData\RoomData\12.txt">
+      <Filter>Resource Files\MapData\RoomData</Filter>
+    </Text>
+    <Text Include="..\res\MapData\RoomData\13.txt">
+      <Filter>Resource Files\MapData\RoomData</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\res\SaveData\saves.SAVE">
+      <Filter>Resource Files\SaveData</Filter>
+    </None>
   </ItemGroup>
 </Project>

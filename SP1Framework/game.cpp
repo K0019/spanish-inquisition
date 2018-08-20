@@ -262,7 +262,7 @@ void controlPlayer()
 
 			for (auto& enemy : g_sEntities.m_vEnemy)
 			{
-				if (g_sEntities.g_sChar.m_cLocation.X == enemy->getLocation().X && g_sEntities.g_sChar.m_cLocation.Y == enemy->getLocation().Y)
+				if (!enemy->isDying() && g_sEntities.g_sChar.m_cLocation.X == enemy->getLocation().X && g_sEntities.g_sChar.m_cLocation.Y == enemy->getLocation().Y)
 				{
 					skip = true;
 					g_sEntities.g_sChar.m_cLocation.X++;
@@ -302,7 +302,7 @@ void controlPlayer()
 
 			for (auto& enemy : g_sEntities.m_vEnemy)
 			{
-				if (g_sEntities.g_sChar.m_cLocation.X == enemy->getLocation().X && g_sEntities.g_sChar.m_cLocation.Y == enemy->getLocation().Y)
+				if (!enemy->isDying() && g_sEntities.g_sChar.m_cLocation.X == enemy->getLocation().X && g_sEntities.g_sChar.m_cLocation.Y == enemy->getLocation().Y)
 				{
 					skip = true;
 					g_sEntities.g_sChar.m_cLocation.Y++;
@@ -342,7 +342,7 @@ void controlPlayer()
 
 			for (auto& enemy : g_sEntities.m_vEnemy)
 			{
-				if (g_sEntities.g_sChar.m_cLocation.X == enemy->getLocation().X && g_sEntities.g_sChar.m_cLocation.Y == enemy->getLocation().Y)
+				if (!enemy->isDying() && g_sEntities.g_sChar.m_cLocation.X == enemy->getLocation().X && g_sEntities.g_sChar.m_cLocation.Y == enemy->getLocation().Y)
 				{
 					skip = true;
 					g_sEntities.g_sChar.m_cLocation.X--;
@@ -382,7 +382,7 @@ void controlPlayer()
 
 			for (auto& enemy : g_sEntities.m_vEnemy)
 			{
-				if (g_sEntities.g_sChar.m_cLocation.X == enemy->getLocation().X && g_sEntities.g_sChar.m_cLocation.Y == enemy->getLocation().Y)
+				if (!enemy->isDying() && g_sEntities.g_sChar.m_cLocation.X == enemy->getLocation().X && g_sEntities.g_sChar.m_cLocation.Y == enemy->getLocation().Y)
 				{
 					skip = true;
 					g_sEntities.g_sChar.m_cLocation.Y--;
@@ -618,6 +618,7 @@ void renderMenu()
 void renderGame()
 {
 	renderLevel();
+	renderDeadEnemy();
 	renderCharacter();    // renders the character into the buffer
 	renderEnemy();
 	renderPellets();
@@ -1004,6 +1005,15 @@ void renderEnemy()
 {
 	for (auto& enemy : g_sEntities.m_vEnemy)
 	{
+		if (enemy->isDying()) continue;
+		render(enemy->getRealLocation(), enemy->getIdentifier()[0], enemy->getIdentifier()[1], enemy->getColor());
+	}
+}
+void renderDeadEnemy()
+{
+	for (auto& enemy : g_sEntities.m_vEnemy)
+	{
+		if (!enemy->isDying()) continue;
 		render(enemy->getRealLocation(), enemy->getIdentifier()[0], enemy->getIdentifier()[1], enemy->getColor());
 	}
 }

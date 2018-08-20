@@ -1291,11 +1291,6 @@ bool loadEnemiesFromRoom()
 				roomHasEnemies = true;
 				g_sLevel.level[row][column] = ' ';
 				break;
-			case 'k':
-				addEnemy(UNIQUE_ENEMY_KNIGHT);
-				roomHasEnemies = true;
-				g_sLevel.level[row][column] = ' ';
-				break;
 			}
 		}
 	}

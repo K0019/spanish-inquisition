@@ -142,6 +142,8 @@
     <Text Include="..\res\MapData\RoomData\NormalRooms\12.txt" />
     <Text Include="..\res\MapData\RoomData\NormalRooms\13.txt" />
     <Text Include="..\res\MapData\RoomData\NormalRooms\14.txt" />
+    <Text Include="..\res\MapData\RoomData\NormalRooms\16.txt" />
+    <Text Include="..\res\MapData\RoomData\NormalRooms\17.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\res\SaveData\saves.SAVE" />

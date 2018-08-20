@@ -229,6 +229,12 @@
     <Text Include="..\res\MapData\RoomData\ItemRooms\15.txt">
       <Filter>Resource Files\MapData\RoomData\ItemRooms</Filter>
     </Text>
+    <Text Include="..\res\MapData\RoomData\NormalRooms\16.txt">
+      <Filter>Resource Files\MapData\RoomData\NormalRooms</Filter>
+    </Text>
+    <Text Include="..\res\MapData\RoomData\NormalRooms\17.txt">
+      <Filter>Resource Files\MapData\RoomData\NormalRooms</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\res\SaveData\saves.SAVE">

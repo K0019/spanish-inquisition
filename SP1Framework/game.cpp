@@ -254,6 +254,7 @@ void gameplay()            // gameplay logic
 	detectPauseMenuProc();
 	controlPlayer();	// moves the character, collision detection, physics, etc
 	playerShoot(); // checks if the player should shoot
+	checkHitPellets(); // checks if the pellets have hit anything, and update stats accordingly
 	g_sEntities.updatePellets(); // update locations of pellets
 	checkHitPellets(); // checks if the pellets have hit anything, and update stats accordingly
 	g_sEntities.updateEnemies(); // update locations of enemies and add pellets of the enemies'
@@ -999,6 +1000,15 @@ void renderLevel()
 				case 2:
 					render(c, "    ", "    ", 0x20);
 					break;
+				case 3:
+					render(c, "    ", "    ", 0x30);
+					break;
+				case 4:
+					render(c, "    ", "    ", 0x60);
+					break;
+				case 5:
+					render(c, "    ", "    ", 0x50);
+					break;
 				}
 				break;
 			case '$':
@@ -1085,7 +1095,24 @@ void renderPellets()
 			switch (pellet.m_bHitReason)
 			{
 			case pellet::P_WALL:
-				render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x89);
+				switch (g_sLevel.floor)
+				{
+				case 1:
+					render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x89);
+					break;
+				case 2:
+					render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x29);
+					break;
+				case 3:
+					render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x39);
+					break;
+				case 4:
+					render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x69);
+					break;
+				case 5:
+					render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x59);
+					break;
+				}
 				break;
 			case pellet::P_DOOR:
 				if (g_sEntities.g_sChar.m_bInBattle)
@@ -1119,7 +1146,24 @@ void renderPellets()
 			switch (pellet.m_bHitReason)
 			{
 			case pellet::P_WALL:
-				render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x84);
+				switch (g_sLevel.floor)
+				{
+				case 1:
+					render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x84);
+					break;
+				case 2:
+					render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x24);
+					break;
+				case 3:
+					render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x34);
+					break;
+				case 4:
+					render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x64);
+					break;
+				case 5:
+					render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x54);
+					break;
+				}
 				break;
 			case pellet::P_DOOR:
 				if (g_sEntities.g_sChar.m_bInBattle)

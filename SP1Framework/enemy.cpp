@@ -392,24 +392,44 @@ void EnemyMelee::strikeAttack(SGameChar * player)
 	{
 	case 0:
 		if (this->m_cLocation.X == player->m_cLocation.X + 1 && this->m_cLocation.Y == player->m_cLocation.Y)
+		{
 			player->m_iPlayerHealth -= this->m_iStrength;
+			if (player->m_iPlayerScore != 0) //If melee enemy hits and damages the player, -5 score from the player
+			{
+				player->m_iPlayerScore -= 5;
+			}
+		}
 		break;
 	case 1:
 		if (this->m_cLocation.X == player->m_cLocation.X && this->m_cLocation.Y == player->m_cLocation.Y - 1)
+		{
 			player->m_iPlayerHealth -= this->m_iStrength;
+			if (player->m_iPlayerScore != 0)
+			{
+				player->m_iPlayerScore -= 5;
+			}
+		}
 		break;
 	case 2:
 		if (this->m_cLocation.X == player->m_cLocation.X - 1 && this->m_cLocation.Y == player->m_cLocation.Y)
+		{
 			player->m_iPlayerHealth -= this->m_iStrength;
+			if (player->m_iPlayerScore != 0)
+			{
+				player->m_iPlayerScore -= 5;
+			}
+		}
 		break;
 	case 3:
 		if (this->m_cLocation.X == player->m_cLocation.X && this->m_cLocation.Y == player->m_cLocation.Y + 1)
+		{
 			player->m_iPlayerHealth -= this->m_iStrength;
+			if (player->m_iPlayerScore != 0)
+			{
+				player->m_iPlayerScore -= 5;
+			}
+		}
 		break;
-	}
-	if (player->m_iPlayerScore != 0)
-	{
-		player->m_iPlayerScore -= 5;
 	}
 }
 

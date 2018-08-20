@@ -48,7 +48,7 @@ void init( void )
 
 	// sets the initial state for the game
 	g_eGameState = S_SPLASHSCREEN;
-	if (DEBUG) g_eGameState = S_MENU;
+	if (DEBUG) g_eGameState = S_GAME;
 
 	g_bHasShot = false;
 	g_sEntities.g_sChar.m_cLocation.X = 2 + (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
@@ -470,22 +470,22 @@ void controlPlayer()
 				{
 					switch (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_iWeaponLevel)
 					{
-					case 1: //Blue Feather Level 1: Decrease movement delay by 20%
+					case 0: //Blue Feather Level 1: Decrease movement delay by 20%
 						{
 							g_adBounceTime[i] = g_dElapsedTime + ((g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.20) * 0.250);
 							break;
 						}
-					case 2: //Blue Feather Level 2: Decrease movement delay by 30%
+					case 1: //Blue Feather Level 2: Decrease movement delay by 30%
 						{
 						g_adBounceTime[i] = g_dElapsedTime + ((g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.30) * 0.250);
 							break;
 						}
-					case 3: //Blue Feather Level 3: Decrease movement delay by 40%
+					case 2: //Blue Feather Level 3: Decrease movement delay by 40%
 						{
 						g_adBounceTime[i] = g_dElapsedTime + ((g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.40) * 0.250);
 							break;
 						}
-					case 4: //Blue Feather Level 4: Decrease movement delay by 50%
+					case 3: //Blue Feather Level 4: Decrease movement delay by 50%
 						{
 						g_adBounceTime[i] = g_dElapsedTime + ((g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.50) * 0.250);
 							break;
@@ -713,22 +713,22 @@ void playerShoot()
 	{
 		switch (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_iWeaponLevel) // Index 5 (Magic Potion): Decrease attack delay by 20/30/40/50%
 		{
-		case 1: //Magic Potion Level 1: Decrease attack delay by 20%
+		case 0: //Magic Potion Level 1: Decrease attack delay by 20%
 			{
 				delay = SHOOTSPEED * (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_fWeaponAttackSpeed - 0.20);
 				break;
 			}
-		case 2: //Magic Potion Level 2: Decrease attack delay by 30%
+		case 1: //Magic Potion Level 2: Decrease attack delay by 30%
 			{
 				delay = SHOOTSPEED * (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_fWeaponAttackSpeed - 0.30);
 				break;
 			}
-		case 3: //Magic Potion Level 3: Decrease attack delay by 40%
+		case 2: //Magic Potion Level 3: Decrease attack delay by 40%
 			{
 				delay = SHOOTSPEED * (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_fWeaponAttackSpeed - 0.40);
 				break;
 			}
-		case 4: //Magic Potion Level 4: Decrease attack delay by 50%
+		case 3: //Magic Potion Level 4: Decrease attack delay by 50%
 			{
 				delay = SHOOTSPEED * (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_fWeaponAttackSpeed - 0.50);
 				break;
@@ -1122,20 +1122,25 @@ void checkHitPellets()
 			continue;
 		}
 
-		// Check for exceed lifespan
+		// Check for exceeded lifespan
 		if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[0].m_bHasWeapon) //Index 1 (Heaven Cracker): Doubles the pellet lifespan to 5 seconds.
 		{
-			g_sEntities.g_sChar.m_dRange *= 2; //!Current issue!: if player has weapon, both player and enemy receives the range increase
-			if (pellet->m_dLifespan >= g_sEntities.g_sChar.m_dRange)  //Check if the pellet has reached its lifespan of 5 seconds, if it does, clear the pellet and show the "><" hit effect.
+			g_sEntities.g_sChar.m_dRange *= 2;
+			if ((pellet->m_dEnemyLifespan >= 2.5) && (pellet->m_bFriendly == false)) //Erase enemy pellets after 2.5 seconds
 			{
 				pellet->m_bHit = true;
+				pellet->m_bHitReason = pellet::P_FLOOR;
+			}
+			if ((pellet->m_dPlayerLifespan >= g_sEntities.g_sChar.m_dRange) && (pellet->m_bFriendly == true))  //Check if the pellet has reached its lifespan of 5 seconds, if it does, clear the pellet and show the "><" hit effect.
+			{
+				pellet->m_bHit = true; //Erase player bullets after 5 seconds, updated from Heaven Cracker
 				pellet->m_bHitReason = pellet::P_FLOOR;
 				continue;
 			}
 		}
 		else
 		{
-			if (pellet->m_dLifespan >= g_sEntities.g_sChar.m_dRange)
+			if (pellet->m_dPlayerLifespan >= g_sEntities.g_sChar.m_dRange) //Erase both player and enemy pellets after 2.5 seconds
 			{
 				pellet->m_bHit = true;
 				pellet->m_bHitReason = pellet::P_FLOOR;
@@ -1182,22 +1187,22 @@ void checkHitPellets()
 			{
 				switch (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[3].m_iWeaponLevel)
 				{
-					case 1: //Glass Canon Level 1: All Enemies deal 2 more damage to the player
+					case 0: //Glass Canon Level 1: All Enemies deal 2 more damage to the player
 						{
 							g_sEntities.g_sChar.m_iPlayerHealth -= (pellet->m_iDamage + 2);
 							break;
 						}
-					case 2: //Glass Canon Level 2: All Enemies deal 3 more damage to the player
+					case 1: //Glass Canon Level 2: All Enemies deal 3 more damage to the player
 						{
 							g_sEntities.g_sChar.m_iPlayerHealth -= (pellet->m_iDamage + 3);
 							break;
 						}
-					case 3: //Glass Canon Level 3: All Enemies deal 4 more damage to the player
+					case 2: //Glass Canon Level 3: All Enemies deal 4 more damage to the player
 						{
 							g_sEntities.g_sChar.m_iPlayerHealth -= (pellet->m_iDamage + 4);
 							break;
 						}
-					case 4: //Glass Canon Level 4: All Enemies deal 5 more damage to the player
+					case 3: //Glass Canon Level 4: All Enemies deal 5 more damage to the player
 						{
 							g_sEntities.g_sChar.m_iPlayerHealth -= (pellet->m_iDamage + 5);
 							break;

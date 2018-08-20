@@ -126,9 +126,10 @@ void Enemy::takeDamage(int amount)
 
 bool Enemy::move(int direction)
 {
+	COORD c = this->m_cLocation;
 	switch (direction)
 	{
-	case 0:
+	case 0: // Up
 		this->m_cLocation.X--;
 		if (this->checkOutOfBounds())
 		{
@@ -136,17 +137,30 @@ bool Enemy::move(int direction)
 			return false;
 		}
 		return true;
-	case 1:
+	case 1: // Up-Right
+		c.X--;
+		c.Y++;
+		if (this->checkOutOfBounds(c))
+		{
+			return false;
+		}
+		else
+		{
+			c.X++;
+			if (this->checkOutOfBounds(c))
+			{
+				c.X--;
+				c.Y--;
+				if (this->checkOutOfBounds(c))
+				{
+					return false;
+				}
+			}
+		}
 		this->m_cLocation.X--;
 		this->m_cLocation.Y++;
-		if (this->checkOutOfBounds())
-		{
-			this->m_cLocation.X++;
-			this->m_cLocation.Y--;
-			return false;
-		}
 		return true;
-	case 2:
+	case 2: // Right
 		this->m_cLocation.Y++;
 		if (this->checkOutOfBounds())
 		{
@@ -154,17 +168,30 @@ bool Enemy::move(int direction)
 			return false;
 		}
 		return true;
-	case 3:
+	case 3: // Down-Right
+		c.X++;
+		c.Y++;
+		if (this->checkOutOfBounds(c))
+		{
+			return false;
+		}
+		else
+		{
+			c.X--;
+			if (this->checkOutOfBounds(c))
+			{
+				c.X++;
+				c.Y--;
+				if (this->checkOutOfBounds(c))
+				{
+					return false;
+				}
+			}
+		}
 		this->m_cLocation.X++;
 		this->m_cLocation.Y++;
-		if (this->checkOutOfBounds())
-		{
-			this->m_cLocation.X--;
-			this->m_cLocation.Y--;
-			return false;
-		}
 		return true;
-	case 4:
+	case 4: // Down
 		this->m_cLocation.X++;
 		if (this->checkOutOfBounds())
 		{
@@ -172,17 +199,30 @@ bool Enemy::move(int direction)
 			return false;
 		}
 		return true;
-	case 5:
+	case 5: // Down-Left
+		c.X++;
+		c.Y--;
+		if (this->checkOutOfBounds(c))
+		{
+			return false;
+		}
+		else
+		{
+			c.X--;
+			if (this->checkOutOfBounds(c))
+			{
+				c.X++;
+				c.Y++;
+				if (this->checkOutOfBounds(c))
+				{
+					return false;
+				}
+			}
+		}
 		this->m_cLocation.X++;
 		this->m_cLocation.Y--;
-		if (this->checkOutOfBounds())
-		{
-			this->m_cLocation.X--;
-			this->m_cLocation.Y++;
-			return false;
-		}
 		return true;
-	case 6:
+	case 6: // Left
 		this->m_cLocation.Y--;
 		if (this->checkOutOfBounds())
 		{
@@ -190,15 +230,28 @@ bool Enemy::move(int direction)
 			return false;
 		}
 		return true;
-	case 7:
+	case 7: // Up-Left
+		c.X--;
+		c.Y--;
+		if (this->checkOutOfBounds(c))
+		{
+			return false;
+		}
+		else
+		{
+			c.X++;
+			if (this->checkOutOfBounds(c))
+			{
+				c.X--;
+				c.Y++;
+				if (this->checkOutOfBounds(c))
+				{
+					return false;
+				}
+			}
+		}
 		this->m_cLocation.X--;
 		this->m_cLocation.Y--;
-		if (this->checkOutOfBounds())
-		{
-			this->m_cLocation.X++;
-			this->m_cLocation.Y++;
-			return false;
-		}
 		return true;
 	}
 	return false;
@@ -206,6 +259,14 @@ bool Enemy::move(int direction)
 bool Enemy::checkOutOfBounds()
 {
 	if (this->levelPointer->getTile(this->m_cLocation) != ' ')
+	{
+		return true;
+	}
+	return false;
+}
+bool Enemy::checkOutOfBounds(COORD c)
+{
+	if (this->levelPointer->getTile(c) != ' ')
 	{
 		return true;
 	}

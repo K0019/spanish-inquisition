@@ -9,14 +9,17 @@ struct MenuEvent
 	Console* mainConsole;					// pointer to the main console (to write to it)
 	COORD r_curspos;						// the cursor position
 	WORD wPlayerColor = 0x0A;				// the color of player (to change in options)
-	bool bStartGame = false;				// event processor: if player selected start game
-	bool bOptions = false;					// event processor: if player selected options
-	bool bShop = false;						// event processor: if player selected shop
-	bool bHowToPlay = false;				// event processor: if player selected tutorial
-	bool bMenu = false;						// event processor: if player backed into menu
-	bool bCredits = false;					// event processor: if player selected credits
-	bool bHasPressedButton = false;			// event processor: the button has been pressed
-	bool bMinimap = true;					// event processor: if the minimap option is toggled
+	bool bCredits;							// event processor: if player selected credits
+	bool bHasPaused;
+	bool bHasPressedButton;					// event processor: the button has been pressed
+	bool bHowToPlay;						// event processor: if player selected tutorial
+	bool bMenu;								// event processor: if player backed into menu
+	bool bMinimap;							// event processor: if the minimap option is toggled
+	bool bOptions;							// event processor: if player selected options
+	bool bPausedGame;
+	bool bQuitGame;
+	bool bShop;								// event processor: if player selected shop
+	bool bStartGame;						// event processor: if player selected start game
 	unsigned int uiCreditsRollTime = 0;		// scrapped idea: animation timer for credits
 	unsigned int uiActivateDoomButton = 0;	// heehee
 	short sh_cursSel = 0;					// menu selector: stores the menu cursor's selection

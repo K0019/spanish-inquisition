@@ -15,9 +15,12 @@ void g_LoadFromFloor(short FloorNumber, std::vector<std::string> *selectionAvail
 // Loads from room data of index in red/MapData/RoomData/<index>.txt
 void g_LoadFromRoom(std::string *RoomNumber, char (*Level)[(ROOM_X + 2) * GRID_X + 2][(ROOM_Y + 2) * GRID_Y + 2], COORD gridCoords);
 
-struct SaveDataStorage
+void g_LoadOptions(unsigned short* OptionsDataArray);
+void g_SaveOptions(unsigned short* OptionsDataArray);
+
+struct DataStorage
 {
 	unsigned int g_iSaveData[9];
-	unsigned int g_iWriteData[9];
+	unsigned short g_shOptionsData[9];
 };
 #endif

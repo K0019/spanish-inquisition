@@ -1330,9 +1330,9 @@ bool EnemyRanged::updateMovement(SGameChar * player)
 			return true;
 		}
 
-		if (this->m_bMobile)
+		if (this->m_bMobile && this->m_dAttackTime <= 0.0)
 		{
-
+			return true;
 		}
 	}
 	return false;

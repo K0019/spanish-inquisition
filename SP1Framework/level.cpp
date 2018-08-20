@@ -93,6 +93,47 @@ void SLevel::generateLevel()
 		this->uncoverAll(room, roomsHaveExit);
 	}
 
+	// Add an extra door for every 6 rooms
+	int extraDoors = 0;
+	do
+	{
+		std::vector<int> directions;
+		bool isDirectionPossible[4] = { true, true, true, true };
+		COORD c;
+		c.X = rand() / (RAND_MAX / GRID_X);
+		c.Y = rand() / (RAND_MAX / GRID_Y);
+		switch (c.X)
+		{
+		case 0:
+			isDirectionPossible[2] = false;
+			break;
+		case GRID_X - 1:
+			isDirectionPossible[0] = false;
+			break;
+		}
+		switch (c.Y)
+		{
+		case 0:
+			isDirectionPossible[1] = false;
+			break;
+		case GRID_Y - 1:
+			isDirectionPossible[3] = false;
+			break;
+		}
+
+		for (int direction = 0; direction < 4; direction++)
+		{
+			if (isDirectionPossible[direction] && this->getTile(this->getCoordinatesForDoor(c.X, c.Y, direction)[0]) != '$')
+				directions.push_back(direction);
+		}
+		if (directions.empty()) continue;
+
+		COORD * doors = this->getCoordinatesForDoor(c.X, c.Y, directions[rand() / (RAND_MAX / directions.size())]);
+		this->modifyTile(doors[0], '$');
+		this->modifyTile(doors[1], '$');
+		extraDoors++;
+	} while (extraDoors < GRID_X * GRID_Y / 6);
+
 	// -----Stairs Down-----
 
 	{

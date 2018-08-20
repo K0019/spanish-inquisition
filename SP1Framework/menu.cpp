@@ -4,6 +4,17 @@
 MenuEvent::MenuEvent(Console* mainConsole)
 {
 	this->mainConsole = mainConsole;
+	this->bStartGame = false;
+	this->bOptions = false;
+	this->bShop = false;
+	this->bHowToPlay = false;
+	this->bMenu = false;
+	this->bCredits = false;
+	this->bQuitGame = false;
+	this->bHasPressedButton = false;
+	this->bPausedGame = false;
+	this->bHasPaused = false;
+	this->bMinimap = true;
 }
 
 // title banner
@@ -21,9 +32,9 @@ void MenuEvent::renderTitle()
 	ASCII[7] = "      ÛÛ²° Û²°Û²Û²°    ÛÛ²°  ÛÛ²Û²Û² Û²°  Û²°Û² Û²°   ÛÛ²°  Û²°  Û²Û²°  Û²°Û²Û²°  Û²°Û²Û²°Û²Û²°     ";
 	ASCII[8] = "     ÛÛÛÛ²°Û²°Û²ÛÛÛÛ²   ÛÛÛÛÛÛ²°Û² Û²ÛÛÛÛ²Û²°Û² Û²°  ÛÛÛÛÛÛÛÛ²ÛÛÛ²° ÛÛÛ²Û²°Û²Û²°  Û²°Û²ÛÛÛ² ÛÛÛÛ²°  ";
 	ASCII[9] = "                                                                                                    ";
-	ASCII[10] = "°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°";
+	ASCII[10] = "²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²";
 	ASCII[11] = "±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±";
-	ASCII[12] = "²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²²";
+	ASCII[12] = "°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°";
 	COORD c = this->mainConsole->getConsoleSize();
 	// This part here is meant to make the banner flexible (i.e. can fill any width higher than its own
 	for (int i = 0; i < 13; i++)
@@ -51,13 +62,13 @@ void MenuEvent::renderTitle()
 					ASCII[i] = " " + ASCII[i];
 					break;
 				case 10:
-					ASCII[i] = "°" + ASCII[i];
+					ASCII[i] = "²" + ASCII[i];
 					break;
 				case 11:
 					ASCII[i] = "±" + ASCII[i];
 					break;
 				case 12:
-					ASCII[i] = "²" + ASCII[i];
+					ASCII[i] = "°" + ASCII[i];
 					break;
 				}
 			}
@@ -80,19 +91,19 @@ void MenuEvent::renderTitle()
 					ASCII[i] += " ";
 					break;
 				case 10:
-					ASCII[i] += "°";
+					ASCII[i] += "²";
 					break;
 				case 11:
 					ASCII[i] += "±";
 					break;
 				case 12:
-					ASCII[i] += "²";
+					ASCII[i] += "°";
 					break;
 				}
 			}
 			c.Y = 2 + i;
 			if (!(i < 10))
-				this->mainConsole->writeToBuffer(c, ASCII[i][j], 0x80);
+				this->mainConsole->writeToBuffer(c, ASCII[i][j], 0x06);
 			else
 				this->mainConsole->writeToBuffer(c, ASCII[i][j], 0x64);
 			c.X++;
@@ -105,23 +116,28 @@ void MenuEvent::renderMenu()
 {
 	COORD c;
 	c.X = this->mainConsole->getConsoleSize().X / 5 + 2;
-	c.Y = this->mainConsole->getConsoleSize().Y / 10 * 8;
-	this->mainConsole->writeToBuffer(c, "PLAY", 0x0f);
+	c.Y = this->mainConsole->getConsoleSize().Y / 10 * 8 - 1;
+	this->mainConsole->writeToBuffer(c, "   PLAY    ", 0x0f);
 	c.Y++;
 	this->mainConsole->writeToBuffer(c, "HOW TO PLAY", 0x0f);
 	c.Y++;
-	this->mainConsole->writeToBuffer(c, "SHOP", 0x0f);
+	this->mainConsole->writeToBuffer(c, "   SHOP    ", 0x0f);
 	c.Y++;
-	this->mainConsole->writeToBuffer(c, "OPTIONS", 0x0f);
+	this->mainConsole->writeToBuffer(c, "  OPTIONS  ", 0x0f);
 	c.Y++;
-	this->mainConsole->writeToBuffer(c, "CREDITS", 0x0f);
+	this->mainConsole->writeToBuffer(c, "  CREDITS  ", 0x0f);
+	c.Y++;
+	this->mainConsole->writeToBuffer(c, "   QUIT    ", 0x0f);
 }
 
 // the cursor in the main menu
 void MenuEvent::renderCursor()
 {
 	COORD c = r_curspos;
-	this->mainConsole->writeToBuffer(c, ">", 0x0f);
+	this->mainConsole->writeToBuffer(c, "[", 0x0f);
+	c.X += 14;
+	this->mainConsole->writeToBuffer(c, "]", 0x0f);
+	c.X -= 14;
 	if (DEBUG)
 	{
 		c.X -= 2;
@@ -192,15 +208,24 @@ void MenuEvent::renderTutorialDetails()
 	c.Y = this->mainConsole->getConsoleSize().Y / 10 + 2;
 	this->mainConsole->writeToBuffer(c, "In-game", 0x0f);
 	c.Y += 2;
-	this->mainConsole->writeToBuffer(c, "@@", 0x0A);
+	this->mainConsole->writeToBuffer(c, "@", 0x0A);
 	c.X += 2;
 	this->mainConsole->writeToBuffer(c, " - You", 0x0f);
 	c.X -= 2;
 	c.Y++;
-	this->mainConsole->writeToBuffer(c, "tt", 0x01);
+	this->mainConsole->writeToBuffer(c, "b", 0x01);
 	c.X += 2;
-	this->mainConsole->writeToBuffer(c, " - Enemy", 0x0f);
+	this->mainConsole->writeToBuffer(c, " - Bandit", 0x0f);
 	c.X -= 2;
+	c.Y++;
+	this->mainConsole->writeToBuffer(c, "(Melee Enemies)", 0x0f);
+	c.Y++;
+	this->mainConsole->writeToBuffer(c, "M", 0x01);
+	c.X += 2;
+	this->mainConsole->writeToBuffer(c, " - Mage", 0x0f);
+	c.X -= 2;
+	c.Y++;
+	this->mainConsole->writeToBuffer(c, " - Ranged Enemy", 0x0f);
 	c.Y++;
 	this->mainConsole->writeToBuffer(c, "#&_ ", 0x01);
 	c.X += 4;

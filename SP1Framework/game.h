@@ -45,6 +45,7 @@ enum EGAMESTATES /* FRAMEWORK */
 	S_HOWTOPLAY,
 	S_CREDITS,
     S_GAME,
+	S_PAUSED,
     S_COUNT
 };
 //	DO NOT DELETE: IMPORTANT
@@ -69,16 +70,22 @@ void credits();				// credits logic
 void resetLevel(int floor); // Generate a new map, with input floor for what to put inside the rooms
 void controlPlayer();		// moves the character, collision detection, physics, etc
 void processUserInput();	// checks if you should change states or do something else with the game, e.g. pause, exit
-void clearScreen();			// clears the current screen and draw from scratch 
 void checkHitPellets();		// Check if pellets have hit anything
 void processMenuEvent();	// processes what the player has done in Menu
 void doomButton();			// heehee
 void processOptionsEvent();	// processes what the player has done in Options
+void detectPauseMenuProc();
+void pauseScreen();
+void changedRoomUpdate(); // Stuff to do when the player exits current room
+bool loadEnemiesFromRoom(); // Load all enemies from the room that the player entered
+void addEnemy(EnemyMelee * enemy); // Add an enemy to the enemy list
+void addEnemy(EnemyRanged * enemy); // Add an enemy to the enemy list
 
 /*
 	THE RENDER FUNCTIONS
 */
 
+void clearScreen();			// clears the current screen and draw from scratch 
 void renderSplashScreen();	// renders the splash screen
 void renderMainMenu();		// renders the main menu
 void renderTutorial();		// renders the how to play screen
@@ -86,6 +93,7 @@ void renderShop();			// renders the shop
 void renderOptions();		// renders the options items
 void renderCredits();		// renders credits
 void renderGame();			// renders the game stuff
+void renderPause();
 void renderScore();			// render the current score from
 void renderCharacter();		// renders the character into the buffer
 void renderFramerate();		// renders debug information, frame rate, elapsed time, etc
@@ -97,11 +105,5 @@ void renderEnemy();			// renders all enemies to the buffer
 void renderStat();			//renders the player stats on the right side of the console
 void render(COORD c, LPCSTR text, LPCSTR text2, WORD color); // Render sprite to screen
 void render(COORD c, std::string& text, std::string& text2, WORD color); // Render sprite to screen
-
-// can you like... not add things here
-
-bool loadEnemiesFromRoom(); // Load all enemies from the room that the player entered
-void addEnemy(EnemyMelee * enemy); // Add an enemy to the enemy list
-void addEnemy(EnemyRanged * enemy); // Add an enemy to the enemy list
 
 #endif // _GAME_H

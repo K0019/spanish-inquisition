@@ -70,6 +70,9 @@ bool loadEnemiesFromRoom(); // Load all enemies from the room that the player en
 void addEnemy(EnemyMelee * enemy); // Add an enemy to the enemy list
 void addEnemy(EnemyRanged * enemy); // Add an enemy to the enemy list
 
+void setUpMoveScreen(); // Setup variables to move render screen
+void moveScreen(); // Moves the render screen
+
 /*
 	THE RENDER FUNCTIONS
 */

@@ -11,7 +11,9 @@ double	g_dDeltaTime;
 int		g_iCurrentFrameCount, g_iLastFrameCount, g_iLastMeasuredSecond;
 double	g_dAccurateElapsedTime;
 bool	g_abKeyPressed[K_COUNT];
-COORD	r_cRenderOffset; // To be used for level rendering, tile coordinates
+COORD	r_cRenderOffset, r_cTargetRenderOffset; // Used for level rendering, tile coordinates
+double r_dRenderTime, r_dTargetRenderTime;
+CStopWatch * r_cswRenderTimer;
 
 int		r_iMoveDirection;
 double	r_dMoveTime;
@@ -48,7 +50,7 @@ void init( void )
 
 	// sets the initial state for the game
 	g_eGameState = S_SPLASHSCREEN;
-	if (DEBUG) g_eGameState = S_MENU;
+	if (DEBUG) g_eGameState = S_GAME;
 
 	g_bHasShot = false;
 	g_sEntities.g_sChar.m_cLocation.X = 2 + (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
@@ -64,8 +66,9 @@ void init( void )
 		addEnemy(UNIQUE_ENEMY_TESTRANGEDMOBILE);
 		g_sEntities.g_sChar.m_bInBattle = true;
 	}*/
-	r_cRenderOffset.X = 1 + g_sEntities.g_sChar.m_cRoom.X * (ROOM_X + 2);
-	r_cRenderOffset.Y = 1 + g_sEntities.g_sChar.m_cRoom.Y * (ROOM_Y + 2);
+	r_cRenderOffset.X = r_cTargetRenderOffset.X = 1 + g_sEntities.g_sChar.m_cRoom.X * (ROOM_X + 2);
+	r_cRenderOffset.Y = r_cTargetRenderOffset.Y = 1 + g_sEntities.g_sChar.m_cRoom.Y * (ROOM_Y + 2);
+	r_dTargetRenderTime = 0.8;
 	g_mEvent.r_curspos.X = g_Console.getConsoleSize().X / 5;
 	g_mEvent.r_curspos.Y = g_Console.getConsoleSize().Y / 10 * 8 - 1;
 	g_sLevel.floor = 1;
@@ -205,15 +208,25 @@ void splashScreenWait()		// waits for time to pass in splash screen
 
 void gameplay()            // gameplay logic
 {
-	//processUserInput();	// checks if you should change states or do something else with the game, e.g. pause, exit
-	detectPauseMenuProc();
-	controlPlayer();	// moves the character, collision detection, physics, etc
-	playerShoot(); // checks if the player should shoot
-	checkHitPellets(); // checks if the pellets have hit anything, and update stats accordingly
-	g_sEntities.updatePellets(); // update locations of pellets
-	checkHitPellets(); // checks if the pellets have hit anything, and update stats accordingly
-	g_sEntities.updateEnemies(); // update locations of enemies and add pellets of the enemies'
-	// sound can be played here too.
+	if (r_cRenderOffset.X == r_cTargetRenderOffset.X && r_cRenderOffset.Y == r_cTargetRenderOffset.Y)
+	{
+		//processUserInput();	// checks if you should change states or do something else with the game, e.g. pause, exit
+		detectPauseMenuProc();
+		controlPlayer();	// moves the character, collision detection, physics, etc
+		if (r_cRenderOffset.X == r_cTargetRenderOffset.X && r_cRenderOffset.Y == r_cTargetRenderOffset.Y)
+		{
+			playerShoot(); // checks if the player should shoot
+			checkHitPellets(); // checks if the pellets have hit anything, and update stats accordingly
+			g_sEntities.updatePellets(); // update locations of pellets
+			checkHitPellets(); // checks if the pellets have hit anything, and update stats accordingly
+			g_sEntities.updateEnemies(); // update locations of enemies and add pellets of the enemies'
+			// sound can be played here too.
+		}
+	}
+	else
+	{
+		moveScreen();
+	}
 }
 
 void menuLogic()
@@ -275,9 +288,11 @@ void controlPlayer()
 				bSomethingHappened = true;
 				if (g_sEntities.g_sChar.m_cLocation.X < r_cRenderOffset.X)
 				{
-					r_cRenderOffset.X -= (ROOM_X + 2);
+					r_cTargetRenderOffset.X -= (ROOM_X + 2);
+					//r_cRenderOffset.X -= (ROOM_X + 2);
 					g_sEntities.g_sChar.m_cLocation.X--;
 					changedRoomUpdate();
+					setUpMoveScreen();
 				}
 			}
 		}
@@ -315,9 +330,11 @@ void controlPlayer()
 				bSomethingHappened = true;
 				if (g_sEntities.g_sChar.m_cLocation.Y < r_cRenderOffset.Y)
 				{
-					r_cRenderOffset.Y -= (ROOM_Y + 2);
+					r_cTargetRenderOffset.Y -= (ROOM_Y + 2);
+					//r_cRenderOffset.Y -= (ROOM_Y + 2);
 					g_sEntities.g_sChar.m_cLocation.Y--;
 					changedRoomUpdate();
+					setUpMoveScreen();
 				}
 			}
 		}
@@ -355,9 +372,11 @@ void controlPlayer()
 				bSomethingHappened = true;
 				if (g_sEntities.g_sChar.m_cLocation.X >= r_cRenderOffset.X + ROOM_X + 2)
 				{
-					r_cRenderOffset.X += (ROOM_X + 2);
+					r_cTargetRenderOffset.X += (ROOM_X + 2);
+					//r_cRenderOffset.X += (ROOM_X + 2);
 					g_sEntities.g_sChar.m_cLocation.X++;
 					changedRoomUpdate();
+					setUpMoveScreen();
 				}
 			}
 		}
@@ -395,9 +414,11 @@ void controlPlayer()
 				bSomethingHappened = true;
 				if (g_sEntities.g_sChar.m_cLocation.Y >= r_cRenderOffset.Y + ROOM_Y + 2)
 				{
-					r_cRenderOffset.Y += (ROOM_Y + 2);
+					r_cTargetRenderOffset.Y += (ROOM_Y + 2);
+					//r_cRenderOffset.Y += (ROOM_Y + 2);
 					g_sEntities.g_sChar.m_cLocation.Y++;
 					changedRoomUpdate();
+					setUpMoveScreen();
 				}
 			}
 		}
@@ -659,6 +680,11 @@ void renderCharacter()
 {
 	// Draw the location of the character
 	COORD c = g_sEntities.g_sChar.getRealCoords();
+	c.X += (r_cTargetRenderOffset.Y - r_cRenderOffset.Y) << 2;
+	c.Y += (r_cTargetRenderOffset.X - r_cRenderOffset.X) << 1;
+
+	if (c.X < 1 || c.X >= 1 + ((ROOM_Y + 2) << 2) || c.Y < 1 || c.Y >= 1 + ((ROOM_X + 2) << 1)) return;
+
 	WORD charColor = g_mEvent.wPlayerColor;
 	//WORD charColor = 0x0A;
 	g_Console.writeToBuffer(c, "@@@@", charColor);
@@ -829,6 +855,38 @@ void playerShoot()
 			}
 		}
 		g_adBounceTime[K_SHOOTUP] = g_dElapsedTime;
+	}
+}
+
+void setUpMoveScreen()
+{
+	r_cswRenderTimer = new CStopWatch;
+	r_cswRenderTimer->startTimer();
+	r_dRenderTime = 0.0;
+}
+void moveScreen()
+{
+	r_dRenderTime += r_cswRenderTimer->getElapsedTime();
+	if (r_cRenderOffset.X == r_cTargetRenderOffset.X) // If moving left or right
+	{
+		if (r_dRenderTime >= (r_dTargetRenderTime / (ROOM_Y + 2)))
+		{
+			r_cRenderOffset.Y += (r_cTargetRenderOffset.Y > r_cRenderOffset.Y) ? (1) : (-1);
+			r_dRenderTime -= r_dTargetRenderTime / (ROOM_Y + 2);
+		}
+	}
+	else // If moving up or down
+	{
+		if (r_dRenderTime >= (r_dTargetRenderTime / (ROOM_X + 2)))
+		{
+			r_cRenderOffset.X += (r_cTargetRenderOffset.X > r_cRenderOffset.X) ? (1) : (-1);
+			r_dRenderTime -= r_dTargetRenderTime / (ROOM_X + 2);
+		}
+	}
+
+	if (r_cRenderOffset.X == r_cTargetRenderOffset.X && r_cRenderOffset.Y == r_cTargetRenderOffset.Y)
+	{
+		delete r_cswRenderTimer;
 	}
 }
 
@@ -1051,7 +1109,11 @@ void renderEnemy()
 	for (auto& enemy : g_sEntities.m_vEnemy)
 	{
 		if (enemy->isDying()) continue;
-		render(enemy->getRealLocation(), enemy->getIdentifier()[0], enemy->getIdentifier()[1], enemy->getColor());
+		COORD c = enemy->getRealLocation();
+		c.X += (r_cTargetRenderOffset.Y - r_cRenderOffset.Y) << 2;
+		c.Y += (r_cTargetRenderOffset.X - r_cRenderOffset.X) << 1;
+		if (c.X < 1 || c.X >= 1 + ((ROOM_Y + 2) << 2) || c.Y < 1 || c.Y >= 1 + ((ROOM_X + 2) << 1)) continue;
+		render(c, enemy->getIdentifier()[0], enemy->getIdentifier()[1], enemy->getColor());
 	}
 }
 void renderDeadEnemy()
@@ -1269,9 +1331,9 @@ void changedRoomUpdate()
 bool loadEnemiesFromRoom()
 {
 	bool roomHasEnemies = false;
-	for (int row = r_cRenderOffset.X; row < r_cRenderOffset.X + ROOM_X + 2; row++)
+	for (int row = r_cTargetRenderOffset.X; row < r_cTargetRenderOffset.X + ROOM_X + 2; row++)
 	{
-		for (int column = r_cRenderOffset.Y; column < r_cRenderOffset.Y + ROOM_Y + 2; column++)
+		for (int column = r_cTargetRenderOffset.Y; column < r_cTargetRenderOffset.Y + ROOM_Y + 2; column++)
 		{
 			COORD c = fastCoord(row, column);
 			switch (g_sLevel.level[row][column])

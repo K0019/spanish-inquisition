@@ -4,11 +4,6 @@
 MenuEvent::MenuEvent(Console* mainConsole)
 {
 	this->mainConsole = mainConsole;
-	this->bStartGame = false;
-	this->bOptions = false;
-	this->bShop = false;
-	this->bHowToPlay = false;
-	this->bMenu = false;
 	this->bCredits = false;
 	this->bQuitGame = false;
 	this->bHasPressedButton = false;
@@ -131,7 +126,7 @@ void MenuEvent::renderMenu()
 }
 
 // the cursor in the main menu
-void MenuEvent::renderCursor()
+void MenuEvent::renderMenuCursor()
 {
 	COORD c = r_curspos;
 	this->mainConsole->writeToBuffer(c, "[", 0x0f);
@@ -364,13 +359,13 @@ void MenuEvent::renderDoomButtonBrackets()
 }
 
 //UNDONE
-void MenuEvent::renderColourOption()
+void MenuEvent::renderColourOption(unsigned short playersoption)
 {
 
 }
 
 //UNDONE
-void MenuEvent::renderOtherOptions()
+void MenuEvent::renderMinimapOption(unsigned short playersoption)
 {
 
 }

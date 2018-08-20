@@ -17,7 +17,6 @@ void g_LoadFromRoom(std::string *RoomNumber, char (*Level)[(ROOM_X + 2) * GRID_X
 
 void g_LoadOptions(unsigned short* OptionsDataArray);
 void g_SaveOptions(unsigned short* OptionsDataArray);
-
 struct DataStorage
 {
 	unsigned int g_iSaveData[9];

@@ -131,9 +131,8 @@
     <Text Include="..\res\MapData\RoomData\0d.txt" />
     <Text Include="..\res\MapData\RoomData\0e.txt" />
     <Text Include="..\res\MapData\RoomData\0f.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\res\SaveData\saves.SAVE" />
+    <Text Include="..\res\SaveData\options.txt" />
+    <Text Include="..\res\SaveData\saves.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

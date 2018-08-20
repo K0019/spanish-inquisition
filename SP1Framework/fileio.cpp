@@ -80,7 +80,13 @@ void g_LoadOptions(unsigned short* OptionsDataArray)
 	std::ifstream PlayerOptions("../res/SaveData/options.txt");
 	if (PlayerOptions.is_open())
 	{
-
+		int i = 0;
+		for (std::string j; std::getline(PlayerOptions, j);)
+		{
+			OptionsDataArray[i] = std::stoi(j);
+			i++;
+		}
+		PlayerOptions.close();
 	}
 }
 
@@ -89,6 +95,13 @@ void g_SaveOptions(unsigned short* OptionsDataArray)
 	std::ofstream PlayerOptions("../res/SaveData/options.txt");
 	if (PlayerOptions.is_open())
 	{
-
+		if (PlayerOptions.is_open())
+		{
+			for (int i = 0; i < 9; i++)
+			{
+				PlayerOptions << OptionsDataArray[i] << '\n';
+			}
+			PlayerOptions.close();
+		}
 	}
 }

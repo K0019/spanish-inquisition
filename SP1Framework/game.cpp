@@ -554,7 +554,7 @@ void controlPlayer()
 		{
 			if (g_abKeyPressed[i])
 			{
-				g_adBounceTime[i] = g_dElapsedTime + 0.250; //0.250 acts as the movement delay of the player, decreasing it makes the player go faster
+				g_adBounceTime[i] = g_dElapsedTime + 0.200; //0.200 acts as the movement delay of the player, decreasing it makes the player go faster
 				if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_bHasWeapon) // Index 7 (Blue Feather): Decrease movement delay by 20/30/40/50%
 				{
 					switch (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_iWeaponLevel)
@@ -683,9 +683,20 @@ void processOptionsEvent()
 
 void detectPauseMenuProc()
 {
-	if (g_abKeyPressed[K_ESCAPE])
+	if (g_abKeyPressed[K_ESCAPE] && !g_mEvent.bHasPaused)
 	{
-		g_mEvent.bPausedGame = !g_mEvent.bPausedGame;
+		g_mEvent.bHasPaused = true;
+		//g_mEvent.bPausedGame = !g_mEvent.bPausedGame;
+	}
+	else if (!g_abKeyPressed[K_ESCAPE] && g_mEvent.bHasPaused)
+	{
+		g_mEvent.bPausedGame = true;
+	}
+	else if (g_abKeyPressed[K_ESCAPE] && g_mEvent.bHasPaused)
+	{
+		g_eGameState = S_GAME;
+		g_mEvent.bPausedGame = false;
+		g_mEvent.bHasPaused = false;
 	}
 	if (g_mEvent.bPausedGame)
 	{

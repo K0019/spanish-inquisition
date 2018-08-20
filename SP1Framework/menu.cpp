@@ -4,6 +4,17 @@
 MenuEvent::MenuEvent(Console* mainConsole)
 {
 	this->mainConsole = mainConsole;
+	this->bStartGame = false;
+	this->bOptions = false;
+	this->bShop = false;
+	this->bHowToPlay = false;
+	this->bMenu = false;
+	this->bCredits = false;
+	this->bQuitGame = false;
+	this->bHasPressedButton = false;
+	this->bPausedGame = false;
+	this->bHasPaused = false;
+	this->bMinimap = true;
 }
 
 // title banner

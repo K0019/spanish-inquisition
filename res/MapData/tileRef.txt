@@ -3,6 +3,7 @@
 $ = Door
 & = Stairs
 * = Stone
+! = Invisible Stone
 b = Bandit (melee enemy)
 m = Mage (ranged enemy)
 k = Knight (melee enemy)

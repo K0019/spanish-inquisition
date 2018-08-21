@@ -48,16 +48,20 @@ void init(void)
 	g_iCurrentFrameCount = g_iLastMeasuredSecond = 0;
 	g_adBounceTime[K_SHOOTUP] = 0.0;
 	for (int i = 0; i < K_COUNT; i++) g_adBounceTime[i] = 0.0;
-	g_eRestartGame = false;
 	// sets the initial state for the game
 	g_eGameState = S_SPLASHSCREEN;
 	if (DEBUG) g_eGameState = S_MENU;
+	if (g_eRestartGame) g_eGameState = S_GAME;
+	g_eRestartGame = false;
 
+	g_sEntities.clearEnemies();
+	g_sEntities.clearPellets();
 	g_bHasShot = false;
 	g_sEntities.g_sChar.m_cLocation.X = 2 + (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
 	g_sEntities.g_sChar.m_cLocation.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
 	g_sLevel.playerStartRoom.X = GRID_X >> 1;
 	g_sLevel.playerStartRoom.Y = GRID_Y >> 1;
+	g_sEntities.g_sChar.m_iPlayerHealth = g_sEntities.g_sChar.m_iMaxHealth = 10;
 	g_sEntities.g_sChar.m_cRoom = g_sLevel.playerStartRoom;
 	/*if (DEBUG)
 	{
@@ -208,7 +212,7 @@ void render(CStopWatch * timer)
 
 void splashScreenWait()		// waits for time to pass in splash screen
 {
-	processUserInput(); // checks if you should change states or do something else with the game, e.g. pause, exit
+	//processUserInput(); // checks if you should change states or do something else with the game, e.g. pause, exit
 	if (g_dAccurateElapsedTime > 3.0) // wait for 3 seconds to switch to game mode, else do nothing
 		g_eGameState = S_MENU;
 }
@@ -674,13 +678,6 @@ void controlPlayer()
 	}
 }
 
-void processUserInput()
-{
-	// quits the game if player hits the escape key
-	if (g_abKeyPressed[K_ESCAPE])
-		g_bQuitGame = true;
-}
-
 void clearScreen()
 {
 	// Clears the buffer with this colour attribute
@@ -717,10 +714,11 @@ void doomButton()
 
 void detectPauseMenuProc()
 {
-	if (g_abKeyPressed[K_ESCAPE])
+	if (g_abKeyPressed[K_ESCAPE] && g_adBounceTime[K_ENTER] < g_dElapsedTime)
 	{
 		/*g_mEvent.bHasPaused = true;*/
 		g_mEvent.bPausedGame = !g_mEvent.bPausedGame;
+		g_adBounceTime[K_ENTER] = g_dElapsedTime + 0.25;
 	}
 	if (g_mEvent.bPausedGame)
 		g_eGameState = S_PAUSED;
@@ -785,7 +783,7 @@ void renderScore()
 	std::string g_sScore = std::to_string(LoadedScore);
 	COORD c = g_Console.getConsoleSize();
 	c.X -= (SHORT)g_sScore.length();
-	c.Y -= 1;
+	c.Y = 3;
 	g_Console.writeToBuffer(c, g_sScore, 0x0f);
 	c.X -= 7;
 	g_Console.writeToBuffer(c, "Score: ", 0x0f);
@@ -1523,33 +1521,7 @@ void CharacterDeath()
 			g_eRestartGame = true;
 			if (g_eRestartGame == true)
 			{
-				g_sEntities.g_sChar.m_iPlayerHealth = 10;
-				g_sEntities.g_sChar.m_iPlayerScore = 0;
-				g_sEntities.g_sChar.m_iMaxHealth = 10;
-				g_sEntities.g_sChar.m_iPlayerDamage = 3;
-				g_bHasShot = false;
-				g_sEntities.g_sChar.m_cLocation.X = 2 + (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
-				g_sEntities.g_sChar.m_cLocation.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
-				g_sLevel.playerStartRoom.X = GRID_X >> 1;
-				g_sLevel.playerStartRoom.Y = GRID_Y >> 1;
-				g_sEntities.g_sChar.m_cRoom = g_sLevel.playerStartRoom;
-				//if (DEBUG) g_sEntities.g_sChar.m_bInBattle = true;
-				r_cRenderOffset.X = 1 + g_sEntities.g_sChar.m_cRoom.X * (ROOM_X + 2);
-				r_cRenderOffset.Y = 1 + g_sEntities.g_sChar.m_cRoom.Y * (ROOM_Y + 2);
-				g_mEvent.r_menucurspos.X = g_Console.getConsoleSize().X / 5;
-				g_mEvent.r_menucurspos.Y = g_Console.getConsoleSize().Y / 10 * 8;
-				g_sLevel.floor = 1;
-				g_sLevel.generateLevel();
-				g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
-				COORD c;
-				c.X = (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
-				c.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
-				//addEnemy(UNIQUE_ENEMY_MELEETEST);
-				//addEnemy(UNIQUE_ENEMY_RANGEDTEST);
-				// sets the width, height and the font name to use in the console
-				g_Console.setConsoleFont(0, 16, L"Consolas");
-				g_LoadFromSave(currDataStorage.g_iSaveData);
-				g_sEntities.clearEnemies();
+				init();
 			}
 		}
 		else if (g_abKeyPressed[K_ENTER])
@@ -1585,38 +1557,33 @@ void CharacterDeath()
 		}
 		else if(g_abKeyPressed[K_V])
 		{
-			//g_eGameState = S_MENU;
-			//g_sEntities.g_sChar.m_iPlayerHealth = 10;
-			//g_sEntities.g_sChar.m_iPlayerScore = 0;
-			//g_sEntities.g_sChar.m_iMaxHealth = 10;
-			//g_sEntities.g_sChar.m_iPlayerDamage = 3;
-			//g_bHasShot = false;
-			//g_sEntities.g_sChar.m_cLocation.X = 2 + (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
-			//g_sEntities.g_sChar.m_cLocation.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
-			//g_sLevel.playerStartRoom.X = GRID_X >> 1;
-			//g_sLevel.playerStartRoom.Y = GRID_Y >> 1;
-			//g_sEntities.g_sChar.m_cRoom = g_sLevel.playerStartRoom;
-			////if (DEBUG) g_sEntities.g_sChar.m_bInBattle = true;
-			//r_cRenderOffset.X = 1 + g_sEntities.g_sChar.m_cRoom.X * (ROOM_X + 2);
-			//r_cRenderOffset.Y = 1 + g_sEntities.g_sChar.m_cRoom.Y * (ROOM_Y + 2);
-			//g_mEvent.r_curspos.X = g_Console.getConsoleSize().X / 5;
-			//g_mEvent.r_curspos.Y = g_Console.getConsoleSize().Y / 10 * 8;
-			//g_sLevel.floor = 1;
-			//g_sLevel.generateLevel();
-			//g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
-			//COORD c;
-			//c.X = (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
-			//c.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
-			////addEnemy(UNIQUE_ENEMY_MELEETEST);
-			////addEnemy(UNIQUE_ENEMY_RANGEDTEST);
-			//// sets the width, height and the font name to use in the console
-			//g_Console.setConsoleFont(0, 16, L"Consolas");
-			//g_LoadFromSave(saveDataStorage.g_iSaveData);
-			//g_sEntities.clearEnemies();
+			g_eGameState = S_MENU;
+			g_sEntities.g_sChar.m_iPlayerHealth = 10;
+			g_sEntities.g_sChar.m_iPlayerScore = 0;
+			g_sEntities.g_sChar.m_iMaxHealth = 10;
+			g_sEntities.g_sChar.m_iPlayerDamage = 3;
+			g_bHasShot = false;
+			g_sEntities.g_sChar.m_cLocation.X = 2 + (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
+			g_sEntities.g_sChar.m_cLocation.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
+			g_sLevel.playerStartRoom.X = GRID_X >> 1;
+			g_sLevel.playerStartRoom.Y = GRID_Y >> 1;
+			g_sEntities.g_sChar.m_cRoom = g_sLevel.playerStartRoom;
+			//if (DEBUG) g_sEntities.g_sChar.m_bInBattle = true;
+			r_cRenderOffset.X = 1 + g_sEntities.g_sChar.m_cRoom.X * (ROOM_X + 2);
+			r_cRenderOffset.Y = 1 + g_sEntities.g_sChar.m_cRoom.Y * (ROOM_Y + 2);
+			g_sLevel.floor = 1;
+			g_sLevel.generateLevel();
+			g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
+			COORD c;
+			c.X = (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
+			c.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
+			// sets the width, height and the font name to use in the console
+			g_sEntities.clearEnemies();
 		}
 		else if (g_abKeyPressed[K_ESCAPE])
 		{
 			g_bQuitGame = true;
 		}
+		g_eRestartGame = false;
 	}
 }

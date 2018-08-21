@@ -64,7 +64,7 @@ void menuNav();
 void submenuNav();
 void resetLevel(int floor); // Generate a new map, with input floor for what to put inside the rooms
 void controlPlayer();		// moves the character, collision detection, physics, etc
-void processUserInput();	// checks if you should change states or do something else with the game, e.g. pause, exit
+//void processUserInput();	// checks if you should change states or do something else with the game, e.g. pause, exit
 void checkHitPellets();		// Check if pellets have hit anything
 void doomButton();			// heehee
 void detectPauseMenuProc();

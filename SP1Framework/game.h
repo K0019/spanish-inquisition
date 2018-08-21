@@ -25,6 +25,7 @@ enum EKEYS /* FRAMEWORK */
     K_DOWN,
     K_LEFT,
     K_RIGHT,
+	K_V,
 	K_SHOOTUP,
 	K_SHOOTRIGHT,
 	K_SHOOTDOWN,
@@ -55,6 +56,7 @@ void getInput    ( void ); /* FRAMEWORK */ // get input from player
 void update      ( CStopWatch * timer, double missedTime ); /* FRAMEWORK */ // update the game and the state of the game
 void render      ( CStopWatch * timer ); /* FRAMEWORK */ // renders the current state of the game to the console
 void shutdown    ( void ); /* FRAMEWORK */ // do clean up, free memory
+void RestartGame();
 
 /*
 	THE UPDATE FUNCTIONS
@@ -78,6 +80,7 @@ void checkHitPellets(); // Check if pellets have hit anything
 void processMenuEvent();
 void doomButton();
 void processOptionsEvent();
+void CharacterDeath();
 
 /*
 	THE RENDER FUNCTIONS

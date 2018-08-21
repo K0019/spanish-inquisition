@@ -50,7 +50,7 @@ void init( void )
 
 	// sets the initial state for the game
 	g_eGameState = S_SPLASHSCREEN;
-	if (DEBUG) g_eGameState = S_GAME;
+	if (DEBUG) g_eGameState = S_MENU;
 
 	g_bHasShot = false;
 	g_sEntities.g_sChar.m_cLocation.X = 2 + (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
@@ -450,17 +450,31 @@ void controlPlayer()
 			}
 			case '1':
 			{
-				g_sEntities.g_sChar.addConsumable(true, 1);
-				COORD c = g_sEntities.g_sChar.m_cLocation;
-				g_sLevel.modifyTile(c, '\0');
-				break;
+				if (g_sEntities.g_sChar.m_iPlayerHealth == g_sEntities.g_sChar.m_iMaxHealth)
+				{
+					break;
+				}
+				else
+				{
+					g_sEntities.g_sChar.addConsumable(true, 1);
+					COORD c = g_sEntities.g_sChar.m_cLocation;
+					g_sLevel.modifyTile(c, '\0');
+					break;
+				}
 			}
 			case '2':
 			{
-				g_sEntities.g_sChar.addConsumable(true, 2);
-				COORD c = g_sEntities.g_sChar.m_cLocation;
-				g_sLevel.modifyTile(c, '\0');
-				break;
+				if (g_sEntities.g_sChar.m_iPlayerHealth == g_sEntities.g_sChar.m_iMaxHealth)
+				{
+					break;
+				}
+				else
+				{
+					g_sEntities.g_sChar.addConsumable(true, 2);
+					COORD c = g_sEntities.g_sChar.m_cLocation;
+					g_sLevel.modifyTile(c, '\0');
+					break;
+				}
 			}
 			case '3':
 			{
@@ -1233,10 +1247,34 @@ void checkHitPellets()
 		// Check collision with rock
 		if (g_sLevel.getTile(pellet->m_cLocation) == '*')
 		{
-			pellet->m_bHit = true;
-			pellet->m_bHitReason = pellet::P_ROCK;
-			pellet++;
-			continue;
+			if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[0].m_bHasWeapon == true)
+			{
+				if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[0].m_iWeaponLevel == 3)
+				{
+					pellet->m_bHit = false;
+				}
+			}
+			else
+			{
+				pellet->m_bHit = true;
+				pellet->m_bHitReason = pellet::P_ROCK;
+				pellet++;
+				continue;
+			}
+		}
+		else if (g_sLevel.getTile(pellet->m_cLocation) == '!') //Collision with invisible rock
+		{
+			if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[0].m_bHasWeapon == true) //Index 0 (Heaven Cracker): Player's pellets can pass through invisible rocks
+			{
+				pellet->m_bHit = false;
+			}
+			else
+			{
+				pellet->m_bHit = true;
+				pellet->m_bHitReason = pellet::P_FLOOR;
+				pellet++;
+				continue;
+			}
 		}
 
 		// Check collision with player, if enemy pellet

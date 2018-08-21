@@ -235,6 +235,24 @@
     <Text Include="..\res\MapData\RoomData\NormalRooms\17.txt">
       <Filter>Resource Files\MapData\RoomData\NormalRooms</Filter>
     </Text>
+    <Text Include="..\res\MapData\RoomData\NormalRooms\18.txt">
+      <Filter>Resource Files\MapData\RoomData\NormalRooms</Filter>
+    </Text>
+    <Text Include="..\res\MapData\RoomData\ItemRooms\19.txt">
+      <Filter>Resource Files\MapData\RoomData\ItemRooms</Filter>
+    </Text>
+    <Text Include="..\res\MapData\RoomData\NormalRooms\1a.txt">
+      <Filter>Resource Files\MapData\RoomData\NormalRooms</Filter>
+    </Text>
+    <Text Include="..\res\MapData\RoomData\NormalRooms\1b.txt">
+      <Filter>Resource Files\MapData\RoomData\NormalRooms</Filter>
+    </Text>
+    <Text Include="..\res\MapData\RoomData\NormalRooms\1c.txt">
+      <Filter>Resource Files\MapData\RoomData\NormalRooms</Filter>
+    </Text>
+    <Text Include="..\res\MapData\RoomData\ItemRooms\1d.txt">
+      <Filter>Resource Files\MapData\RoomData\ItemRooms</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\res\SaveData\saves.SAVE">

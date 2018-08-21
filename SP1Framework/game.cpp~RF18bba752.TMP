@@ -11,9 +11,7 @@ double	g_dDeltaTime;
 int		g_iCurrentFrameCount, g_iLastFrameCount, g_iLastMeasuredSecond;
 double	g_dAccurateElapsedTime;
 bool	g_abKeyPressed[K_COUNT];
-COORD	r_cRenderOffset, r_cTargetRenderOffset; // Used for level rendering, tile coordinates
-double r_dRenderTime, r_dTargetRenderTime;
-CStopWatch * r_cswRenderTimer;
+COORD	r_cRenderOffset; // To be used for level rendering, tile coordinates
 
 int		r_iMoveDirection;
 double	r_dMoveTime;
@@ -66,13 +64,11 @@ void init( void )
 		addEnemy(UNIQUE_ENEMY_TESTRANGEDMOBILE);
 		g_sEntities.g_sChar.m_bInBattle = true;
 	}*/
-	r_cRenderOffset.X = r_cTargetRenderOffset.X = 1 + g_sEntities.g_sChar.m_cRoom.X * (ROOM_X + 2);
-	r_cRenderOffset.Y = r_cTargetRenderOffset.Y = 1 + g_sEntities.g_sChar.m_cRoom.Y * (ROOM_Y + 2);
-	r_dTargetRenderTime = SCREEN_SCROLL_LENGTH;
+	r_cRenderOffset.X = 1 + g_sEntities.g_sChar.m_cRoom.X * (ROOM_X + 2);
+	r_cRenderOffset.Y = 1 + g_sEntities.g_sChar.m_cRoom.Y * (ROOM_Y + 2);
 	g_mEvent.r_curspos.X = g_Console.getConsoleSize().X / 5;
 	g_mEvent.r_curspos.Y = g_Console.getConsoleSize().Y / 10 * 8 - 1;
 	g_sLevel.floor = 1;
-	if (DEBUG) g_sLevel.floor = 3;
 	g_sLevel.generateLevel();
 	g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
 	COORD c;
@@ -209,25 +205,15 @@ void splashScreenWait()		// waits for time to pass in splash screen
 
 void gameplay()            // gameplay logic
 {
-	if (r_cRenderOffset.X == r_cTargetRenderOffset.X && r_cRenderOffset.Y == r_cTargetRenderOffset.Y)
-	{
-		//processUserInput();	// checks if you should change states or do something else with the game, e.g. pause, exit
-		detectPauseMenuProc();
-		controlPlayer();	// moves the character, collision detection, physics, etc
-		if (r_cRenderOffset.X == r_cTargetRenderOffset.X && r_cRenderOffset.Y == r_cTargetRenderOffset.Y)
-		{
-			playerShoot(); // checks if the player should shoot
-			checkHitPellets(); // checks if the pellets have hit anything, and update stats accordingly
-			g_sEntities.updatePellets(); // update locations of pellets
-			checkHitPellets(); // checks if the pellets have hit anything, and update stats accordingly
-			g_sEntities.updateEnemies(); // update locations of enemies and add pellets of the enemies'
-			// sound can be played here too.
-		}
-	}
-	else
-	{
-		moveScreen();
-	}
+	//processUserInput();	// checks if you should change states or do something else with the game, e.g. pause, exit
+	detectPauseMenuProc();
+	controlPlayer();	// moves the character, collision detection, physics, etc
+	playerShoot(); // checks if the player should shoot
+	checkHitPellets(); // checks if the pellets have hit anything, and update stats accordingly
+	g_sEntities.updatePellets(); // update locations of pellets
+	checkHitPellets(); // checks if the pellets have hit anything, and update stats accordingly
+	g_sEntities.updateEnemies(); // update locations of enemies and add pellets of the enemies'
+	// sound can be played here too.
 }
 
 void menuLogic()
@@ -289,11 +275,9 @@ void controlPlayer()
 				bSomethingHappened = true;
 				if (g_sEntities.g_sChar.m_cLocation.X < r_cRenderOffset.X)
 				{
-					r_cTargetRenderOffset.X -= (ROOM_X + 2);
-					//r_cRenderOffset.X -= (ROOM_X + 2);
+					r_cRenderOffset.X -= (ROOM_X + 2);
 					g_sEntities.g_sChar.m_cLocation.X--;
 					changedRoomUpdate();
-					setUpMoveScreen();
 				}
 			}
 		}
@@ -331,11 +315,9 @@ void controlPlayer()
 				bSomethingHappened = true;
 				if (g_sEntities.g_sChar.m_cLocation.Y < r_cRenderOffset.Y)
 				{
-					r_cTargetRenderOffset.Y -= (ROOM_Y + 2);
-					//r_cRenderOffset.Y -= (ROOM_Y + 2);
+					r_cRenderOffset.Y -= (ROOM_Y + 2);
 					g_sEntities.g_sChar.m_cLocation.Y--;
 					changedRoomUpdate();
-					setUpMoveScreen();
 				}
 			}
 		}
@@ -373,11 +355,9 @@ void controlPlayer()
 				bSomethingHappened = true;
 				if (g_sEntities.g_sChar.m_cLocation.X >= r_cRenderOffset.X + ROOM_X + 2)
 				{
-					r_cTargetRenderOffset.X += (ROOM_X + 2);
-					//r_cRenderOffset.X += (ROOM_X + 2);
+					r_cRenderOffset.X += (ROOM_X + 2);
 					g_sEntities.g_sChar.m_cLocation.X++;
 					changedRoomUpdate();
-					setUpMoveScreen();
 				}
 			}
 		}
@@ -415,11 +395,9 @@ void controlPlayer()
 				bSomethingHappened = true;
 				if (g_sEntities.g_sChar.m_cLocation.Y >= r_cRenderOffset.Y + ROOM_Y + 2)
 				{
-					r_cTargetRenderOffset.Y += (ROOM_Y + 2);
-					//r_cRenderOffset.Y += (ROOM_Y + 2);
+					r_cRenderOffset.Y += (ROOM_Y + 2);
 					g_sEntities.g_sChar.m_cLocation.Y++;
 					changedRoomUpdate();
-					setUpMoveScreen();
 				}
 			}
 		}
@@ -681,11 +659,6 @@ void renderCharacter()
 {
 	// Draw the location of the character
 	COORD c = g_sEntities.g_sChar.getRealCoords();
-	c.X += (r_cTargetRenderOffset.Y - r_cRenderOffset.Y) << 2;
-	c.Y += (r_cTargetRenderOffset.X - r_cRenderOffset.X) << 1;
-
-	if (c.X < 1 || c.X >= 1 + ((ROOM_Y + 2) << 2) || c.Y < 1 || c.Y >= 1 + ((ROOM_X + 2) << 1)) return;
-
 	WORD charColor = g_mEvent.wPlayerColor;
 	//WORD charColor = 0x0A;
 	g_Console.writeToBuffer(c, "@@@@", charColor);
@@ -856,38 +829,6 @@ void playerShoot()
 			}
 		}
 		g_adBounceTime[K_SHOOTUP] = g_dElapsedTime;
-	}
-}
-
-void setUpMoveScreen()
-{
-	r_cswRenderTimer = new CStopWatch;
-	r_cswRenderTimer->startTimer();
-	r_dRenderTime = 0.0;
-}
-void moveScreen()
-{
-	r_dRenderTime += r_cswRenderTimer->getElapsedTime();
-	if (r_cRenderOffset.X == r_cTargetRenderOffset.X) // If moving left or right
-	{
-		if (r_dRenderTime >= (r_dTargetRenderTime / (ROOM_Y + 2)))
-		{
-			r_cRenderOffset.Y += (r_cTargetRenderOffset.Y > r_cRenderOffset.Y) ? (1) : (-1);
-			r_dRenderTime -= r_dTargetRenderTime / (ROOM_Y + 2);
-		}
-	}
-	else // If moving up or down
-	{
-		if (r_dRenderTime >= (r_dTargetRenderTime / (ROOM_X + 2)))
-		{
-			r_cRenderOffset.X += (r_cTargetRenderOffset.X > r_cRenderOffset.X) ? (1) : (-1);
-			r_dRenderTime -= r_dTargetRenderTime / (ROOM_X + 2);
-		}
-	}
-
-	if (r_cRenderOffset.X == r_cTargetRenderOffset.X && r_cRenderOffset.Y == r_cTargetRenderOffset.Y)
-	{
-		delete r_cswRenderTimer;
 	}
 }
 
@@ -1110,11 +1051,7 @@ void renderEnemy()
 	for (auto& enemy : g_sEntities.m_vEnemy)
 	{
 		if (enemy->isDying()) continue;
-		COORD c = enemy->getRealLocation();
-		c.X += (r_cTargetRenderOffset.Y - r_cRenderOffset.Y) << 2;
-		c.Y += (r_cTargetRenderOffset.X - r_cRenderOffset.X) << 1;
-		if (c.X < 1 || c.X >= 1 + ((ROOM_Y + 2) << 2) || c.Y < 1 || c.Y >= 1 + ((ROOM_X + 2) << 1)) continue;
-		render(c, enemy->getIdentifier()[0], enemy->getIdentifier()[1], enemy->getColor());
+		render(enemy->getRealLocation(), enemy->getIdentifier()[0], enemy->getIdentifier()[1], enemy->getColor());
 	}
 }
 void renderDeadEnemy()
@@ -1183,6 +1120,32 @@ void checkHitPellets()
 			}
 			pellet++;
 			continue;
+		}
+
+		// Check for exceeded lifespan
+		if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[0].m_bHasWeapon) //Index 1 (Heaven Cracker): Doubles the pellet lifespan to 5 seconds.
+		{
+			g_sEntities.g_sChar.m_dRange *= 2;
+			if ((pellet->m_dEnemyLifespan >= 2.5) && (pellet->m_bFriendly == false)) //Erase enemy pellets after 2.5 seconds
+			{
+				pellet->m_bHit = true;
+				pellet->m_bHitReason = pellet::P_FLOOR;
+			}
+			if ((pellet->m_dPlayerLifespan >= g_sEntities.g_sChar.m_dRange) && (pellet->m_bFriendly == true))  //Check if the pellet has reached its lifespan of 5 seconds, if it does, clear the pellet and show the "><" hit effect.
+			{
+				pellet->m_bHit = true; //Erase player bullets after 5 seconds, updated from Heaven Cracker
+				pellet->m_bHitReason = pellet::P_FLOOR;
+				continue;
+			}
+		}
+		else
+		{
+			if (pellet->m_dPlayerLifespan >= g_sEntities.g_sChar.m_dRange) //Erase both player and enemy pellets after 2.5 seconds
+			{
+				pellet->m_bHit = true;
+				pellet->m_bHitReason = pellet::P_FLOOR;
+				continue;
+			}
 		}
 
 		// Check collision with wall
@@ -1280,32 +1243,6 @@ void checkHitPellets()
 			}
 		}
 
-		// Check for exceeded lifespan
-		if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[0].m_bHasWeapon) //Index 1 (Heaven Cracker): Doubles the pellet lifespan to 5 seconds.
-		{
-			g_sEntities.g_sChar.m_dRange *= 2;
-			if ((pellet->m_dEnemyLifespan >= 2.5) && (pellet->m_bFriendly == false)) //Erase enemy pellets after 2.5 seconds
-			{
-				pellet->m_bHit = true;
-				pellet->m_bHitReason = pellet::P_FLOOR;
-			}
-			if ((pellet->m_dPlayerLifespan >= g_sEntities.g_sChar.m_dRange) && (pellet->m_bFriendly == true))  //Check if the pellet has reached its lifespan of 5 seconds, if it does, clear the pellet and show the "><" hit effect.
-			{
-				pellet->m_bHit = true; //Erase player bullets after 5 seconds, updated from Heaven Cracker
-				pellet->m_bHitReason = pellet::P_FLOOR;
-				continue;
-			}
-		}
-		else
-		{
-			if (pellet->m_dPlayerLifespan >= g_sEntities.g_sChar.m_dRange) //Erase both player and enemy pellets after 2.5 seconds
-			{
-				pellet->m_bHit = true;
-				pellet->m_bHitReason = pellet::P_FLOOR;
-				continue;
-			}
-		}
-
 		pellet++;
 	}
 }
@@ -1337,9 +1274,9 @@ void changedRoomUpdate()
 bool loadEnemiesFromRoom()
 {
 	bool roomHasEnemies = false;
-	for (int row = r_cTargetRenderOffset.X; row < r_cTargetRenderOffset.X + ROOM_X + 2; row++)
+	for (int row = r_cRenderOffset.X; row < r_cRenderOffset.X + ROOM_X + 2; row++)
 	{
-		for (int column = r_cTargetRenderOffset.Y; column < r_cTargetRenderOffset.Y + ROOM_Y + 2; column++)
+		for (int column = r_cRenderOffset.Y; column < r_cRenderOffset.Y + ROOM_Y + 2; column++)
 		{
 			COORD c = fastCoord(row, column);
 			switch (g_sLevel.level[row][column])
@@ -1351,11 +1288,6 @@ bool loadEnemiesFromRoom()
 				break;
 			case 'm':
 				addEnemy(UNIQUE_ENEMY_MAGE);
-				roomHasEnemies = true;
-				g_sLevel.level[row][column] = ' ';
-				break;
-			case 'k':
-				addEnemy(UNIQUE_ENEMY_KNIGHT);
 				roomHasEnemies = true;
 				g_sLevel.level[row][column] = ' ';
 				break;

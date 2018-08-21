@@ -2,7 +2,7 @@
 
 Name | Ability | Tier 1 | Tier 2 | Tier 3
 ---|---|---|---|---
-Heaven Cracker| Pellets pass through walls and re-enter from the other side of the screen. Pellet lifespan doubled. |Damage increased by 2. |Damage increased by 3.| Damage increased by 4.
+Heaven Cracker| Pellets pass through invisible rocks. Pellet lifespan doubled. |Damage increased by 2. |Damage increased by 3.| Damage increased by 4.
 
 Enchanted Sword| Damage increased by 2. Health increased by 3. | Damage increase by 3. Health increased by 4. | Damage increase by 4. Health increased by 5. | Damage increase by 5. Health increased by 6.
 

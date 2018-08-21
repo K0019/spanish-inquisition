@@ -137,7 +137,7 @@ void g_SaveOptions(unsigned short* OptionsDataArray)
 	{
 		if (PlayerOptions.is_open())
 		{
-			for (int i = 0; i < 9; i++)
+			for (int i = 0; i < 2; i++)
 			{
 				PlayerOptions << OptionsDataArray[i] << '\n';
 			}

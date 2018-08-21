@@ -373,6 +373,13 @@ void submenuNav()
 			g_adBounceTime[K_SHOOTRIGHT] = g_dElapsedTime + 0.15;
 
 		}
+		if (g_abKeyPressed[K_ENTER] && g_adBounceTime[K_ENTER] < g_dElapsedTime && g_mEvent.sh_optionSel == 3)
+		{
+			currDataStorage.g_shOptionsData[0] = g_mEvent.shPlayerCharColourChoice;
+			currDataStorage.g_shOptionsData[1] = g_mEvent.bMinimap;
+			g_SaveOptions(currDataStorage.g_shOptionsData);
+			g_adBounceTime[K_ENTER] = g_dElapsedTime + 0.15;
+		}
 		doomButton();
 	}
 }

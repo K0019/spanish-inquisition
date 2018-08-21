@@ -642,29 +642,29 @@ void controlPlayer()
 		{
 			if (g_abKeyPressed[i])
 			{
-				g_adBounceTime[i] = g_dElapsedTime + 0.200; //0.200 acts as the movement delay of the player, decreasing it makes the player go faster
+				g_adBounceTime[i] = g_dElapsedTime + 0.175; //0.200 acts as the movement delay of the player, decreasing it makes the player go faster
 				if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_bHasWeapon) // Index 7 (Blue Feather): Decrease movement delay by 20/30/40/50%
 				{
 					switch (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_iWeaponLevel)
 					{
 					case 0: //Blue Feather Level 1: Decrease movement delay by 20%
 						{
-							g_adBounceTime[i] = g_dElapsedTime + ((g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.20) * 0.250);
+							g_adBounceTime[i] = g_dElapsedTime + ((g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.20) * 0.175);
 							break;
 						}
 					case 1: //Blue Feather Level 2: Decrease movement delay by 30%
 						{
-						g_adBounceTime[i] = g_dElapsedTime + ((g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.30) * 0.250);
+						g_adBounceTime[i] = g_dElapsedTime + ((g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.30) * 0.175);
 							break;
 						}
 					case 2: //Blue Feather Level 3: Decrease movement delay by 40%
 						{
-						g_adBounceTime[i] = g_dElapsedTime + ((g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.40) * 0.250);
+						g_adBounceTime[i] = g_dElapsedTime + ((g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.40) * 0.175);
 							break;
 						}
 					case 3: //Blue Feather Level 4: Decrease movement delay by 50%
 						{
-						g_adBounceTime[i] = g_dElapsedTime + ((g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.50) * 0.250);
+						g_adBounceTime[i] = g_dElapsedTime + ((g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.50) * 0.175);
 							break;
 						}
 					}
@@ -1484,6 +1484,16 @@ bool loadEnemiesFromRoom()
 				break;
 			case 'k':
 				addEnemy(UNIQUE_ENEMY_KNIGHT);
+				roomHasEnemies = true;
+				g_sLevel.level[row][column] = ' ';
+				break;
+			case 'e':
+				addEnemy(UNIQUE_ENEMY_ENHANCEDSORCERER);
+				roomHasEnemies = true;
+				g_sLevel.level[row][column] = ' ';
+				break;
+			case 'g':
+				addEnemy(UNIQUE_ENEMY_GUARDIAN);
 				roomHasEnemies = true;
 				g_sLevel.level[row][column] = ' ';
 				break;

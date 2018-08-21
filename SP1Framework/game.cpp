@@ -302,9 +302,15 @@ void submenuNav()
 {
 	if (g_mEvent.shMenuState == 2)
 	{
-		if (g_abKeyPressed[K_SHOOTLEFT] && g_mEvent.sh_cursSel < 5 && g_adBounceTime[K_SHOOTLEFT] < g_dElapsedTime)
+		if (g_abKeyPressed[K_SHOOTLEFT] && g_mEvent.sh_shopItemSel > 0 && g_adBounceTime[K_SHOOTLEFT] < g_dElapsedTime)
 		{
-			
+			g_mEvent.sh_shopItemSel--;
+			g_adBounceTime[K_SHOOTLEFT] = g_dElapsedTime + 0.15;
+		}
+		if (g_abKeyPressed[K_SHOOTRIGHT] && g_mEvent.sh_shopItemSel < 6 && g_adBounceTime[K_SHOOTRIGHT] < g_dElapsedTime)
+		{
+			g_mEvent.sh_shopItemSel++;
+			g_adBounceTime[K_SHOOTRIGHT] = g_dElapsedTime + 0.15;
 		}
 	}
 	else if (g_mEvent.shMenuState == 3)
@@ -747,7 +753,7 @@ void renderSplashScreen()  // renders the splash screen
 
 void renderMenu()
 {
-	g_mEvent.MenuRender(currDataStorage.g_shOptionsData);
+	g_mEvent.MenuRender(currDataStorage.g_shOptionsData, &g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList);
 }
 
 void renderGame()

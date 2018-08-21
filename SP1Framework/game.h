@@ -57,7 +57,8 @@ void splashScreenWait();	// waits for time to pass in splash screen
 void playerShoot();			// allows the player to shoot
 void gameplay();			// gameplay logic
 void menuLogic();
-void goBack();				// press enter to go back
+void menuNav();
+void submenuNav();
 void resetLevel(int floor); // Generate a new map, with input floor for what to put inside the rooms
 void controlPlayer();		// moves the character, collision detection, physics, etc
 void processUserInput();	// checks if you should change states or do something else with the game, e.g. pause, exit

@@ -8,8 +8,39 @@ MenuEvent::MenuEvent(Console* mainConsole)
 	this->bQuitGame = false;
 	this->bHasPressedButton = false;
 	this->bPausedGame = false;
-	this->bHasPaused = false;
 	this->bMinimap = true;
+}
+
+void MenuEvent::MenuRender(unsigned short* OptionsDataArray)
+{
+	switch (shMenuState)
+	{
+	case 0:
+		renderMenu();
+		renderTitle();
+		renderMenuCursor();
+		break;
+	case 1:
+		renderTutorialDetails();
+		break;
+	case 2:
+		renderItemTitleSelected();
+		renderItemDescSelected();
+		renderItemPriceSelected();
+		renderItemCurrTSelected();
+		renderItemNextTSelected();
+		break;
+	case 3:
+		renderDoomButton();
+		renderDoomButtonBrackets();
+		renderColourOption();
+		renderMinimapOption();
+		renderSaveOption();
+		break;
+	case 4:
+		renderCreditsRollText();
+		break;
+	}
 }
 
 // title banner
@@ -128,7 +159,7 @@ void MenuEvent::renderMenu()
 // the cursor in the main menu
 void MenuEvent::renderMenuCursor()
 {
-	COORD c = r_curspos;
+	COORD c = r_menucurspos;
 	this->mainConsole->writeToBuffer(c, "[", 0x0f);
 	c.X += 14;
 	this->mainConsole->writeToBuffer(c, "]", 0x0f);
@@ -136,7 +167,7 @@ void MenuEvent::renderMenuCursor()
 	if (DEBUG)
 	{
 		c.X -= 2;
-		this->mainConsole->writeToBuffer(c, std::to_string(r_curspos.Y), 0x0f);
+		this->mainConsole->writeToBuffer(c, std::to_string(r_menucurspos.Y), 0x0f);
 		c.X -= 2;
 		this->mainConsole->writeToBuffer(c, std::to_string(sh_cursSel), 0x0f);
 	}
@@ -309,7 +340,7 @@ void MenuEvent::renderDoomButton()
 	Button[3] = "лллллллллл";
 	Button[4] = " лллллллл ";
 	COORD c = this->mainConsole->getConsoleSize();
-	c.X /= 10;
+	c.X = (c.X >> 1) - 8;
 	c.Y /= 4;
 	for (int i = 0; i < 5; i++)
 	{
@@ -341,31 +372,62 @@ void MenuEvent::renderDoomButtonBrackets()
 	RightBracket[5] = "  лл";
 	RightBracket[6] = "лллл";
 	COORD c = this->mainConsole->getConsoleSize();
-	(c.X /= 10) -= 4;
+	c.X = (c.X >> 1) - 12;
 	(c.Y /= 4) -= 1;
-	for (int i = 0; i < 7; i++)
+	if (sh_optionSel == 0)
 	{
-		this->mainConsole->writeToBuffer(c, LeftBracket[i], 0x08);
-		c.Y++;
-	}
-	c = this->mainConsole->getConsoleSize();
-	(c.X /= 10) += 10;
-	(c.Y /= 4) -= 1;
-	for (int i = 0; i < 7; i++)
-	{
-		this->mainConsole->writeToBuffer(c, RightBracket[i], 0x08);
-		c.Y++;
+		for (int i = 0; i < 7; i++)
+		{
+			this->mainConsole->writeToBuffer(c, LeftBracket[i], 0x08);
+			c.Y++;
+		}
+		c = this->mainConsole->getConsoleSize();
+		c.X = (c.X >> 1) + 2;
+		(c.Y /= 4) -= 1;
+		for (int i = 0; i < 7; i++)
+		{
+			this->mainConsole->writeToBuffer(c, RightBracket[i], 0x08);
+			c.Y++;
+		}
 	}
 }
 
-//UNDONE
-void MenuEvent::renderColourOption(unsigned short playersoption)
+void MenuEvent::renderColourOption()
 {
-
+	COORD c = this->mainConsole->getConsoleSize();
+	c.X = (c.X >> 1) - 10;
+	c.Y = (c.Y >> 1) + 3;
+	this->mainConsole->writeToBuffer(c, "Char Colour: ");
+	c.X += 12;
+	this->mainConsole->writeToBuffer(c, (sh_optionSel == 1 ? "<" : ""));
+	c.X += 2;
+	this->mainConsole->writeToBuffer(c, "@", wPlayerColor);
+	c.X += 2;
+	this->mainConsole->writeToBuffer(c, (sh_optionSel == 1 ? ">" : ""));
 }
 
-//UNDONE
-void MenuEvent::renderMinimapOption(unsigned short playersoption)
+void MenuEvent::renderMinimapOption()
 {
+	COORD c = this->mainConsole->getConsoleSize();
+	c.X = (c.X >> 1) - 10;
+	c.Y = (c.Y >> 1) + 4;
+	this->mainConsole->writeToBuffer(c, "Minimap: ");
+	c.X += 12;
+	this->mainConsole->writeToBuffer(c, (sh_optionSel == 2 ? "<" : ""));
+	c.X++;
+	this->mainConsole->writeToBuffer(c, (bMinimap ? "Yes" : "No"), (bMinimap ? 0x0a : 0x0c));
+	c.X += 3;
+	this->mainConsole->writeToBuffer(c, (sh_optionSel == 2 ? ">" : ""));
+}
 
+void MenuEvent::renderSaveOption()
+{
+	COORD c = this->mainConsole->getConsoleSize();
+	c.X = (c.X >> 1) - 7;
+	c.Y -= 5;
+	this->mainConsole->writeToBuffer(c, (sh_optionSel == 3 ? ">" : ""));
+	c.X++;
+	this->mainConsole->writeToBuffer(c, " SAVE ");
+	c.X += 6;
+	this->mainConsole->writeToBuffer(c, (sh_optionSel == 3 ? "<" : ""));
 }

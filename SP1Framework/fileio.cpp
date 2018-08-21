@@ -39,7 +39,7 @@ void g_SaveToSave(unsigned int* SaveDataArray)
 		}
 		SaveFileData.close();
 	}
-	else throw (std::invalid_argument("cannot write to file."));
+	else throw (std::invalid_argument("Cannot write to file."));
 }
 
 void g_LoadFromFloor(short FloorNumber, std::vector<std::string> *selectionAvailable)
@@ -118,6 +118,15 @@ void g_LoadOptions(unsigned short* OptionsDataArray)
 			i++;
 		}
 		PlayerOptions.close();
+	}
+	else
+	{
+		std::ofstream PlayerOptions("../res/SaveData/options.txt");
+		if (PlayerOptions.is_open())
+		{
+			PlayerOptions << "0\n";
+			PlayerOptions << "1\n";
+		}
 	}
 }
 

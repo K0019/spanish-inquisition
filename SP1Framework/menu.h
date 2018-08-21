@@ -7,16 +7,18 @@
 struct MenuEvent
 {
 	Console* mainConsole;					// pointer to the main console (to write to it)
-	COORD r_curspos;						// the cursor position
+	COORD r_menucurspos;					// the cursor position
+	COORD r_optioncurspos;					// the cursor position
+	COORD r_shopcurspos;					// the cursor position
 	WORD wPlayerColor = 0x0A;				// the color of player (to change in options)
 	bool bCredits;							// event processor: if player selected credits
-	bool bHasPaused;
 	bool bHasPressedButton;					// event processor: the button has been pressed
 	bool bMinimap;							// event processor: if the minimap option is toggled
 	bool bPausedGame;
 	bool bQuitGame;
 	unsigned int uiCreditsRollTime = 0;		// scrapped idea: animation timer for credits
 	unsigned int uiActivateDoomButton = 0;	// heehee
+	short shPlayerCharColourChoice = 0;
 	short shMenuState = 0;
 	short shPauseState = 0;
 	short sh_cursSel = 0;					// menu selector: stores the menu cursor's selection
@@ -25,11 +27,9 @@ struct MenuEvent
 	unsigned int CreditsOffsetY = 0;		// scrapped idea: how much the credits should go up by
 	MenuEvent(Console* mainConsole);		// Construcc
 
-	// NAVIGATEION FUNCTIONS
-
-	void MenuSelection();
-
 	// RENDER FUNCTIONS
+
+	void MenuRender(unsigned short* OptionsDataArray);
 
 	void renderTitle();						// renders banner in title screen
 	void renderMenu();						// renders menu options
@@ -48,7 +48,8 @@ struct MenuEvent
 
 	void renderDoomButton();				// heehee
 	void renderDoomButtonBrackets();		// heehee's brackets when selected
-	void renderColourOption(unsigned short playersoption);	// options: char colour option
-	void renderMinimapOption(unsigned short playersoption);	// options: ugh
+	void renderColourOption();				// options: char colour option
+	void renderMinimapOption();				// options: ugh
+	void renderSaveOption();
 };
 #endif // !_MENU_H

@@ -125,6 +125,9 @@
     <ClInclude Include="consumables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="stat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\res\MapData\FloorData\ItemRooms\Floor1.txt">
@@ -247,10 +250,11 @@
     <Text Include="..\res\MapData\RoomData\ItemRooms\1d.txt">
       <Filter>Resource Files\MapData\RoomData\ItemRooms</Filter>
     </Text>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\res\SaveData\saves.SAVE">
+    <Text Include="..\res\SaveData\options.txt">
       <Filter>Resource Files\SaveData</Filter>
-    </None>
+    </Text>
+    <Text Include="..\res\SaveData\saves.txt">
+      <Filter>Resource Files\SaveData</Filter>
+    </Text>
   </ItemGroup>
 </Project>

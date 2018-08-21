@@ -1315,20 +1315,10 @@ void checkHitPellets()
 		// Check collision with rock
 		if (g_sLevel.getTile(pellet->m_cLocation) == '*')
 		{
-			if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[0].m_bHasWeapon == true)
-			{
-				if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[0].m_iWeaponLevel == 3)
-				{
-					pellet->m_bHit = false;
-				}
-			}
-			else
-			{
-				pellet->m_bHit = true;
-				pellet->m_bHitReason = pellet::P_ROCK;
-				pellet++;
-				continue;
-			}
+			pellet->m_bHit = true;
+			pellet->m_bHitReason = pellet::P_ROCK;
+			pellet++;
+			continue;
 		}
 		else if (g_sLevel.getTile(pellet->m_cLocation) == '!') //Collision with invisible rock
 		{

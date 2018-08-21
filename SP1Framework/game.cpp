@@ -1542,6 +1542,7 @@ void CharacterDeath()
 		}
 		else if (g_abKeyPressed[K_ENTER])
 		{
+			g_sEntities.g_sChar.m_iGlobalScore = g_sEntities.g_sChar.m_iPlayerScore;
 			//g_eGameState = S_SHOP;
 			//g_sEntities.g_sChar.m_iPlayerHealth = 10;
 			//g_sEntities.g_sChar.m_iPlayerScore = 0;
@@ -1573,6 +1574,7 @@ void CharacterDeath()
 		}
 		else if(g_abKeyPressed[K_V])
 		{
+			g_sEntities.g_sChar.m_iGlobalScore = g_sEntities.g_sChar.m_iPlayerScore;
 			g_eGameState = S_MENU;
 			g_sEntities.g_sChar.m_iPlayerHealth = 10;
 			g_sEntities.g_sChar.m_iPlayerScore = 0;
@@ -1598,6 +1600,7 @@ void CharacterDeath()
 		}
 		else if (g_abKeyPressed[K_ESCAPE])
 		{
+			g_sEntities.g_sChar.m_iGlobalScore = g_sEntities.g_sChar.m_iPlayerScore;
 			g_bQuitGame = true;
 		}
 		g_eRestartGame = false;

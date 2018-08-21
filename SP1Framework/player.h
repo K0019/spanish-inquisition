@@ -19,6 +19,7 @@ struct SGameChar
 	int m_iPlayerHealth = 10; //The constantly changing variable, increased by items and consumables.
 	int	m_iPlayerDamage = 3; //The amount of damage the player deals per pellet
 	unsigned int m_iPlayerScore = 0; //The player's score
+	unsigned int m_iGlobalScore = 0;
 	double m_dRange = 2.5; //How long the player's pellets will last before de-spawning
 	double m_dVelocity = SHOOTVELOCITY; //The velocity of the player's pellets
 	SAllItems m_sPlayerItems;

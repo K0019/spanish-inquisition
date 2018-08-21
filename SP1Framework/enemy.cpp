@@ -282,7 +282,8 @@ bool Enemy::move(int direction)
 }
 bool Enemy::checkOutOfBounds()
 {
-	if (this->levelPointer->getTile(this->m_cLocation) != ' ')
+	char tile = this->levelPointer->getTile(this->m_cLocation);
+	if (tile != ' ' && tile != '&' && tile != '\0' && tile != '%' && tile != '1' && tile != '2' && tile != '3' && tile != '4')
 	{
 		return true;
 	}
@@ -290,7 +291,8 @@ bool Enemy::checkOutOfBounds()
 }
 bool Enemy::checkOutOfBounds(COORD c)
 {
-	if (this->levelPointer->getTile(c) != ' ')
+	char tile = this->levelPointer->getTile(c);
+	if (tile != ' ' && tile != '&' && tile != '\0' && tile != '%' && tile != '1' && tile != '2' && tile != '3' && tile != '4')
 	{
 		return true;
 	}

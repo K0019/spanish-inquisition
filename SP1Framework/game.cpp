@@ -31,6 +31,7 @@ double				g_adBounceTime[K_COUNT]; // this is to prevent key bouncing, so we won
 
 bool g_bHasShot;
 bool g_bHasWeapon;
+bool g_eRestartGame;
 
 //--------------------------------------------------------------
 // Purpose  : Initialisation function
@@ -39,15 +40,15 @@ bool g_bHasWeapon;
 // Input    : void
 // Output   : void
 //--------------------------------------------------------------
-void init( void )
+void init(void)
 {
 	srand((unsigned int)time(NULL));
 	// Set precision for floating point output
 	g_dElapsedTime = 0.0;
 	g_iCurrentFrameCount = g_iLastMeasuredSecond = 0;
 	g_adBounceTime[K_SHOOTUP] = 0.0;
-    for (int i = 0; i < K_COUNT; i++) g_adBounceTime[i] = 0.0;
-
+	for (int i = 0; i < K_COUNT; i++) g_adBounceTime[i] = 0.0;
+	g_eRestartGame = false;
 	// sets the initial state for the game
 	g_eGameState = S_SPLASHSCREEN;
 	if (DEBUG) g_eGameState = S_MENU;
@@ -68,23 +69,28 @@ void init( void )
 	}*/
 	r_cRenderOffset.X = r_cTargetRenderOffset.X = 1 + g_sEntities.g_sChar.m_cRoom.X * (ROOM_X + 2);
 	r_cRenderOffset.Y = r_cTargetRenderOffset.Y = 1 + g_sEntities.g_sChar.m_cRoom.Y * (ROOM_Y + 2);
-	r_dTargetRenderTime = 0.8;
-	g_mEvent.r_curspos.X = g_Console.getConsoleSize().X / 5;
-	g_mEvent.r_curspos.Y = g_Console.getConsoleSize().Y / 10 * 8 - 1;
+	r_dTargetRenderTime = SCREEN_SCROLL_LENGTH;
+	g_mEvent.r_menucurspos.X = g_Console.getConsoleSize().X / 5;
+	g_mEvent.r_menucurspos.Y = g_Console.getConsoleSize().Y / 10 * 8 - 1;
 	g_sLevel.floor = 1;
+	if (DEBUG) g_sLevel.floor = 1;
 	g_sLevel.generateLevel();
 	g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
 	COORD c;
 	c.X = (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
 	c.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
-	//addEnemy(UNIQUE_ENEMY_MELEETEST);
-	//addEnemy(UNIQUE_ENEMY_RANGEDTEST);
     // sets the width, height and the font name to use in the console
     g_Console.setConsoleFont(0, 16, L"Consolas");
 	g_LoadFromSave(currDataStorage.g_iSaveData);
 	g_LoadOptions(currDataStorage.g_shOptionsData);
+	g_mEvent.wPlayerColor = 
+		(currDataStorage.g_shOptionsData[0] == 2 ? 0x0d : 
+		(currDataStorage.g_shOptionsData[0] == 1) ? 0x0b : 0x0a);
+	g_mEvent.shPlayerCharColourChoice = 
+		(currDataStorage.g_shOptionsData[0] == 2 ? 2 :
+		(currDataStorage.g_shOptionsData[0] == 1) ? 1 : 0);
+	g_mEvent.bMinimap = ((currDataStorage.g_shOptionsData[1] == 0) ? false : true);
 }
-
 //--------------------------------------------------------------
 // Purpose  : Reset before exiting the program
 //            Do your clean up of memory here
@@ -120,13 +126,14 @@ void getInput( void )
 		g_abKeyPressed[K_DOWN]   = isKeyPressed(0x53);
 		g_abKeyPressed[K_LEFT]   = isKeyPressed(0x41);
 		g_abKeyPressed[K_RIGHT]  = isKeyPressed(0x44);
+		g_abKeyPressed[K_V] = isKeyPressed(0x56);
 		g_abKeyPressed[K_SHOOTUP] = isKeyPressed(VK_UP);
 		g_abKeyPressed[K_SHOOTRIGHT] = isKeyPressed(VK_RIGHT);
-		g_abKeyPressed[K_SHOOTDOWN] = isKeyPressed(VK_DOWN);
-		g_abKeyPressed[K_SHOOTLEFT] = isKeyPressed(VK_LEFT);
-		g_abKeyPressed[K_SPACE]  = isKeyPressed(VK_SPACE);
-		g_abKeyPressed[K_ESCAPE] = isKeyPressed(VK_ESCAPE);
-		g_abKeyPressed[K_ENTER] = isKeyPressed(VK_RETURN);
+		g_abKeyPressed[K_SHOOTDOWN]	 = isKeyPressed(VK_DOWN);
+		g_abKeyPressed[K_SHOOTLEFT]  = isKeyPressed(VK_LEFT);
+		g_abKeyPressed[K_SPACE]		 = isKeyPressed(VK_SPACE);
+		g_abKeyPressed[K_ESCAPE]	 = isKeyPressed(VK_ESCAPE);
+		g_abKeyPressed[K_ENTER]		 = isKeyPressed(VK_RETURN);
 	}
 }
 
@@ -155,7 +162,7 @@ void update(CStopWatch * timer, double missedTime)
 	{
 		case S_SPLASHSCREEN : splashScreenWait(); // game logic for the splash screen
 			break;
-		case S_MENU: ;
+		case S_MENU: menuLogic();
 			break;
 		case S_GAME: gameplay(); // gameplay logic when we are in the game
 			break;
@@ -201,7 +208,7 @@ void render(CStopWatch * timer)
 
 void splashScreenWait()		// waits for time to pass in splash screen
 {
-	//processUserInput(); // checks if you should change states or do something else with the game, e.g. pause, exit
+	processUserInput(); // checks if you should change states or do something else with the game, e.g. pause, exit
 	if (g_dAccurateElapsedTime > 3.0) // wait for 3 seconds to switch to game mode, else do nothing
 		g_eGameState = S_MENU;
 }
@@ -231,14 +238,142 @@ void gameplay()            // gameplay logic
 
 void menuLogic()
 {
+	menuNav();
+	submenuNav();
 }
 
-void goBack()
+void menuNav()
 {
-	if (g_abKeyPressed[K_ENTER] == true || g_abKeyPressed[K_ESCAPE] == true)
+	if (g_abKeyPressed[K_SHOOTDOWN] && g_mEvent.sh_cursSel < 5 && g_adBounceTime[K_SHOOTDOWN] < g_dElapsedTime && g_mEvent.shMenuState == 0)
+	{
+		g_mEvent.sh_cursSel++;
+		g_mEvent.r_menucurspos.Y++;
+		g_adBounceTime[K_SHOOTDOWN] = g_dElapsedTime + 0.15;
+	}
+	else if (g_abKeyPressed[K_SHOOTUP] && g_mEvent.sh_cursSel > 0 && g_adBounceTime[K_SHOOTUP] < g_dElapsedTime && g_mEvent.shMenuState == 0)
+	{
+		g_mEvent.sh_cursSel--;
+		g_mEvent.r_menucurspos.Y--;
+		g_adBounceTime[K_SHOOTUP] = g_dElapsedTime + 0.15;
+	}
+	if (g_abKeyPressed[K_ENTER] && !g_mEvent.bHasPressedButton)
+	{
+		switch (g_mEvent.sh_cursSel)
+		{
+		case 0:
+			g_eGameState = S_GAME;
+			break;
+		case 1:
+			g_mEvent.shMenuState = 1;
+			break;
+		case 2:
+			g_mEvent.shMenuState = 2;
+			break;
+		case 3:
+			g_mEvent.shMenuState = 3;
+			break;
+		case 4:
+			g_mEvent.shMenuState = 4;
+			break;
+		case 5:
+			g_bQuitGame = true;
+			break;
+		}
+	}
+	if (g_mEvent.bHasPressedButton)
+	{
+		if (!g_abKeyPressed[K_ENTER])
+		{
+			g_mEvent.bHasPressedButton = false;
+		}
+	}
+	if (g_abKeyPressed[K_ESCAPE] == true)
 	{
 		g_mEvent.shMenuState = 0;
 		g_mEvent.uiCreditsRollTime = 0;
+	}
+}
+
+void submenuNav()
+{
+	if (g_mEvent.shMenuState == 2)
+	{
+		if (g_abKeyPressed[K_SHOOTLEFT] && g_mEvent.sh_cursSel < 5 && g_adBounceTime[K_SHOOTLEFT] < g_dElapsedTime)
+		{
+			
+		}
+	}
+	else if (g_mEvent.shMenuState == 3)
+	{
+		if (g_abKeyPressed[K_SHOOTUP] && g_adBounceTime[K_SHOOTUP] < g_dElapsedTime && g_mEvent.sh_optionSel > 0)
+		{
+			g_mEvent.sh_optionSel--;
+			g_adBounceTime[K_SHOOTUP] = g_dElapsedTime + 0.15;
+		}
+		if (g_abKeyPressed[K_SHOOTDOWN] && g_adBounceTime[K_SHOOTDOWN] < g_dElapsedTime && g_mEvent.sh_optionSel < 3)
+		{
+			g_mEvent.sh_optionSel++;
+			g_adBounceTime[K_SHOOTDOWN] = g_dElapsedTime + 0.15;
+		}
+		if (g_abKeyPressed[K_SHOOTLEFT] && g_adBounceTime[K_SHOOTLEFT] < g_dElapsedTime)
+		{
+			if (g_mEvent.sh_optionSel == 1)
+			{
+				switch (g_mEvent.shPlayerCharColourChoice)
+				{
+				case 0:
+					g_mEvent.wPlayerColor = 0x0d;
+					g_mEvent.shPlayerCharColourChoice = 2;
+					break;
+				case 1:
+					g_mEvent.wPlayerColor = 0x0a;
+					g_mEvent.shPlayerCharColourChoice = 0;
+					break;
+				case 2:
+					g_mEvent.wPlayerColor = 0x0b;
+					g_mEvent.shPlayerCharColourChoice = 1;
+					break;
+				default:
+					g_mEvent.wPlayerColor = 0x0a;
+				}
+			}
+			if (g_mEvent.sh_optionSel == 2)
+			{
+				g_mEvent.bMinimap = !g_mEvent.bMinimap;
+			}
+			g_adBounceTime[K_SHOOTLEFT] = g_dElapsedTime + 0.15;
+
+		}
+		if (g_abKeyPressed[K_SHOOTRIGHT] && g_adBounceTime[K_SHOOTRIGHT] < g_dElapsedTime)
+		{
+			if (g_mEvent.sh_optionSel == 1)
+			{
+				switch (g_mEvent.shPlayerCharColourChoice)
+				{
+				case 0:
+					g_mEvent.wPlayerColor = 0x0b;
+					g_mEvent.shPlayerCharColourChoice = 1;
+					break;
+				case 1:
+					g_mEvent.wPlayerColor = 0x0d;
+					g_mEvent.shPlayerCharColourChoice = 2;
+					break;
+				case 2:
+					g_mEvent.wPlayerColor = 0x0a;
+					g_mEvent.shPlayerCharColourChoice = 0;
+					break;
+				default:
+					g_mEvent.wPlayerColor = 0x0a;
+				}
+			}
+			if (g_mEvent.sh_optionSel == 2)
+			{
+				g_mEvent.bMinimap = !g_mEvent.bMinimap;
+			}
+			g_adBounceTime[K_SHOOTRIGHT] = g_dElapsedTime + 0.15;
+
+		}
+		doomButton();
 	}
 }
 
@@ -549,7 +684,7 @@ void doomButton()
 {
 	if (g_abKeyPressed[K_ENTER] && g_mEvent.sh_optionSel == 0)
 	{
-		if (g_mEvent.uiActivateDoomButton < 1000)
+		if (g_mEvent.uiActivateDoomButton < 100)
 		{
 			g_mEvent.uiActivateDoomButton++;
 		}
@@ -562,7 +697,7 @@ void doomButton()
 				NukedSaveData[i] = 0;
 			}
 			g_SaveToSave(NukedSaveData);
-			g_eGameState = S_MENU;
+			g_mEvent.shMenuState = 0;
 			g_mEvent.bHasPressedButton = true;
 			g_LoadFromSave(currDataStorage.g_iSaveData);
 		}
@@ -573,32 +708,15 @@ void doomButton()
 	}
 }
 
-void processOptionsEvent()
-{
-
-}
-
 void detectPauseMenuProc()
 {
-	if (g_abKeyPressed[K_ESCAPE] && !g_mEvent.bHasPaused)
+	if (g_abKeyPressed[K_ESCAPE])
 	{
-		g_mEvent.bHasPaused = true;
-		//g_mEvent.bPausedGame = !g_mEvent.bPausedGame;
-	}
-	else if (!g_abKeyPressed[K_ESCAPE] && g_mEvent.bHasPaused)
-	{
-		g_mEvent.bPausedGame = true;
-	}
-	else if (g_abKeyPressed[K_ESCAPE] && g_mEvent.bHasPaused)
-	{
-		g_eGameState = S_GAME;
-		g_mEvent.bPausedGame = false;
-		g_mEvent.bHasPaused = false;
+		/*g_mEvent.bHasPaused = true;*/
+		g_mEvent.bPausedGame = !g_mEvent.bPausedGame;
 	}
 	if (g_mEvent.bPausedGame)
-	{
 		g_eGameState = S_PAUSED;
-	}
 	else
 		g_eGameState = S_GAME;
 }
@@ -624,32 +742,7 @@ void renderSplashScreen()  // renders the splash screen
 
 void renderMenu()
 {
-	switch (g_mEvent.shMenuState)
-	{
-	case 0:
-		g_mEvent.renderMenu();
-		g_mEvent.renderTitle();
-		g_mEvent.renderMenuCursor();
-		break;
-	case 1:
-		g_mEvent.renderTutorialDetails();
-		break;
-	case 2:
-		g_mEvent.renderItemTitleSelected();
-		g_mEvent.renderItemDescSelected();
-		g_mEvent.renderItemPriceSelected();
-		g_mEvent.renderItemCurrTSelected();
-		g_mEvent.renderItemNextTSelected();
-		break;
-	case 3:
-		g_mEvent.renderDoomButton();
-		g_mEvent.renderDoomButtonBrackets();
-		g_mEvent.renderColourOption(1);
-		g_mEvent.renderMinimapOption(1);
-		break;
-	case 4:
-		break;
-	}
+	g_mEvent.MenuRender(currDataStorage.g_shOptionsData);
 }
 
 void renderGame()
@@ -661,6 +754,7 @@ void renderGame()
 	renderPellets();
 	renderMiniMap();
 	renderStat();
+	CharacterDeath();
 }
 
 void renderPause()
@@ -1198,32 +1292,6 @@ void checkHitPellets()
 			continue;
 		}
 
-		// Check for exceeded lifespan
-		if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[0].m_bHasWeapon) //Index 1 (Heaven Cracker): Doubles the pellet lifespan to 5 seconds.
-		{
-			g_sEntities.g_sChar.m_dRange *= 2;
-			if ((pellet->m_dEnemyLifespan >= 2.5) && (pellet->m_bFriendly == false)) //Erase enemy pellets after 2.5 seconds
-			{
-				pellet->m_bHit = true;
-				pellet->m_bHitReason = pellet::P_FLOOR;
-			}
-			if ((pellet->m_dPlayerLifespan >= g_sEntities.g_sChar.m_dRange) && (pellet->m_bFriendly == true))  //Check if the pellet has reached its lifespan of 5 seconds, if it does, clear the pellet and show the "><" hit effect.
-			{
-				pellet->m_bHit = true; //Erase player bullets after 5 seconds, updated from Heaven Cracker
-				pellet->m_bHitReason = pellet::P_FLOOR;
-				continue;
-			}
-		}
-		else
-		{
-			if (pellet->m_dPlayerLifespan >= g_sEntities.g_sChar.m_dRange) //Erase both player and enemy pellets after 2.5 seconds
-			{
-				pellet->m_bHit = true;
-				pellet->m_bHitReason = pellet::P_FLOOR;
-				continue;
-			}
-		}
-
 		// Check collision with wall
 		if ((pellet->m_cLocation.X - 1) % (ROOM_X + 2) == 0 ||
 			pellet->m_cLocation.X % (ROOM_X + 2) == 0 ||
@@ -1343,6 +1411,32 @@ void checkHitPellets()
 			}
 		}
 
+		// Check for exceeded lifespan
+		if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[0].m_bHasWeapon) //Index 1 (Heaven Cracker): Doubles the pellet lifespan to 5 seconds.
+		{
+			g_sEntities.g_sChar.m_dRange *= 2;
+			if ((pellet->m_dEnemyLifespan >= 2.5) && (pellet->m_bFriendly == false)) //Erase enemy pellets after 2.5 seconds
+			{
+				pellet->m_bHit = true;
+				pellet->m_bHitReason = pellet::P_FLOOR;
+			}
+			if ((pellet->m_dPlayerLifespan >= g_sEntities.g_sChar.m_dRange) && (pellet->m_bFriendly == true))  //Check if the pellet has reached its lifespan of 5 seconds, if it does, clear the pellet and show the "><" hit effect.
+			{
+				pellet->m_bHit = true; //Erase player bullets after 5 seconds, updated from Heaven Cracker
+				pellet->m_bHitReason = pellet::P_FLOOR;
+				continue;
+			}
+		}
+		else
+		{
+			if (pellet->m_dPlayerLifespan >= g_sEntities.g_sChar.m_dRange) //Erase both player and enemy pellets after 2.5 seconds
+			{
+				pellet->m_bHit = true;
+				pellet->m_bHitReason = pellet::P_FLOOR;
+				continue;
+			}
+		}
+
 		pellet++;
 	}
 }
@@ -1409,4 +1503,123 @@ void addEnemy(EnemyMelee * enemy)
 void addEnemy(EnemyRanged * enemy)
 {
 	g_sEntities.m_vEnemy.push_back(std::move(std::unique_ptr<EnemyRanged>(enemy)));
+}
+void CharacterDeath()
+{
+	if (g_sEntities.g_sChar.m_iPlayerHealth <= 0)
+	{
+		COORD c = g_Console.getConsoleSize();
+		c.X = 5;
+		c.Y = 5;
+		g_Console.writeToBuffer(c, "Game Over", 0x64);
+		c.Y++;
+		g_Console.writeToBuffer(c, "Press 'Space' to play again.", 0xE4);
+		c.Y++;
+		g_Console.writeToBuffer(c, "Press 'Enter' to exit to Shop.", 0xE4);
+		c.Y++;
+		g_Console.writeToBuffer(c, "Press 'V' to exit to Main Menu.", 0xE4);
+		c.Y++;
+		g_Console.writeToBuffer(c, "Press 'Esc' to exit the game.", 0xE4);
+
+		if (g_abKeyPressed[K_SPACE])
+		{
+			g_eRestartGame = true;
+			if (g_eRestartGame == true)
+			{
+				g_sEntities.g_sChar.m_iPlayerHealth = 10;
+				g_sEntities.g_sChar.m_iPlayerScore = 0;
+				g_sEntities.g_sChar.m_iMaxHealth = 10;
+				g_sEntities.g_sChar.m_iPlayerDamage = 3;
+				g_bHasShot = false;
+				g_sEntities.g_sChar.m_cLocation.X = 2 + (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
+				g_sEntities.g_sChar.m_cLocation.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
+				g_sLevel.playerStartRoom.X = GRID_X >> 1;
+				g_sLevel.playerStartRoom.Y = GRID_Y >> 1;
+				g_sEntities.g_sChar.m_cRoom = g_sLevel.playerStartRoom;
+				//if (DEBUG) g_sEntities.g_sChar.m_bInBattle = true;
+				r_cRenderOffset.X = 1 + g_sEntities.g_sChar.m_cRoom.X * (ROOM_X + 2);
+				r_cRenderOffset.Y = 1 + g_sEntities.g_sChar.m_cRoom.Y * (ROOM_Y + 2);
+				g_mEvent.r_menucurspos.X = g_Console.getConsoleSize().X / 5;
+				g_mEvent.r_menucurspos.Y = g_Console.getConsoleSize().Y / 10 * 8;
+				g_sLevel.floor = 1;
+				g_sLevel.generateLevel();
+				g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
+				COORD c;
+				c.X = (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
+				c.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
+				//addEnemy(UNIQUE_ENEMY_MELEETEST);
+				//addEnemy(UNIQUE_ENEMY_RANGEDTEST);
+				// sets the width, height and the font name to use in the console
+				g_Console.setConsoleFont(0, 16, L"Consolas");
+				g_LoadFromSave(currDataStorage.g_iSaveData);
+				g_sEntities.clearEnemies();
+			}
+		}
+		else if (g_abKeyPressed[K_ENTER])
+		{
+			//g_eGameState = S_SHOP;
+			//g_sEntities.g_sChar.m_iPlayerHealth = 10;
+			//g_sEntities.g_sChar.m_iPlayerScore = 0;
+			//g_sEntities.g_sChar.m_iMaxHealth = 10;
+			//g_sEntities.g_sChar.m_iPlayerDamage = 3;
+			//g_bHasShot = false;
+			//g_sEntities.g_sChar.m_cLocation.X = 2 + (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
+			//g_sEntities.g_sChar.m_cLocation.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
+			//g_sLevel.playerStartRoom.X = GRID_X >> 1;
+			//g_sLevel.playerStartRoom.Y = GRID_Y >> 1;
+			//g_sEntities.g_sChar.m_cRoom = g_sLevel.playerStartRoom;
+			////if (DEBUG) g_sEntities.g_sChar.m_bInBattle = true;
+			//r_cRenderOffset.X = 1 + g_sEntities.g_sChar.m_cRoom.X * (ROOM_X + 2);
+			//r_cRenderOffset.Y = 1 + g_sEntities.g_sChar.m_cRoom.Y * (ROOM_Y + 2);
+			//g_mEvent.r_curspos.X = g_Console.getConsoleSize().X / 5;
+			//g_mEvent.r_curspos.Y = g_Console.getConsoleSize().Y / 10 * 8;
+			//g_sLevel.floor = 1;
+			//g_sLevel.generateLevel();
+			//g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
+			//COORD c;
+			//c.X = (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
+			//c.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
+			////addEnemy(UNIQUE_ENEMY_MELEETEST);
+			////addEnemy(UNIQUE_ENEMY_RANGEDTEST);
+			//// sets the width, height and the font name to use in the console
+			//g_Console.setConsoleFont(0, 16, L"Consolas");
+			//g_LoadFromSave(saveDataStorage.g_iSaveData);
+			//g_sEntities.clearEnemies();
+		}
+		else if(g_abKeyPressed[K_V])
+		{
+			//g_eGameState = S_MENU;
+			//g_sEntities.g_sChar.m_iPlayerHealth = 10;
+			//g_sEntities.g_sChar.m_iPlayerScore = 0;
+			//g_sEntities.g_sChar.m_iMaxHealth = 10;
+			//g_sEntities.g_sChar.m_iPlayerDamage = 3;
+			//g_bHasShot = false;
+			//g_sEntities.g_sChar.m_cLocation.X = 2 + (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
+			//g_sEntities.g_sChar.m_cLocation.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
+			//g_sLevel.playerStartRoom.X = GRID_X >> 1;
+			//g_sLevel.playerStartRoom.Y = GRID_Y >> 1;
+			//g_sEntities.g_sChar.m_cRoom = g_sLevel.playerStartRoom;
+			////if (DEBUG) g_sEntities.g_sChar.m_bInBattle = true;
+			//r_cRenderOffset.X = 1 + g_sEntities.g_sChar.m_cRoom.X * (ROOM_X + 2);
+			//r_cRenderOffset.Y = 1 + g_sEntities.g_sChar.m_cRoom.Y * (ROOM_Y + 2);
+			//g_mEvent.r_curspos.X = g_Console.getConsoleSize().X / 5;
+			//g_mEvent.r_curspos.Y = g_Console.getConsoleSize().Y / 10 * 8;
+			//g_sLevel.floor = 1;
+			//g_sLevel.generateLevel();
+			//g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
+			//COORD c;
+			//c.X = (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
+			//c.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
+			////addEnemy(UNIQUE_ENEMY_MELEETEST);
+			////addEnemy(UNIQUE_ENEMY_RANGEDTEST);
+			//// sets the width, height and the font name to use in the console
+			//g_Console.setConsoleFont(0, 16, L"Consolas");
+			//g_LoadFromSave(saveDataStorage.g_iSaveData);
+			//g_sEntities.clearEnemies();
+		}
+		else if (g_abKeyPressed[K_ESCAPE])
+		{
+			g_bQuitGame = true;
+		}
+	}
 }

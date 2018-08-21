@@ -25,6 +25,7 @@ enum EKEYS /* FRAMEWORK */
     K_DOWN,
     K_LEFT,
     K_RIGHT,
+	K_V,
 	K_SHOOTUP,
 	K_SHOOTRIGHT,
 	K_SHOOTDOWN,
@@ -50,6 +51,8 @@ void getInput    ( void ); /* FRAMEWORK */ // get input from player
 void update      ( CStopWatch * timer, double missedTime ); /* FRAMEWORK */ // update the game and the state of the game
 void render      ( CStopWatch * timer ); /* FRAMEWORK */ // renders the current state of the game to the console
 void shutdown    ( void ); /* FRAMEWORK */ // do clean up, free memory
+void RestartGame();
+
 /*
 	THE UPDATE FUNCTIONS
 */
@@ -57,7 +60,8 @@ void splashScreenWait();	// waits for time to pass in splash screen
 void playerShoot();			// allows the player to shoot
 void gameplay();			// gameplay logic
 void menuLogic();
-void goBack();				// press enter to go back
+void menuNav();
+void submenuNav();
 void resetLevel(int floor); // Generate a new map, with input floor for what to put inside the rooms
 void controlPlayer();		// moves the character, collision detection, physics, etc
 void processUserInput();	// checks if you should change states or do something else with the game, e.g. pause, exit
@@ -69,7 +73,7 @@ void changedRoomUpdate(); // Stuff to do when the player exits current room
 bool loadEnemiesFromRoom(); // Load all enemies from the room that the player entered
 void addEnemy(EnemyMelee * enemy); // Add an enemy to the enemy list
 void addEnemy(EnemyRanged * enemy); // Add an enemy to the enemy list
-
+void CharacterDeath();
 void setUpMoveScreen(); // Setup variables to move render screen
 void moveScreen(); // Moves the render screen
 

@@ -91,7 +91,6 @@
     <ClCompile Include="menu.cpp" />
     <ClCompile Include="pellet.cpp" />
     <ClCompile Include="player.cpp" />
-    <ClCompile Include="stat.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="consumables.h" />

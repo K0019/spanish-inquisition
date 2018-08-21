@@ -10,8 +10,9 @@
 #define GRID_Y 5
 #define ROOM_X 11
 #define ROOM_Y 19
-#define FINAL_FLOOR 3
+#define FINAL_FLOOR 5
 #define SPECIAL_ROOMS_COUNT 2
+#define SCREEN_SCROLL_LENGTH 0.7
 #define SHOOTSPEED 0.35
 #define SHOOTVELOCITY 0.225
 #define ENEMY_DYING_LENGTH 1.0

@@ -3,8 +3,11 @@
 $ = Door
 & = Stairs
 * = Stone
+! = Invisible Stone
 b = Bandit (melee enemy)
 m = Mage (ranged enemy)
+k = Knight (melee enemy)
+e = Enhanced Sorcerer (ranged enemy)
 1 = Minor Health Pack
 2 = Greater Health Pack
 3 = Small Medal

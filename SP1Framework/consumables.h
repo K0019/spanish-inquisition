@@ -15,7 +15,7 @@ struct SConsumable //Struct that holds all consumable information
 	int m_iConsumableHealth;
 	int m_iConsumableScore;
 
-	SConsumable(std::string name, int index, int health, int score);
+	SConsumable(char name[], int index, int health, int score);
 };
 
 struct SAllConsumables //Struct that holds all consumables as individual consumables
@@ -23,7 +23,7 @@ struct SAllConsumables //Struct that holds all consumables as individual consuma
 	std::vector<SConsumable> m_vConsumableList;
 
 	SAllConsumables();
-	void addConsumable(SConsumable consumable);
+	void addConsumable(SConsumable& consumable);
 };
 
 

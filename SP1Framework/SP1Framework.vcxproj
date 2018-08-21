@@ -106,6 +106,46 @@
     <ClInclude Include="menu.h" />
     <ClInclude Include="pellet.h" />
     <ClInclude Include="player.h" />
+    <ClInclude Include="stat.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\res\MapData\FloorData\ItemRooms\Floor1.txt" />
+    <Text Include="..\res\MapData\FloorData\ItemRooms\Floor2.txt" />
+    <Text Include="..\res\MapData\FloorData\ItemRooms\Floor3.txt" />
+    <Text Include="..\res\MapData\FloorData\ItemRooms\Floor4.txt" />
+    <Text Include="..\res\MapData\FloorData\ItemRooms\Floor5.txt" />
+    <Text Include="..\res\MapData\FloorData\NormalRooms\Floor1.txt" />
+    <Text Include="..\res\MapData\FloorData\NormalRooms\Floor2.txt" />
+    <Text Include="..\res\MapData\FloorData\NormalRooms\Floor3.txt" />
+    <Text Include="..\res\MapData\FloorData\NormalRooms\Floor4.txt" />
+    <Text Include="..\res\MapData\FloorData\NormalRooms\Floor5.txt" />
+    <Text Include="..\res\MapData\RoomData\ItemRooms\00.txt" />
+    <Text Include="..\res\MapData\RoomData\ItemRooms\06.txt" />
+    <Text Include="..\res\MapData\RoomData\ItemRooms\0b.txt" />
+    <Text Include="..\res\MapData\RoomData\ItemRooms\0e.txt" />
+    <Text Include="..\res\MapData\RoomData\ItemRooms\0f.txt" />
+    <Text Include="..\res\MapData\RoomData\ItemRooms\15.txt" />
+    <Text Include="..\res\MapData\RoomData\NormalRooms\01.txt" />
+    <Text Include="..\res\MapData\RoomData\NormalRooms\02.txt" />
+    <Text Include="..\res\MapData\RoomData\NormalRooms\03.txt" />
+    <Text Include="..\res\MapData\RoomData\NormalRooms\04.txt" />
+    <Text Include="..\res\MapData\RoomData\NormalRooms\05.txt" />
+    <Text Include="..\res\MapData\RoomData\NormalRooms\07.txt" />
+    <Text Include="..\res\MapData\RoomData\NormalRooms\08.txt" />
+    <Text Include="..\res\MapData\RoomData\NormalRooms\09.txt" />
+    <Text Include="..\res\MapData\RoomData\NormalRooms\0a.txt" />
+    <Text Include="..\res\MapData\RoomData\NormalRooms\0c.txt" />
+    <Text Include="..\res\MapData\RoomData\NormalRooms\0d.txt" />
+    <Text Include="..\res\MapData\RoomData\NormalRooms\10.txt" />
+    <Text Include="..\res\MapData\RoomData\NormalRooms\11.txt" />
+    <Text Include="..\res\MapData\RoomData\NormalRooms\12.txt" />
+    <Text Include="..\res\MapData\RoomData\NormalRooms\13.txt" />
+    <Text Include="..\res\MapData\RoomData\NormalRooms\14.txt" />
+    <Text Include="..\res\MapData\RoomData\NormalRooms\16.txt" />
+    <Text Include="..\res\MapData\RoomData\NormalRooms\17.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\res\SaveData\saves.SAVE" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

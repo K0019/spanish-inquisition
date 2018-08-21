@@ -19,6 +19,30 @@
     <Filter Include="Source Files\Framework">
       <UniqueIdentifier>{37c19c94-9502-4b2b-b3f1-70fa908b49af}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\MapData">
+      <UniqueIdentifier>{815a660e-ee27-4943-b921-7e14c1e1dd3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\SaveData">
+      <UniqueIdentifier>{4633633a-1808-4416-a86e-4475772cc229}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\MapData\FloorData">
+      <UniqueIdentifier>{34450117-4685-403f-8f9e-35ce42999873}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\MapData\RoomData">
+      <UniqueIdentifier>{16fae992-d734-443c-83f6-64f4ad062d66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\MapData\FloorData\ItemRooms">
+      <UniqueIdentifier>{70bd9d4e-39e1-4939-a77b-cb74244a6698}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\MapData\FloorData\NormalRooms">
+      <UniqueIdentifier>{a67f3b44-dd4a-4e69-aa63-691ea963affa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\MapData\RoomData\ItemRooms">
+      <UniqueIdentifier>{8cc2cacf-37f3-492a-aa29-3539c570e7b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\MapData\RoomData\NormalRooms">
+      <UniqueIdentifier>{08b93761-b9c6-462a-993d-c61b5e4a9982}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -101,5 +125,114 @@
     <ClInclude Include="consumables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\res\MapData\FloorData\ItemRooms\Floor1.txt">
+      <Filter>Resource Files\MapData\FloorData\ItemRooms</Filter>
+    </Text>
+    <Text Include="..\res\MapData\FloorData\ItemRooms\Floor2.txt">
+      <Filter>Resource Files\MapData\FloorData\ItemRooms</Filter>
+    </Text>
+    <Text Include="..\res\MapData\FloorData\ItemRooms\Floor3.txt">
+      <Filter>Resource Files\MapData\FloorData\ItemRooms</Filter>
+    </Text>
+    <Text Include="..\res\MapData\FloorData\ItemRooms\Floor4.txt">
+      <Filter>Resource Files\MapData\FloorData\ItemRooms</Filter>
+    </Text>
+    <Text Include="..\res\MapData\FloorData\ItemRooms\Floor5.txt">
+      <Filter>Resource Files\MapData\FloorData\ItemRooms</Filter>
+    </Text>
+    <Text Include="..\res\MapData\FloorData\NormalRooms\Floor1.txt">
+      <Filter>Resource Files\MapData\FloorData\NormalRooms</Filter>
+    </Text>
+    <Text Include="..\res\MapData\FloorData\NormalRooms\Floor2.txt">
+      <Filter>Resource Files\MapData\FloorData\NormalRooms</Filter>
+    </Text>
+    <Text Include="..\res\MapData\FloorData\NormalRooms\Floor3.txt">
+      <Filter>Resource Files\MapData\FloorData\NormalRooms</Filter>
+    </Text>
+    <Text Include="..\res\MapData\FloorData\NormalRooms\Floor4.txt">
+      <Filter>Resource Files\MapData\FloorData\NormalRooms</Filter>
+    </Text>
+    <Text Include="..\res\MapData\FloorData\NormalRooms\Floor5.txt">
+      <Filter>Resource Files\MapData\FloorData\NormalRooms</Filter>
+    </Text>
+    <Text Include="..\res\MapData\RoomData\ItemRooms\00.txt">
+      <Filter>Resource Files\MapData\RoomData\ItemRooms</Filter>
+    </Text>
+    <Text Include="..\res\MapData\RoomData\ItemRooms\0b.txt">
+      <Filter>Resource Files\MapData\RoomData\ItemRooms</Filter>
+    </Text>
+    <Text Include="..\res\MapData\RoomData\ItemRooms\0e.txt">
+      <Filter>Resource Files\MapData\RoomData\ItemRooms</Filter>
+    </Text>
+    <Text Include="..\res\MapData\RoomData\ItemRooms\0f.txt">
+      <Filter>Resource Files\MapData\RoomData\ItemRooms</Filter>
+    </Text>
+    <Text Include="..\res\MapData\RoomData\ItemRooms\06.txt">
+      <Filter>Resource Files\MapData\RoomData\ItemRooms</Filter>
+    </Text>
+    <Text Include="..\res\MapData\RoomData\NormalRooms\0a.txt">
+      <Filter>Resource Files\MapData\RoomData\NormalRooms</Filter>
+    </Text>
+    <Text Include="..\res\MapData\RoomData\NormalRooms\0c.txt">
+      <Filter>Resource Files\MapData\RoomData\NormalRooms</Filter>
+    </Text>
+    <Text Include="..\res\MapData\RoomData\NormalRooms\0d.txt">
+      <Filter>Resource Files\MapData\RoomData\NormalRooms</Filter>
+    </Text>
+    <Text Include="..\res\MapData\RoomData\NormalRooms\01.txt">
+      <Filter>Resource Files\MapData\RoomData\NormalRooms</Filter>
+    </Text>
+    <Text Include="..\res\MapData\RoomData\NormalRooms\02.txt">
+      <Filter>Resource Files\MapData\RoomData\NormalRooms</Filter>
+    </Text>
+    <Text Include="..\res\MapData\RoomData\NormalRooms\03.txt">
+      <Filter>Resource Files\MapData\RoomData\NormalRooms</Filter>
+    </Text>
+    <Text Include="..\res\MapData\RoomData\NormalRooms\04.txt">
+      <Filter>Resource Files\MapData\RoomData\NormalRooms</Filter>
+    </Text>
+    <Text Include="..\res\MapData\RoomData\NormalRooms\05.txt">
+      <Filter>Resource Files\MapData\RoomData\NormalRooms</Filter>
+    </Text>
+    <Text Include="..\res\MapData\RoomData\NormalRooms\07.txt">
+      <Filter>Resource Files\MapData\RoomData\NormalRooms</Filter>
+    </Text>
+    <Text Include="..\res\MapData\RoomData\NormalRooms\08.txt">
+      <Filter>Resource Files\MapData\RoomData\NormalRooms</Filter>
+    </Text>
+    <Text Include="..\res\MapData\RoomData\NormalRooms\09.txt">
+      <Filter>Resource Files\MapData\RoomData\NormalRooms</Filter>
+    </Text>
+    <Text Include="..\res\MapData\RoomData\NormalRooms\10.txt">
+      <Filter>Resource Files\MapData\RoomData\NormalRooms</Filter>
+    </Text>
+    <Text Include="..\res\MapData\RoomData\NormalRooms\11.txt">
+      <Filter>Resource Files\MapData\RoomData\NormalRooms</Filter>
+    </Text>
+    <Text Include="..\res\MapData\RoomData\NormalRooms\12.txt">
+      <Filter>Resource Files\MapData\RoomData\NormalRooms</Filter>
+    </Text>
+    <Text Include="..\res\MapData\RoomData\NormalRooms\13.txt">
+      <Filter>Resource Files\MapData\RoomData\NormalRooms</Filter>
+    </Text>
+    <Text Include="..\res\MapData\RoomData\NormalRooms\14.txt">
+      <Filter>Resource Files\MapData\RoomData\NormalRooms</Filter>
+    </Text>
+    <Text Include="..\res\MapData\RoomData\ItemRooms\15.txt">
+      <Filter>Resource Files\MapData\RoomData\ItemRooms</Filter>
+    </Text>
+    <Text Include="..\res\MapData\RoomData\NormalRooms\16.txt">
+      <Filter>Resource Files\MapData\RoomData\NormalRooms</Filter>
+    </Text>
+    <Text Include="..\res\MapData\RoomData\NormalRooms\17.txt">
+      <Filter>Resource Files\MapData\RoomData\NormalRooms</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\res\SaveData\saves.SAVE">
+      <Filter>Resource Files\SaveData</Filter>
+    </None>
   </ItemGroup>
 </Project>

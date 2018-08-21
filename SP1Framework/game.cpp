@@ -77,7 +77,6 @@ void init(void)
 	g_mEvent.r_menucurspos.X = g_Console.getConsoleSize().X / 5;
 	g_mEvent.r_menucurspos.Y = g_Console.getConsoleSize().Y / 10 * 8 - 1;
 	g_sLevel.floor = 1;
-	if (DEBUG) g_sLevel.floor = 1;
 	g_sLevel.generateLevel();
 	g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
 	COORD c;

@@ -127,6 +127,7 @@
     <Text Include="..\res\MapData\RoomData\ItemRooms\15.txt" />
     <Text Include="..\res\MapData\RoomData\ItemRooms\19.txt" />
     <Text Include="..\res\MapData\RoomData\ItemRooms\1d.txt" />
+    <Text Include="..\res\MapData\RoomData\ItemRooms\1f.txt" />
     <Text Include="..\res\MapData\RoomData\NormalRooms\01.txt" />
     <Text Include="..\res\MapData\RoomData\NormalRooms\02.txt" />
     <Text Include="..\res\MapData\RoomData\NormalRooms\03.txt" />
@@ -149,6 +150,11 @@
     <Text Include="..\res\MapData\RoomData\NormalRooms\1a.txt" />
     <Text Include="..\res\MapData\RoomData\NormalRooms\1b.txt" />
     <Text Include="..\res\MapData\RoomData\NormalRooms\1c.txt" />
+    <Text Include="..\res\MapData\RoomData\NormalRooms\1e.txt" />
+    <Text Include="..\res\MapData\RoomData\NormalRooms\20.txt" />
+    <Text Include="..\res\MapData\RoomData\NormalRooms\21.txt" />
+    <Text Include="..\res\MapData\RoomData\NormalRooms\22.txt" />
+    <Text Include="..\res\MapData\RoomData\NormalRooms\23.txt" />
     <Text Include="..\res\SaveData\options.txt" />
     <Text Include="..\res\SaveData\saves.txt" />
   </ItemGroup>

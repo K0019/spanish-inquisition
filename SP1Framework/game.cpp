@@ -68,10 +68,11 @@ void init( void )
 	}*/
 	r_cRenderOffset.X = r_cTargetRenderOffset.X = 1 + g_sEntities.g_sChar.m_cRoom.X * (ROOM_X + 2);
 	r_cRenderOffset.Y = r_cTargetRenderOffset.Y = 1 + g_sEntities.g_sChar.m_cRoom.Y * (ROOM_Y + 2);
-	r_dTargetRenderTime = 0.8;
+	r_dTargetRenderTime = SCREEN_SCROLL_LENGTH;
 	g_mEvent.r_curspos.X = g_Console.getConsoleSize().X / 5;
 	g_mEvent.r_curspos.Y = g_Console.getConsoleSize().Y / 10 * 8 - 1;
 	g_sLevel.floor = 1;
+	if (DEBUG) g_sLevel.floor = 3;
 	g_sLevel.generateLevel();
 	g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
 	COORD c;
@@ -1184,32 +1185,6 @@ void checkHitPellets()
 			continue;
 		}
 
-		// Check for exceeded lifespan
-		if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[0].m_bHasWeapon) //Index 1 (Heaven Cracker): Doubles the pellet lifespan to 5 seconds.
-		{
-			g_sEntities.g_sChar.m_dRange *= 2;
-			if ((pellet->m_dEnemyLifespan >= 2.5) && (pellet->m_bFriendly == false)) //Erase enemy pellets after 2.5 seconds
-			{
-				pellet->m_bHit = true;
-				pellet->m_bHitReason = pellet::P_FLOOR;
-			}
-			if ((pellet->m_dPlayerLifespan >= g_sEntities.g_sChar.m_dRange) && (pellet->m_bFriendly == true))  //Check if the pellet has reached its lifespan of 5 seconds, if it does, clear the pellet and show the "><" hit effect.
-			{
-				pellet->m_bHit = true; //Erase player bullets after 5 seconds, updated from Heaven Cracker
-				pellet->m_bHitReason = pellet::P_FLOOR;
-				continue;
-			}
-		}
-		else
-		{
-			if (pellet->m_dPlayerLifespan >= g_sEntities.g_sChar.m_dRange) //Erase both player and enemy pellets after 2.5 seconds
-			{
-				pellet->m_bHit = true;
-				pellet->m_bHitReason = pellet::P_FLOOR;
-				continue;
-			}
-		}
-
 		// Check collision with wall
 		if ((pellet->m_cLocation.X - 1) % (ROOM_X + 2) == 0 ||
 			pellet->m_cLocation.X % (ROOM_X + 2) == 0 ||
@@ -1302,6 +1277,32 @@ void checkHitPellets()
 
 					break;
 				}
+			}
+		}
+
+		// Check for exceeded lifespan
+		if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[0].m_bHasWeapon) //Index 1 (Heaven Cracker): Doubles the pellet lifespan to 5 seconds.
+		{
+			g_sEntities.g_sChar.m_dRange *= 2;
+			if ((pellet->m_dEnemyLifespan >= 2.5) && (pellet->m_bFriendly == false)) //Erase enemy pellets after 2.5 seconds
+			{
+				pellet->m_bHit = true;
+				pellet->m_bHitReason = pellet::P_FLOOR;
+			}
+			if ((pellet->m_dPlayerLifespan >= g_sEntities.g_sChar.m_dRange) && (pellet->m_bFriendly == true))  //Check if the pellet has reached its lifespan of 5 seconds, if it does, clear the pellet and show the "><" hit effect.
+			{
+				pellet->m_bHit = true; //Erase player bullets after 5 seconds, updated from Heaven Cracker
+				pellet->m_bHitReason = pellet::P_FLOOR;
+				continue;
+			}
+		}
+		else
+		{
+			if (pellet->m_dPlayerLifespan >= g_sEntities.g_sChar.m_dRange) //Erase both player and enemy pellets after 2.5 seconds
+			{
+				pellet->m_bHit = true;
+				pellet->m_bHitReason = pellet::P_FLOOR;
+				continue;
 			}
 		}
 

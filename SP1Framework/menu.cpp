@@ -11,7 +11,7 @@ MenuEvent::MenuEvent(Console* mainConsole)
 	this->bMinimap = true;
 }
 
-void MenuEvent::MenuRender(unsigned short* OptionsDataArray)
+void MenuEvent::MenuRender(unsigned short* OptionsDataArray, std::vector<SItem> * itemList)
 {
 	switch (shMenuState)
 	{
@@ -24,11 +24,7 @@ void MenuEvent::MenuRender(unsigned short* OptionsDataArray)
 		renderTutorialDetails();
 		break;
 	case 2:
-		renderItemTitleSelected();
-		renderItemDescSelected();
-		renderItemPriceSelected();
-		renderItemCurrTSelected();
-		renderItemNextTSelected();
+		renderItemSelected(itemList);
 		break;
 	case 3:
 		renderDoomButton();
@@ -301,33 +297,282 @@ void MenuEvent::renderCreditsRollText()
 }
 
 //UNDONE
-void MenuEvent::renderItemTitleSelected()
+void MenuEvent::renderItemSelected(std::vector<SItem> * itemList)
 {
-
-}
-
-//UNDONE
-void MenuEvent::renderItemPriceSelected()
-{
-
-}
-
-//UNDONE
-void MenuEvent::renderItemDescSelected()
-{
-
-}
-
-//UNDONE
-void MenuEvent::renderItemCurrTSelected()
-{
-
-}
-
-//UNDONE
-void MenuEvent::renderItemNextTSelected()
-{
-
+	std::string nameOfItem = (*itemList)[sh_shopItemSel].m_sName;
+	COORD c;
+	c.X = c.Y = 1;
+	switch (sh_shopItemSel)
+	{
+		case 0:
+		{
+			this->mainConsole->writeToBuffer(c, nameOfItem, 0x0f);
+			int currentTier = (*itemList)[sh_shopItemSel].m_iWeaponLevel;
+			c.Y += 2;
+			this->mainConsole->writeToBuffer(c, "Pellets pass through invisible rocks.");
+			c.Y++;
+			this->mainConsole->writeToBuffer(c, "Pellet lifespan doubled.");
+			c.Y++;
+			switch (currentTier)
+			{
+				case 1:
+				{
+					this->mainConsole->writeToBuffer(c, "Increases damage by 2.");
+					break;
+				}
+				case 2:
+				{
+					this->mainConsole->writeToBuffer(c, "Increases damage by 3.");
+					break;
+				}
+				case 3:
+				{
+					this->mainConsole->writeToBuffer(c, "Increases damage by 4.");
+					break;
+				}
+				default:
+					break;
+			}
+			break;
+		}
+		case 1:
+		{
+			this->mainConsole->writeToBuffer(c, nameOfItem, 0x0f);
+			int currentTier = (*itemList)[sh_shopItemSel].m_iWeaponLevel;
+			switch (currentTier)
+			{
+				case 0:
+				{
+					c.Y += 2;
+					this->mainConsole->writeToBuffer(c, "Damage increased by 2.");
+					c.Y++;
+					this->mainConsole->writeToBuffer(c, "Health increased by 3.");
+					break;
+				}
+				case 1:
+				{
+					c.Y += 2;
+					this->mainConsole->writeToBuffer(c, "Damage increased by 3.");
+					c.Y++;
+					this->mainConsole->writeToBuffer(c, "Health increased by 4.");
+					break;
+				}
+				case 2:
+				{
+					c.Y += 2;
+					this->mainConsole->writeToBuffer(c, "Damage increased by 4.");
+					c.Y++;
+					this->mainConsole->writeToBuffer(c, "Health increased by 5.");
+					break;
+				}
+				case 3:
+				{
+					c.Y += 2;
+					this->mainConsole->writeToBuffer(c, "Damage increased by 5.");
+					c.Y++;
+					this->mainConsole->writeToBuffer(c, "Health increased by 6.");
+					break;
+				}
+				default:
+					break;
+			}
+			break;
+		}
+		case 2:
+		{
+			this->mainConsole->writeToBuffer(c, nameOfItem, 0x0f);
+			int currentTier = (*itemList)[sh_shopItemSel].m_iWeaponLevel;
+			switch (currentTier)
+			{
+				case 0:
+				{
+					c.Y += 2;
+					this->mainConsole->writeToBuffer(c, "Increases the HP stat of the player by 5 hp.");
+					break;
+				}
+				case 1:
+				{
+					c.Y += 2;
+					this->mainConsole->writeToBuffer(c, "Increases the HP stat of the player by 7 hp.");
+					break;
+				}
+				case 2:
+				{
+					c.Y += 2;
+					this->mainConsole->writeToBuffer(c, "Increases the HP stat of the player by 9 hp.");
+					break;
+				}
+				case 3:
+				{
+					c.Y += 2;
+					this->mainConsole->writeToBuffer(c, "Increases the HP stat of the player by 11 hp.");
+					break;
+				}
+				default:
+					break;
+			}
+			break;
+		}
+		case 3:
+		{
+			this->mainConsole->writeToBuffer(c, nameOfItem, 0x0f);
+			int currentTier = (*itemList)[sh_shopItemSel].m_iWeaponLevel;
+			switch (currentTier)
+			{
+			case 0:
+			{
+				c.Y += 2;
+				this->mainConsole->writeToBuffer(c, "All enemies deal 2 more damage.");
+				c.Y++;
+				this->mainConsole->writeToBuffer(c, "Player deals 4 more damage.");
+				break;
+			}
+			case 1:
+			{
+				c.Y += 2;
+				this->mainConsole->writeToBuffer(c, "All enemies deal 3 more damage.");
+				c.Y++;
+				this->mainConsole->writeToBuffer(c, "Player deals 5 more damage.");
+				break;
+			}
+			case 2:
+			{
+				c.Y += 2;
+				this->mainConsole->writeToBuffer(c, "All enemies deal 4 more damage.");
+				c.Y++;
+				this->mainConsole->writeToBuffer(c, "Player deals 6 more damage.");
+				break;
+			}
+			case 3:
+			{
+				c.Y += 2;
+				this->mainConsole->writeToBuffer(c, "All enemies deal 5 more damage.");
+				c.Y++;
+				this->mainConsole->writeToBuffer(c, "Player deals 7 more damage.");
+				break;
+			}
+			default:
+				break;
+			}
+			break;
+		}
+		case 4:
+		{
+			this->mainConsole->writeToBuffer(c, nameOfItem, 0x0f);
+			int currentTier = (*itemList)[sh_shopItemSel].m_iWeaponLevel;
+			switch (currentTier)
+			{
+			case 0:
+			{
+				c.Y += 2;
+				this->mainConsole->writeToBuffer(c, "Attack speed increased by 20%");
+				c.Y++;
+				this->mainConsole->writeToBuffer(c, "Pellet velocity increased by 20%.");
+				break;
+			}
+			case 1:
+			{
+				c.Y += 2;
+				this->mainConsole->writeToBuffer(c, "Attack speed increased by 30%");
+				c.Y++;
+				this->mainConsole->writeToBuffer(c, "Pellet velocity increased by 30%.");
+				break;
+			}
+			case 2:
+			{
+				c.Y += 2;
+				this->mainConsole->writeToBuffer(c, "Attack speed increased by 40%");
+				c.Y++;
+				this->mainConsole->writeToBuffer(c, "Pellet velocity increased by 40%.");
+				break;
+			}
+			case 3:
+			{
+				c.Y += 2;
+				this->mainConsole->writeToBuffer(c, "Attack speed increased by 50%");
+				c.Y++;
+				this->mainConsole->writeToBuffer(c, "Pellet velocity increased by 50%.");
+				break;
+			}
+			default:
+				break;
+			}
+			break;
+		}
+		case 5:
+		{
+			this->mainConsole->writeToBuffer(c, nameOfItem, 0x0f);
+			int currentTier = (*itemList)[sh_shopItemSel].m_iWeaponLevel;
+			c.Y += 2;
+			this->mainConsole->writeToBuffer(c, "Increases player's score by "); 
+			c.X += 28;
+			switch (currentTier)
+			{
+			case 0:
+			{
+				this->mainConsole->writeToBuffer(c, "1.5x");
+				break;
+			}
+			case 1:
+			{
+				this->mainConsole->writeToBuffer(c, "2x.");
+				break;
+			}
+			case 2:
+			{
+				this->mainConsole->writeToBuffer(c, "2.5x.");
+				break;
+			}
+			case 3:
+			{
+				this->mainConsole->writeToBuffer(c, "3x.");
+				break;
+			}
+			default:
+				break;
+			}
+			break;
+		}
+		case 6:
+		{
+			this->mainConsole->writeToBuffer(c, nameOfItem, 0x0f);
+			int currentTier = (*itemList)[sh_shopItemSel].m_iWeaponLevel;
+			c.Y += 2;
+			this->mainConsole->writeToBuffer(c, "Increases player's movement speed by ");
+			c.X += 37;
+			switch (currentTier)
+			{
+			case 0:
+			{
+				this->mainConsole->writeToBuffer(c, "20%.");
+				break;
+			}
+			case 1:
+			{
+				this->mainConsole->writeToBuffer(c, "30%.");
+				break;
+			}
+			case 2:
+			{
+				this->mainConsole->writeToBuffer(c, "40%.");
+				break;
+			}
+			case 3:
+			{
+				this->mainConsole->writeToBuffer(c, "50%.");
+				break;
+			}
+			default:
+				break;
+			}
+			break;
+		}
+		default:
+		{
+			this->mainConsole->writeToBuffer(c, "Invalid Item");
+		}
+	}
+	
 }
 
 // heehee

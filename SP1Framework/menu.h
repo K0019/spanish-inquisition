@@ -3,6 +3,7 @@
 #define _MENU_H
 #include "Framework/console.h"
 #include "definitions.h"
+#include "item.h"
 // here we go
 struct MenuEvent
 {
@@ -29,7 +30,7 @@ struct MenuEvent
 
 	// RENDER FUNCTIONS
 
-	void MenuRender(unsigned short* OptionsDataArray);
+	void MenuRender(unsigned short* OptionsDataArray, std::vector<SItem> * itemList);
 
 	void renderTitle();						// renders banner in title screen
 	void renderMenu();						// renders menu options
@@ -40,11 +41,7 @@ struct MenuEvent
 	void renderCreditsRollAnimation();		// scrapped idea: see above
 	void renderCreditsRollText();			// scrapped idea: converted into just static text
 
-	void renderItemTitleSelected();			// shop: selected item name 
-	void renderItemPriceSelected();			// shop: selected item's price 
-	void renderItemDescSelected();			// shop: selected item desc
-	void renderItemCurrTSelected();			// shop: selected item's current tier
-	void renderItemNextTSelected();			// shop: selected item's next tier
+	void renderItemSelected(std::vector<SItem> * itemList);			// shop: selected item name 
 
 	void renderDoomButton();				// heehee
 	void renderDoomButtonBrackets();		// heehee's brackets when selected

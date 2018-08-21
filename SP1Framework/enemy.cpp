@@ -4,7 +4,7 @@
 // CLASS DEFINITION: Enemy [ABSTRACT]
 // ---------------------------------------
 
-Enemy::Enemy(SLevel * levelPointer, std::string name, std::string identifier, std::string identifier2, COORD location, WORD color, int HP, int damage, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration)
+Enemy::Enemy(SLevel * levelPointer, std::string name, std::string identifier, std::string identifier2, COORD location, WORD color, int HP, int damage, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration, int scoreGiven, int enemyID)
 	: m_iMoveDuration(moveDuration), m_sName(name), m_dLengthOfAttack(lengthOfAttack), m_dAttackTimeThreshold(attackTimeThreshold), m_dStunDuration(stunDuration)
 {
 	this->levelPointer = levelPointer;
@@ -24,6 +24,8 @@ Enemy::Enemy(SLevel * levelPointer, std::string name, std::string identifier, st
 	this->m_dFlashAttackingTime = 0.0;
 	this->m_dLastMoveTime = this->Timer.accurateTotalTime();
 	this->m_dStunTime = 0.0;
+	this->m_iScoreGiven = scoreGiven;
+	this->m_iEnemyID = enemyID;
 }
 
 double Enemy::checkAttackDelayExpire()
@@ -124,11 +126,34 @@ void Enemy::takeDamage(int amount)
 	this->m_iHP -= amount;
 }
 
+void Enemy::scoreGiven(SGameChar * player)
+{
+	switch (this->m_iEnemyID)
+	{
+		case 1:
+		{
+			player->m_iPlayerScore += this->m_iScoreGiven;
+			break;
+		}
+		case 2:
+		{
+			player->m_iPlayerScore += this->m_iScoreGiven;
+			break;
+		}
+		case 3:
+		{
+			player->m_iPlayerScore += this->m_iScoreGiven;
+			break;
+		}
+	}
+}
+
 bool Enemy::move(int direction)
 {
+	COORD c = this->m_cLocation;
 	switch (direction)
 	{
-	case 0:
+	case 0: // Up
 		this->m_cLocation.X--;
 		if (this->checkOutOfBounds())
 		{
@@ -136,17 +161,30 @@ bool Enemy::move(int direction)
 			return false;
 		}
 		return true;
-	case 1:
+	case 1: // Up-Right
+		c.X--;
+		c.Y++;
+		if (this->checkOutOfBounds(c))
+		{
+			return false;
+		}
+		else
+		{
+			c.X++;
+			if (this->checkOutOfBounds(c))
+			{
+				c.X--;
+				c.Y--;
+				if (this->checkOutOfBounds(c))
+				{
+					return false;
+				}
+			}
+		}
 		this->m_cLocation.X--;
 		this->m_cLocation.Y++;
-		if (this->checkOutOfBounds())
-		{
-			this->m_cLocation.X++;
-			this->m_cLocation.Y--;
-			return false;
-		}
 		return true;
-	case 2:
+	case 2: // Right
 		this->m_cLocation.Y++;
 		if (this->checkOutOfBounds())
 		{
@@ -154,17 +192,30 @@ bool Enemy::move(int direction)
 			return false;
 		}
 		return true;
-	case 3:
+	case 3: // Down-Right
+		c.X++;
+		c.Y++;
+		if (this->checkOutOfBounds(c))
+		{
+			return false;
+		}
+		else
+		{
+			c.X--;
+			if (this->checkOutOfBounds(c))
+			{
+				c.X++;
+				c.Y--;
+				if (this->checkOutOfBounds(c))
+				{
+					return false;
+				}
+			}
+		}
 		this->m_cLocation.X++;
 		this->m_cLocation.Y++;
-		if (this->checkOutOfBounds())
-		{
-			this->m_cLocation.X--;
-			this->m_cLocation.Y--;
-			return false;
-		}
 		return true;
-	case 4:
+	case 4: // Down
 		this->m_cLocation.X++;
 		if (this->checkOutOfBounds())
 		{
@@ -172,17 +223,30 @@ bool Enemy::move(int direction)
 			return false;
 		}
 		return true;
-	case 5:
+	case 5: // Down-Left
+		c.X++;
+		c.Y--;
+		if (this->checkOutOfBounds(c))
+		{
+			return false;
+		}
+		else
+		{
+			c.X--;
+			if (this->checkOutOfBounds(c))
+			{
+				c.X++;
+				c.Y++;
+				if (this->checkOutOfBounds(c))
+				{
+					return false;
+				}
+			}
+		}
 		this->m_cLocation.X++;
 		this->m_cLocation.Y--;
-		if (this->checkOutOfBounds())
-		{
-			this->m_cLocation.X--;
-			this->m_cLocation.Y++;
-			return false;
-		}
 		return true;
-	case 6:
+	case 6: // Left
 		this->m_cLocation.Y--;
 		if (this->checkOutOfBounds())
 		{
@@ -190,22 +254,45 @@ bool Enemy::move(int direction)
 			return false;
 		}
 		return true;
-	case 7:
+	case 7: // Up-Left
+		c.X--;
+		c.Y--;
+		if (this->checkOutOfBounds(c))
+		{
+			return false;
+		}
+		else
+		{
+			c.X++;
+			if (this->checkOutOfBounds(c))
+			{
+				c.X--;
+				c.Y++;
+				if (this->checkOutOfBounds(c))
+				{
+					return false;
+				}
+			}
+		}
 		this->m_cLocation.X--;
 		this->m_cLocation.Y--;
-		if (this->checkOutOfBounds())
-		{
-			this->m_cLocation.X++;
-			this->m_cLocation.Y++;
-			return false;
-		}
 		return true;
 	}
 	return false;
 }
 bool Enemy::checkOutOfBounds()
 {
-	if (this->levelPointer->getTile(this->m_cLocation) != ' ')
+	char tile = this->levelPointer->getTile(this->m_cLocation);
+	if (tile != ' ' && tile != '&' && tile != '\0' && tile != '%' && tile != '1' && tile != '2' && tile != '3' && tile != '4')
+	{
+		return true;
+	}
+	return false;
+}
+bool Enemy::checkOutOfBounds(COORD c)
+{
+	char tile = this->levelPointer->getTile(c);
+	if (tile != ' ' && tile != '&' && tile != '\0' && tile != '%' && tile != '1' && tile != '2' && tile != '3' && tile != '4')
 	{
 		return true;
 	}
@@ -216,8 +303,8 @@ bool Enemy::checkOutOfBounds()
 // CLASS DEFINITION: EnemyMelee
 // ---------------------------------------
 
-EnemyMelee::EnemyMelee(SLevel * levelPointer, std::string name, std::string indicator, std::string indicator2, COORD location, WORD color, int HP, int damage, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration)
-	: Enemy(levelPointer, name, indicator, indicator2, location, color, HP, damage, moveDuration, lengthOfAttack, attackTimeThreshold, stunDuration)
+EnemyMelee::EnemyMelee(SLevel * levelPointer, std::string name, std::string indicator, std::string indicator2, COORD location, WORD color, int HP, int damage, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration, int scoreGiven, int enemyID)
+	: Enemy(levelPointer, name, indicator, indicator2, location, color, HP, damage, moveDuration, lengthOfAttack, attackTimeThreshold, stunDuration, scoreGiven, enemyID)
 {
 
 }
@@ -312,19 +399,43 @@ void EnemyMelee::strikeAttack(SGameChar * player)
 	{
 	case 0:
 		if (this->m_cLocation.X == player->m_cLocation.X + 1 && this->m_cLocation.Y == player->m_cLocation.Y)
+		{
 			player->m_iPlayerHealth -= this->m_iStrength;
+			if (player->m_iPlayerScore != 0) //If melee enemy hits and damages the player, -5 score from the player
+			{
+				player->m_iPlayerScore -= 5;
+			}
+		}
 		break;
 	case 1:
 		if (this->m_cLocation.X == player->m_cLocation.X && this->m_cLocation.Y == player->m_cLocation.Y - 1)
+		{
 			player->m_iPlayerHealth -= this->m_iStrength;
+			if (player->m_iPlayerScore != 0)
+			{
+				player->m_iPlayerScore -= 5;
+			}
+		}
 		break;
 	case 2:
 		if (this->m_cLocation.X == player->m_cLocation.X - 1 && this->m_cLocation.Y == player->m_cLocation.Y)
+		{
 			player->m_iPlayerHealth -= this->m_iStrength;
+			if (player->m_iPlayerScore != 0)
+			{
+				player->m_iPlayerScore -= 5;
+			}
+		}
 		break;
 	case 3:
 		if (this->m_cLocation.X == player->m_cLocation.X && this->m_cLocation.Y == player->m_cLocation.Y + 1)
+		{
 			player->m_iPlayerHealth -= this->m_iStrength;
+			if (player->m_iPlayerScore != 0)
+			{
+				player->m_iPlayerScore -= 5;
+			}
+		}
 		break;
 	}
 }
@@ -604,8 +715,8 @@ bool EnemyMelee::updateMovement(SGameChar * player)
 // CLASS DEFINITION: EnemyRanged
 // ---------------------------------------
 
-EnemyRanged::EnemyRanged(SLevel * levelPointer, std::vector<SPellet> * pellet, std::string name, std::string indicator, std::string indicator2, COORD location, WORD color, int HP, int damage, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration, bool isMobile, double pelletVelocity)
-	: Enemy(levelPointer, name, indicator, indicator2, location, color, HP, damage, moveDuration, lengthOfAttack, attackTimeThreshold, stunDuration)
+EnemyRanged::EnemyRanged(SLevel * levelPointer, std::vector<SPellet> * pellet, std::string name, std::string indicator, std::string indicator2, COORD location, WORD color, int HP, int damage, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration, bool isMobile, double pelletVelocity, int scoreGiven, int enemyID)
+	: Enemy(levelPointer, name, indicator, indicator2, location, color, HP, damage, moveDuration, lengthOfAttack, attackTimeThreshold, stunDuration, scoreGiven, enemyID)
 {
 	this->m_vPelletList = pellet;
 	this->m_bMobile = isMobile;
@@ -1330,9 +1441,9 @@ bool EnemyRanged::updateMovement(SGameChar * player)
 			return true;
 		}
 
-		if (this->m_bMobile)
+		if (this->m_bMobile && this->m_dAttackTime <= 0.0)
 		{
-
+			return true;
 		}
 	}
 	return false;

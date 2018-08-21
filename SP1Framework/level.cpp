@@ -3,17 +3,22 @@
 
 extern Console g_Console;
 
+SLevel::~SLevel()
+{
+	if (this->miniMap != nullptr) delete this->miniMap;
+}
+
 void SLevel::generateLevel()
 {
 	// TEMPORARY VARIABLES
 	bool * roomsHaveExit = new bool[GRID_X * GRID_Y];
+	std::vector<std::string> roomSelections, itemRoomSelections;
 
 	// INSTANTIATE VARIABLES
 	for (int index = 0; index < GRID_X * GRID_Y; index++)
 		roomsHaveExit[index] = false;
 
 	// RESET MEMBER VARIABLES
-	this->roomSelections.clear();
 	if (this->miniMap != nullptr) delete this->miniMap;
 
 	// -----Clear Level-----
@@ -26,7 +31,8 @@ void SLevel::generateLevel()
 	}
 
 	// Get possible room selections
-	g_LoadFromFloor(this->floor, &this->roomSelections);
+	g_LoadFromFloor(this->floor, &roomSelections);
+	g_LoadFromFloorItem(this->floor, &itemRoomSelections);
 
 	// -----Borders and Room Contents-----
 	// Set exit room, at least 2 rooms away from entry room
@@ -38,6 +44,13 @@ void SLevel::generateLevel()
 		this->exitRoom.X <= this->playerStartRoom.X + 1 &&
 		this->exitRoom.Y >= this->playerStartRoom.Y - 1 &&
 		this->exitRoom.Y <= this->playerStartRoom.Y + 1);
+	// Set item room somewhere in the level
+	do
+	{
+		this->itemRoom.X = rand() / (RAND_MAX / GRID_X);
+		this->itemRoom.Y = rand() / (RAND_MAX / GRID_Y);
+	} while ((this->exitRoom.X == this->itemRoom.X && this->exitRoom.Y == this->itemRoom.Y) ||
+		(this->playerStartRoom.X == this->itemRoom.X && this->playerStartRoom.Y == this->itemRoom.Y));
 
 	// Generate level
 	for (int gridRow = 0; gridRow < GRID_X; gridRow++)
@@ -57,9 +70,13 @@ void SLevel::generateLevel()
 				for (int wallColumn = 0; wallColumn < ROOM_Y + 2; wallColumn++)
 					this->level[(gridRow + 1) * (ROOM_X + 2)][1 + gridColumn * (ROOM_Y + 2) + wallColumn] = '#';
 			}
+			else if (this->itemRoom.X == gridRow && this->itemRoom.Y == gridColumn)
+			{
+				g_LoadFromItemRoom(&itemRoomSelections[rand() / (RAND_MAX / itemRoomSelections.size())], &this->level, fastCoord(gridRow, gridColumn));
+			}
 			else
 			{
-				g_LoadFromRoom(&this->roomSelections[rand() / (RAND_MAX / this->roomSelections.size())], &this->level, fastCoord(gridRow, gridColumn));
+				g_LoadFromRoom(&roomSelections[rand() / (RAND_MAX / roomSelections.size())], &this->level, fastCoord(gridRow, gridColumn));
 			}
 		}
 	}
@@ -93,6 +110,47 @@ void SLevel::generateLevel()
 		this->uncoverAll(room, roomsHaveExit);
 	}
 
+	// Add an extra door for every 6 rooms
+	int extraDoors = 0;
+	do
+	{
+		std::vector<int> directions;
+		bool isDirectionPossible[4] = { true, true, true, true };
+		COORD c;
+		c.X = rand() / (RAND_MAX / GRID_X);
+		c.Y = rand() / (RAND_MAX / GRID_Y);
+		switch (c.X)
+		{
+		case 0:
+			isDirectionPossible[2] = false;
+			break;
+		case GRID_X - 1:
+			isDirectionPossible[0] = false;
+			break;
+		}
+		switch (c.Y)
+		{
+		case 0:
+			isDirectionPossible[1] = false;
+			break;
+		case GRID_Y - 1:
+			isDirectionPossible[3] = false;
+			break;
+		}
+
+		for (int direction = 0; direction < 4; direction++)
+		{
+			if (isDirectionPossible[direction] && this->getTile(this->getCoordinatesForDoor(c.X, c.Y, direction)[0]) != '$')
+				directions.push_back(direction);
+		}
+		if (directions.empty()) continue;
+
+		COORD * doors = this->getCoordinatesForDoor(c.X, c.Y, directions[rand() / (RAND_MAX / directions.size())]);
+		this->modifyTile(doors[0], '$');
+		this->modifyTile(doors[1], '$');
+		extraDoors++;
+	} while (extraDoors < GRID_X * GRID_Y / 6);
+
 	// -----Stairs Down-----
 
 	{
@@ -118,6 +176,7 @@ void SLevel::generateLevel()
 	// DELETE ALLOCATED STORAGE
 	delete[] roomsHaveExit;
 
+	// Generate minimap
 	this->miniMap = new SMiniMap(&this->level, this->playerStartRoom, this->exitRoom);
 }
 

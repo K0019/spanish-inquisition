@@ -11,7 +11,9 @@ double	g_dDeltaTime;
 int		g_iCurrentFrameCount, g_iLastFrameCount, g_iLastMeasuredSecond;
 double	g_dAccurateElapsedTime;
 bool	g_abKeyPressed[K_COUNT];
-COORD	r_cRenderOffset; // To be used for level rendering, tile coordinates
+COORD	r_cRenderOffset, r_cTargetRenderOffset; // Used for level rendering, tile coordinates
+double r_dRenderTime, r_dTargetRenderTime;
+CStopWatch * r_cswRenderTimer;
 
 int		r_iMoveDirection;
 double	r_dMoveTime;
@@ -22,7 +24,7 @@ Console g_Console(120, 30, "The Great Escapade");
 // Game specific variables here
 EGAMESTATES			g_eGameState = S_SPLASHSCREEN;
 SLevel				g_sLevel;
-SaveDataStorage		saveDataStorage;
+DataStorage			currDataStorage;
 SAllEntities		g_sEntities; // Hold all entities in the level
 MenuEvent			g_mEvent(&g_Console);
 double				g_adBounceTime[K_COUNT]; // this is to prevent key bouncing, so we won't trigger keypresses more than once
@@ -49,29 +51,45 @@ void init(void)
 	g_eRestartGame = false;
 	// sets the initial state for the game
 	g_eGameState = S_SPLASHSCREEN;
-	if (DEBUG) g_eGameState = S_MENU;
-		g_bHasShot = false;
-		g_sEntities.g_sChar.m_cLocation.X = 2 + (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
-		g_sEntities.g_sChar.m_cLocation.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
-		g_sLevel.playerStartRoom.X = GRID_X >> 1;
-		g_sLevel.playerStartRoom.Y = GRID_Y >> 1;
-		g_sEntities.g_sChar.m_cRoom = g_sLevel.playerStartRoom;
-		//if (DEBUG) g_sEntities.g_sChar.m_bInBattle = true;
-		r_cRenderOffset.X = 1 + g_sEntities.g_sChar.m_cRoom.X * (ROOM_X + 2);
-		r_cRenderOffset.Y = 1 + g_sEntities.g_sChar.m_cRoom.Y * (ROOM_Y + 2);
-		g_mEvent.r_curspos.X = g_Console.getConsoleSize().X / 5;
-		g_mEvent.r_curspos.Y = g_Console.getConsoleSize().Y / 10 * 8;
-		g_sLevel.floor = 1;
-		g_sLevel.generateLevel();
-		g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
+	if (DEBUG) g_eGameState = S_GAME;
+
+	g_bHasShot = false;
+	g_sEntities.g_sChar.m_cLocation.X = 2 + (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
+	g_sEntities.g_sChar.m_cLocation.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
+	g_sLevel.playerStartRoom.X = GRID_X >> 1;
+	g_sLevel.playerStartRoom.Y = GRID_Y >> 1;
+	g_sEntities.g_sChar.m_cRoom = g_sLevel.playerStartRoom;
+	/*if (DEBUG)
+	{
 		COORD c;
-		c.X = (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
-		c.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
-		//addEnemy(UNIQUE_ENEMY_MELEETEST);
-		//addEnemy(UNIQUE_ENEMY_RANGEDTEST);
-		// sets the width, height and the font name to use in the console
-		g_Console.setConsoleFont(0, 16, L"Consolas");
-		g_LoadFromSave(saveDataStorage.g_iSaveData);
+		c.X = g_sEntities.g_sChar.m_cLocation.X - 3;
+		c.Y = g_sEntities.g_sChar.m_cLocation.Y;
+		addEnemy(UNIQUE_ENEMY_TESTRANGEDMOBILE);
+		g_sEntities.g_sChar.m_bInBattle = true;
+	}*/
+	r_cRenderOffset.X = r_cTargetRenderOffset.X = 1 + g_sEntities.g_sChar.m_cRoom.X * (ROOM_X + 2);
+	r_cRenderOffset.Y = r_cTargetRenderOffset.Y = 1 + g_sEntities.g_sChar.m_cRoom.Y * (ROOM_Y + 2);
+	r_dTargetRenderTime = SCREEN_SCROLL_LENGTH;
+	g_mEvent.r_menucurspos.X = g_Console.getConsoleSize().X / 5;
+	g_mEvent.r_menucurspos.Y = g_Console.getConsoleSize().Y / 10 * 8 - 1;
+	g_sLevel.floor = 1;
+	if (DEBUG) g_sLevel.floor = 3;
+	g_sLevel.generateLevel();
+	g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
+	COORD c;
+	c.X = (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
+	c.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
+    // sets the width, height and the font name to use in the console
+    g_Console.setConsoleFont(0, 16, L"Consolas");
+	g_LoadFromSave(currDataStorage.g_iSaveData);
+	g_LoadOptions(currDataStorage.g_shOptionsData);
+	g_mEvent.wPlayerColor = 
+		(currDataStorage.g_shOptionsData[0] == 2 ? 0x0d : 
+		(currDataStorage.g_shOptionsData[0] == 1) ? 0x0b : 0x0a);
+	g_mEvent.shPlayerCharColourChoice = 
+		(currDataStorage.g_shOptionsData[0] == 2 ? 2 :
+		(currDataStorage.g_shOptionsData[0] == 1) ? 1 : 0);
+	g_mEvent.bMinimap = ((currDataStorage.g_shOptionsData[1] == 0) ? false : true);
 }
 //--------------------------------------------------------------
 // Purpose  : Reset before exiting the program
@@ -111,11 +129,11 @@ void getInput( void )
 		g_abKeyPressed[K_V] = isKeyPressed(0x56);
 		g_abKeyPressed[K_SHOOTUP] = isKeyPressed(VK_UP);
 		g_abKeyPressed[K_SHOOTRIGHT] = isKeyPressed(VK_RIGHT);
-		g_abKeyPressed[K_SHOOTDOWN] = isKeyPressed(VK_DOWN);
-		g_abKeyPressed[K_SHOOTLEFT] = isKeyPressed(VK_LEFT);
-		g_abKeyPressed[K_SPACE]  = isKeyPressed(VK_SPACE);
-		g_abKeyPressed[K_ESCAPE] = isKeyPressed(VK_ESCAPE);
-		g_abKeyPressed[K_ENTER] = isKeyPressed(VK_RETURN);
+		g_abKeyPressed[K_SHOOTDOWN]	 = isKeyPressed(VK_DOWN);
+		g_abKeyPressed[K_SHOOTLEFT]  = isKeyPressed(VK_LEFT);
+		g_abKeyPressed[K_SPACE]		 = isKeyPressed(VK_SPACE);
+		g_abKeyPressed[K_ESCAPE]	 = isKeyPressed(VK_ESCAPE);
+		g_abKeyPressed[K_ENTER]		 = isKeyPressed(VK_RETURN);
 	}
 }
 
@@ -144,17 +162,11 @@ void update(CStopWatch * timer, double missedTime)
 	{
 		case S_SPLASHSCREEN : splashScreenWait(); // game logic for the splash screen
 			break;
-		case S_MENU: mainMenu();
-			break;
-		case S_HOWTOPLAY: tutorial();
-			break;
-		case S_SHOP: shop();
-			break;
-		case S_OPTIONS: options();
-			break;
-		case S_CREDITS: credits();
+		case S_MENU: menuLogic();
 			break;
 		case S_GAME: gameplay(); // gameplay logic when we are in the game
+			break;
+		case S_PAUSED: pauseScreen();
 			break;
 	}
 }
@@ -173,17 +185,11 @@ void render(CStopWatch * timer)
 	{
 		case S_SPLASHSCREEN: renderSplashScreen();
 			break;
-		case S_MENU: renderMainMenu();
-			break;
-		case S_HOWTOPLAY: renderTutorial();
-			break;
-		case S_SHOP: renderShop();
-			break;
-		case S_OPTIONS: renderOptions();
-			break;
-		case S_CREDITS: renderCredits();
+		case S_MENU: renderMenu();
 			break;
 		case S_GAME: renderGame();
+			break;
+		case S_PAUSED: renderPause();
 			break;
 	}
     renderFramerate();	// renders debug information, frame rate, elapsed time, etc
@@ -207,101 +213,167 @@ void splashScreenWait()		// waits for time to pass in splash screen
 		g_eGameState = S_MENU;
 }
 
-void mainMenu()
-{
-	processUserInput(); // checks if you should change states or do something else with the game, e.g. pause, exit
-	menuNavigate();
-	processMenuEvent();
-}
-
-void tutorial()
-{
-	processUserInput();
-	goBack();
-	processMenuEvent();
-}
-
-void shop()
-{
-	processUserInput();
-}
-
-void options()
-{
-	processUserInput();
-	doomButton();
-}
-
-void credits()
-{
-	processUserInput();
-	goBack();
-	processMenuEvent();
-}
-
 void gameplay()            // gameplay logic
 {
-	processUserInput();	// checks if you should change states or do something else with the game, e.g. pause, exit
-	controlPlayer();	// moves the character, collision detection, physics, etc
-	playerShoot(); // checks if the player should shoot
-	g_sEntities.updatePellets(); // update locations of pellets
-	checkHitPellets(); // checks if the pellets have hit anything, and update stats accordingly
-	g_sEntities.updateEnemies(); // update locations of enemies and add pellets of the enemies'
-	// sound can be played here too.
+	if (r_cRenderOffset.X == r_cTargetRenderOffset.X && r_cRenderOffset.Y == r_cTargetRenderOffset.Y)
+	{
+		//processUserInput();	// checks if you should change states or do something else with the game, e.g. pause, exit
+		detectPauseMenuProc();
+		controlPlayer();	// moves the character, collision detection, physics, etc
+		if (r_cRenderOffset.X == r_cTargetRenderOffset.X && r_cRenderOffset.Y == r_cTargetRenderOffset.Y)
+		{
+			playerShoot(); // checks if the player should shoot
+			checkHitPellets(); // checks if the pellets have hit anything, and update stats accordingly
+			g_sEntities.updatePellets(); // update locations of pellets
+			checkHitPellets(); // checks if the pellets have hit anything, and update stats accordingly
+			g_sEntities.updateEnemies(); // update locations of enemies and add pellets of the enemies'
+			// sound can be played here too.
+		}
+	}
+	else
+	{
+		moveScreen();
+	}
 }
 
-void menuNavigate()
+void menuLogic()
 {
-	bool KeyPressed = false;
-	if (g_abKeyPressed[K_SHOOTUP] && g_mEvent.sh_cursSel > 0 && g_adBounceTime[K_SHOOTUP] < g_dElapsedTime)
-	{
-		g_mEvent.sh_cursSel--;
-		g_mEvent.r_curspos.Y--;
-		KeyPressed = true;
-	}
-	else if (g_abKeyPressed[K_SHOOTDOWN] && g_mEvent.sh_cursSel < 4 && g_adBounceTime[K_SHOOTDOWN] < g_dElapsedTime)
+	menuNav();
+	submenuNav();
+}
+
+void menuNav()
+{
+	if (g_abKeyPressed[K_SHOOTDOWN] && g_mEvent.sh_cursSel < 5 && g_adBounceTime[K_SHOOTDOWN] < g_dElapsedTime && g_mEvent.shMenuState == 0)
 	{
 		g_mEvent.sh_cursSel++;
-		g_mEvent.r_curspos.Y++;
-		KeyPressed = true;
+		g_mEvent.r_menucurspos.Y++;
+		g_adBounceTime[K_SHOOTDOWN] = g_dElapsedTime + 0.15;
 	}
-	if (g_abKeyPressed[K_ENTER] && g_mEvent.bHasPressedButton == false)
+	else if (g_abKeyPressed[K_SHOOTUP] && g_mEvent.sh_cursSel > 0 && g_adBounceTime[K_SHOOTUP] < g_dElapsedTime && g_mEvent.shMenuState == 0)
+	{
+		g_mEvent.sh_cursSel--;
+		g_mEvent.r_menucurspos.Y--;
+		g_adBounceTime[K_SHOOTUP] = g_dElapsedTime + 0.15;
+	}
+	if (g_abKeyPressed[K_ENTER] && !g_mEvent.bHasPressedButton)
 	{
 		switch (g_mEvent.sh_cursSel)
 		{
 		case 0:
-			g_mEvent.bStartGame = true;
+			g_eGameState = S_GAME;
 			break;
 		case 1:
-			g_mEvent.bHowToPlay = true;
+			g_mEvent.shMenuState = 1;
 			break;
 		case 2:
-			g_mEvent.bShop = true;
+			g_mEvent.shMenuState = 2;
 			break;
 		case 3:
-			g_mEvent.bOptions = true;
+			g_mEvent.shMenuState = 3;
 			break;
 		case 4:
-			g_mEvent.bCredits = true;
-		default:
+			g_mEvent.shMenuState = 4;
+			break;
+		case 5:
+			g_bQuitGame = true;
 			break;
 		}
 	}
-	if (KeyPressed)
+	if (g_mEvent.bHasPressedButton)
 	{
-		if (g_abKeyPressed[K_SHOOTUP])
-			g_adBounceTime[K_SHOOTUP] = g_dElapsedTime + 0.125;
-		if (g_abKeyPressed[K_SHOOTDOWN]) 
-			g_adBounceTime[K_SHOOTDOWN] = g_dElapsedTime + 0.125;
+		if (!g_abKeyPressed[K_ENTER])
+		{
+			g_mEvent.bHasPressedButton = false;
+		}
+	}
+	if (g_abKeyPressed[K_ESCAPE] == true)
+	{
+		g_mEvent.shMenuState = 0;
+		g_mEvent.uiCreditsRollTime = 0;
 	}
 }
 
-void goBack()
+void submenuNav()
 {
-	if (g_abKeyPressed[K_ENTER] == true)
+	if (g_mEvent.shMenuState == 2)
 	{
-		g_mEvent.bMenu = true;
-		g_mEvent.uiCreditsRollTime = 0;
+		if (g_abKeyPressed[K_SHOOTLEFT] && g_mEvent.sh_cursSel < 5 && g_adBounceTime[K_SHOOTLEFT] < g_dElapsedTime)
+		{
+			
+		}
+	}
+	else if (g_mEvent.shMenuState == 3)
+	{
+		if (g_abKeyPressed[K_SHOOTUP] && g_adBounceTime[K_SHOOTUP] < g_dElapsedTime && g_mEvent.sh_optionSel > 0)
+		{
+			g_mEvent.sh_optionSel--;
+			g_adBounceTime[K_SHOOTUP] = g_dElapsedTime + 0.15;
+		}
+		if (g_abKeyPressed[K_SHOOTDOWN] && g_adBounceTime[K_SHOOTDOWN] < g_dElapsedTime && g_mEvent.sh_optionSel < 3)
+		{
+			g_mEvent.sh_optionSel++;
+			g_adBounceTime[K_SHOOTDOWN] = g_dElapsedTime + 0.15;
+		}
+		if (g_abKeyPressed[K_SHOOTLEFT] && g_adBounceTime[K_SHOOTLEFT] < g_dElapsedTime)
+		{
+			if (g_mEvent.sh_optionSel == 1)
+			{
+				switch (g_mEvent.shPlayerCharColourChoice)
+				{
+				case 0:
+					g_mEvent.wPlayerColor = 0x0d;
+					g_mEvent.shPlayerCharColourChoice = 2;
+					break;
+				case 1:
+					g_mEvent.wPlayerColor = 0x0a;
+					g_mEvent.shPlayerCharColourChoice = 0;
+					break;
+				case 2:
+					g_mEvent.wPlayerColor = 0x0b;
+					g_mEvent.shPlayerCharColourChoice = 1;
+					break;
+				default:
+					g_mEvent.wPlayerColor = 0x0a;
+				}
+			}
+			if (g_mEvent.sh_optionSel == 2)
+			{
+				g_mEvent.bMinimap = !g_mEvent.bMinimap;
+			}
+			g_adBounceTime[K_SHOOTLEFT] = g_dElapsedTime + 0.15;
+
+		}
+		if (g_abKeyPressed[K_SHOOTRIGHT] && g_adBounceTime[K_SHOOTRIGHT] < g_dElapsedTime)
+		{
+			if (g_mEvent.sh_optionSel == 1)
+			{
+				switch (g_mEvent.shPlayerCharColourChoice)
+				{
+				case 0:
+					g_mEvent.wPlayerColor = 0x0b;
+					g_mEvent.shPlayerCharColourChoice = 1;
+					break;
+				case 1:
+					g_mEvent.wPlayerColor = 0x0d;
+					g_mEvent.shPlayerCharColourChoice = 2;
+					break;
+				case 2:
+					g_mEvent.wPlayerColor = 0x0a;
+					g_mEvent.shPlayerCharColourChoice = 0;
+					break;
+				default:
+					g_mEvent.wPlayerColor = 0x0a;
+				}
+			}
+			if (g_mEvent.sh_optionSel == 2)
+			{
+				g_mEvent.bMinimap = !g_mEvent.bMinimap;
+			}
+			g_adBounceTime[K_SHOOTRIGHT] = g_dElapsedTime + 0.15;
+
+		}
+		doomButton();
 	}
 }
 
@@ -339,7 +411,7 @@ void controlPlayer()
 
 			for (auto& enemy : g_sEntities.m_vEnemy)
 			{
-				if (g_sEntities.g_sChar.m_cLocation.X == enemy->getLocation().X && g_sEntities.g_sChar.m_cLocation.Y == enemy->getLocation().Y)
+				if (!enemy->isDying() && g_sEntities.g_sChar.m_cLocation.X == enemy->getLocation().X && g_sEntities.g_sChar.m_cLocation.Y == enemy->getLocation().Y)
 				{
 					skip = true;
 					g_sEntities.g_sChar.m_cLocation.X++;
@@ -351,14 +423,11 @@ void controlPlayer()
 				bSomethingHappened = true;
 				if (g_sEntities.g_sChar.m_cLocation.X < r_cRenderOffset.X)
 				{
-					r_cRenderOffset.X -= (ROOM_X + 2);
+					r_cTargetRenderOffset.X -= (ROOM_X + 2);
+					//r_cRenderOffset.X -= (ROOM_X + 2);
 					g_sEntities.g_sChar.m_cLocation.X--;
-					g_sEntities.clearPellets();
-					g_sEntities.clearEnemies();
-					if (loadEnemiesFromRoom())
-						g_sEntities.g_sChar.m_bInBattle = true;
-					g_sLevel.miniMap->enteredRoom[(g_sEntities.g_sChar.m_cLocation.X - 1) / (ROOM_X + 2) * GRID_Y + (g_sEntities.g_sChar.m_cLocation.Y - 1) / (ROOM_Y + 2)] = true;
-					g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
+					changedRoomUpdate();
+					setUpMoveScreen();
 				}
 			}
 		}
@@ -384,7 +453,7 @@ void controlPlayer()
 
 			for (auto& enemy : g_sEntities.m_vEnemy)
 			{
-				if (g_sEntities.g_sChar.m_cLocation.X == enemy->getLocation().X && g_sEntities.g_sChar.m_cLocation.Y == enemy->getLocation().Y)
+				if (!enemy->isDying() && g_sEntities.g_sChar.m_cLocation.X == enemy->getLocation().X && g_sEntities.g_sChar.m_cLocation.Y == enemy->getLocation().Y)
 				{
 					skip = true;
 					g_sEntities.g_sChar.m_cLocation.Y++;
@@ -396,14 +465,11 @@ void controlPlayer()
 				bSomethingHappened = true;
 				if (g_sEntities.g_sChar.m_cLocation.Y < r_cRenderOffset.Y)
 				{
-					r_cRenderOffset.Y -= (ROOM_Y + 2);
+					r_cTargetRenderOffset.Y -= (ROOM_Y + 2);
+					//r_cRenderOffset.Y -= (ROOM_Y + 2);
 					g_sEntities.g_sChar.m_cLocation.Y--;
-					g_sEntities.clearPellets();
-					g_sEntities.clearEnemies();
-					if (loadEnemiesFromRoom())
-						g_sEntities.g_sChar.m_bInBattle = true;
-					g_sLevel.miniMap->enteredRoom[(g_sEntities.g_sChar.m_cLocation.X - 1) / (ROOM_X + 2) * GRID_Y + (g_sEntities.g_sChar.m_cLocation.Y - 1) / (ROOM_Y + 2)] = true;
-					g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
+					changedRoomUpdate();
+					setUpMoveScreen();
 				}
 			}
 		}
@@ -429,7 +495,7 @@ void controlPlayer()
 
 			for (auto& enemy : g_sEntities.m_vEnemy)
 			{
-				if (g_sEntities.g_sChar.m_cLocation.X == enemy->getLocation().X && g_sEntities.g_sChar.m_cLocation.Y == enemy->getLocation().Y)
+				if (!enemy->isDying() && g_sEntities.g_sChar.m_cLocation.X == enemy->getLocation().X && g_sEntities.g_sChar.m_cLocation.Y == enemy->getLocation().Y)
 				{
 					skip = true;
 					g_sEntities.g_sChar.m_cLocation.X--;
@@ -441,14 +507,11 @@ void controlPlayer()
 				bSomethingHappened = true;
 				if (g_sEntities.g_sChar.m_cLocation.X >= r_cRenderOffset.X + ROOM_X + 2)
 				{
-					r_cRenderOffset.X += (ROOM_X + 2);
+					r_cTargetRenderOffset.X += (ROOM_X + 2);
+					//r_cRenderOffset.X += (ROOM_X + 2);
 					g_sEntities.g_sChar.m_cLocation.X++;
-					g_sEntities.clearPellets();
-					g_sEntities.clearEnemies();
-					if (loadEnemiesFromRoom())
-						g_sEntities.g_sChar.m_bInBattle = true;
-					g_sLevel.miniMap->enteredRoom[(g_sEntities.g_sChar.m_cLocation.X - 1) / (ROOM_X + 2) * GRID_Y + (g_sEntities.g_sChar.m_cLocation.Y - 1) / (ROOM_Y + 2)] = true;
-					g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
+					changedRoomUpdate();
+					setUpMoveScreen();
 				}
 			}
 		}
@@ -474,7 +537,7 @@ void controlPlayer()
 
 			for (auto& enemy : g_sEntities.m_vEnemy)
 			{
-				if (g_sEntities.g_sChar.m_cLocation.X == enemy->getLocation().X && g_sEntities.g_sChar.m_cLocation.Y == enemy->getLocation().Y)
+				if (!enemy->isDying() && g_sEntities.g_sChar.m_cLocation.X == enemy->getLocation().X && g_sEntities.g_sChar.m_cLocation.Y == enemy->getLocation().Y)
 				{
 					skip = true;
 					g_sEntities.g_sChar.m_cLocation.Y--;
@@ -486,14 +549,11 @@ void controlPlayer()
 				bSomethingHappened = true;
 				if (g_sEntities.g_sChar.m_cLocation.Y >= r_cRenderOffset.Y + ROOM_Y + 2)
 				{
-					r_cRenderOffset.Y += (ROOM_Y + 2);
+					r_cTargetRenderOffset.Y += (ROOM_Y + 2);
+					//r_cRenderOffset.Y += (ROOM_Y + 2);
 					g_sEntities.g_sChar.m_cLocation.Y++;
-					g_sEntities.clearPellets();
-					g_sEntities.clearEnemies();
-					if (loadEnemiesFromRoom())
-						g_sEntities.g_sChar.m_bInBattle = true;
-					g_sLevel.miniMap->enteredRoom[(g_sEntities.g_sChar.m_cLocation.X - 1) / (ROOM_X + 2) * GRID_Y + (g_sEntities.g_sChar.m_cLocation.Y - 1) / (ROOM_Y + 2)] = true;
-					g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
+					changedRoomUpdate();
+					setUpMoveScreen();
 				}
 			}
 		}
@@ -504,8 +564,16 @@ void controlPlayer()
 		{
 			case '&':
 			{
-				resetLevel(++g_sLevel.floor);
-				bSomethingHappened = true;
+				if (++g_sLevel.floor > FINAL_FLOOR)
+				{
+					// YAN QUAN TODO: End game stuff
+				}
+				else
+				{
+					resetLevel(g_sLevel.floor);
+					g_sEntities.g_sChar.m_iPlayerScore += 50; //Give player 50 score for completing a level
+					bSomethingHappened = true;
+				}
 				break;
 			}
 			case '%': //When spacebar is pressed on top of an item
@@ -553,36 +621,35 @@ void controlPlayer()
 		{
 			if (g_abKeyPressed[i])
 			{
-				g_adBounceTime[i] = g_dElapsedTime + 0.20; //0.250
+				g_adBounceTime[i] = g_dElapsedTime + 0.200; //0.200 acts as the movement delay of the player, decreasing it makes the player go faster
 				if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_bHasWeapon) // Index 7 (Blue Feather): Decrease movement delay by 20/30/40/50%
 				{
 					switch (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_iWeaponLevel)
 					{
-					case 1: //Blue Feather Level 1: Decrease movement delay by 20%
+					case 0: //Blue Feather Level 1: Decrease movement delay by 20%
 						{
-							g_adBounceTime[i] *= (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.20);
+							g_adBounceTime[i] = g_dElapsedTime + ((g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.20) * 0.250);
 							break;
 						}
-					case 2: //Blue Feather Level 2: Decrease movement delay by 30%
+					case 1: //Blue Feather Level 2: Decrease movement delay by 30%
 						{
-							g_adBounceTime[i] *= (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.30);
+						g_adBounceTime[i] = g_dElapsedTime + ((g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.30) * 0.250);
 							break;
 						}
-					case 3: //Blue Feather Level 3: Decrease movement delay by 40%
+					case 2: //Blue Feather Level 3: Decrease movement delay by 40%
 						{
-							g_adBounceTime[i] *= (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.40);
+						g_adBounceTime[i] = g_dElapsedTime + ((g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.40) * 0.250);
 							break;
 						}
-					case 4: //Blue Feather Level 4: Decrease movement delay by 50%
+					case 3: //Blue Feather Level 4: Decrease movement delay by 50%
 						{
-							g_adBounceTime[i] *= (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.50);
+						g_adBounceTime[i] = g_dElapsedTime + ((g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.50) * 0.250);
 							break;
 						}
 					}
 				}
 			}
 		}
-		if (g_abKeyPressed[K_SPACE]) g_adBounceTime[K_SPACE] = g_dElapsedTime + 0.225;
 	}
 }
 
@@ -599,60 +666,11 @@ void clearScreen()
 	g_Console.clearBuffer(0x0f);
 }
 
-void processMenuEvent()
-{
-	if (g_mEvent.bHasPressedButton == false)
-	{
-		if (g_abKeyPressed[K_ENTER] == false)
-		{
-			if (g_mEvent.bStartGame == true)
-			{
-				g_eGameState = S_GAME;
-				g_mEvent.bStartGame = false;
-			}
-			if (g_mEvent.bHowToPlay == true)
-			{
-				g_eGameState = S_HOWTOPLAY;
-				g_mEvent.bHowToPlay = false;
-			}
-			if (g_mEvent.bShop == true)
-			{
-				g_eGameState = S_SHOP;
-				g_mEvent.bShop = false;
-			}
-			if (g_mEvent.bOptions == true)
-			{
-				g_eGameState = S_OPTIONS;
-				g_mEvent.bOptions = false;
-			}
-			if (g_mEvent.bMenu == true)
-			{
-				g_eGameState = S_MENU;
-				g_mEvent.bMenu = false;
-			}
-			if (g_mEvent.bCredits == true)
-			{
-				g_eGameState = S_CREDITS;
-				g_mEvent.bCredits = false;
-			}
-		}
-	}
-	else
-	{
-		if (g_abKeyPressed[K_ENTER] == true)
-		{
-			g_mEvent.bHasPressedButton = true;
-		}
-		else
-			g_mEvent.bHasPressedButton = false;
-	}
-}
-
 void doomButton()
 {
 	if (g_abKeyPressed[K_ENTER] && g_mEvent.sh_optionSel == 0)
 	{
-		if (g_mEvent.uiActivateDoomButton < 1000)
+		if (g_mEvent.uiActivateDoomButton < 100)
 		{
 			g_mEvent.uiActivateDoomButton++;
 		}
@@ -665,9 +683,9 @@ void doomButton()
 				NukedSaveData[i] = 0;
 			}
 			g_SaveToSave(NukedSaveData);
-			g_eGameState = S_MENU;
+			g_mEvent.shMenuState = 0;
 			g_mEvent.bHasPressedButton = true;
-			g_LoadFromSave(saveDataStorage.g_iSaveData);
+			g_LoadFromSave(currDataStorage.g_iSaveData);
 		}
 	}
 	else
@@ -676,9 +694,22 @@ void doomButton()
 	}
 }
 
-void processOptionsEvent()
+void detectPauseMenuProc()
 {
-	
+	if (g_abKeyPressed[K_ESCAPE])
+	{
+		/*g_mEvent.bHasPaused = true;*/
+		g_mEvent.bPausedGame = !g_mEvent.bPausedGame;
+	}
+	if (g_mEvent.bPausedGame)
+		g_eGameState = S_PAUSED;
+	else
+		g_eGameState = S_GAME;
+}
+
+void pauseScreen()
+{
+	detectPauseMenuProc();
 }
 
 void renderSplashScreen()  // renders the splash screen
@@ -695,41 +726,15 @@ void renderSplashScreen()  // renders the splash screen
 	g_Console.writeToBuffer(c, "Press 'Esc' to quit", 0x09);
 }
 
-void renderMainMenu()
+void renderMenu()
 {
-	g_mEvent.renderTitle();
-	g_mEvent.renderMenu();
-	g_mEvent.renderCursor();
-	renderScore();
-}
-
-void renderTutorial()
-{
-	g_mEvent.renderTutorialDetails();
-}
-
-void renderShop()
-{
-	g_mEvent.renderItemTitleSelected();
-	g_mEvent.renderItemPriceSelected();
-	g_mEvent.renderItemDescSelected();
-}
-
-void renderOptions()
-{
-	g_mEvent.renderDoomButton();
-	g_mEvent.renderGoomButtonBrackets();
-}
-
-void renderCredits()
-{
-	g_mEvent.renderCreditsRollAnimation();
-	g_mEvent.renderCreditsRollText();
+	g_mEvent.MenuRender(currDataStorage.g_shOptionsData);
 }
 
 void renderGame()
 {
 	renderLevel();
+	renderDeadEnemy();
 	renderCharacter();    // renders the character into the buffer
 	renderEnemy();
 	renderPellets();
@@ -738,9 +743,24 @@ void renderGame()
 	CharacterDeath();
 }
 
+void renderPause()
+{
+	COORD c;
+	c.X = 0;
+	c.Y = 0;
+	for (; c.X < g_Console.getConsoleSize().X; c.X++)
+	{
+		for (; c.Y < g_Console.getConsoleSize().Y; c.Y++)
+		{
+			g_Console.writeToBuffer(c, " ", 0x40);
+		}
+		c.Y = 0;
+	}
+}
+
 void renderScore() 
 {
-	unsigned int LoadedScore = saveDataStorage.g_iSaveData[0];
+	unsigned int LoadedScore = currDataStorage.g_iSaveData[0];
 	std::string g_sScore = std::to_string(LoadedScore);
 	COORD c = g_Console.getConsoleSize();
 	c.X -= (SHORT)g_sScore.length();
@@ -753,8 +773,14 @@ void renderScore()
 void renderCharacter()
 {
 	// Draw the location of the character
-	WORD charColor = g_mEvent.wPlayerColor;
 	COORD c = g_sEntities.g_sChar.getRealCoords();
+	c.X += (r_cTargetRenderOffset.Y - r_cRenderOffset.Y) << 2;
+	c.Y += (r_cTargetRenderOffset.X - r_cRenderOffset.X) << 1;
+
+	if (c.X < 1 || c.X >= 1 + ((ROOM_Y + 2) << 2) || c.Y < 1 || c.Y >= 1 + ((ROOM_X + 2) << 1)) return;
+
+	WORD charColor = g_mEvent.wPlayerColor;
+	//WORD charColor = 0x0A;
 	g_Console.writeToBuffer(c, "@@@@", charColor);
 	c.Y++;
 	g_Console.writeToBuffer(c, "@@@@", charColor);
@@ -807,22 +833,22 @@ void playerShoot()
 	{
 		switch (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_iWeaponLevel) // Index 5 (Magic Potion): Decrease attack delay by 20/30/40/50%
 		{
-		case 1: //Magic Potion Level 1: Decrease attack delay by 20%
+		case 0: //Magic Potion Level 1: Decrease attack delay by 20%
 			{
 				delay = SHOOTSPEED * (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_fWeaponAttackSpeed - 0.20);
 				break;
 			}
-		case 2: //Magic Potion Level 2: Decrease attack delay by 30%
+		case 1: //Magic Potion Level 2: Decrease attack delay by 30%
 			{
 				delay = SHOOTSPEED * (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_fWeaponAttackSpeed - 0.30);
 				break;
 			}
-		case 3: //Magic Potion Level 3: Decrease attack delay by 40%
+		case 2: //Magic Potion Level 3: Decrease attack delay by 40%
 			{
 				delay = SHOOTSPEED * (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_fWeaponAttackSpeed - 0.40);
 				break;
 			}
-		case 4: //Magic Potion Level 4: Decrease attack delay by 50%
+		case 3: //Magic Potion Level 4: Decrease attack delay by 50%
 			{
 				delay = SHOOTSPEED * (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_fWeaponAttackSpeed - 0.50);
 				break;
@@ -926,6 +952,38 @@ void playerShoot()
 	}
 }
 
+void setUpMoveScreen()
+{
+	r_cswRenderTimer = new CStopWatch;
+	r_cswRenderTimer->startTimer();
+	r_dRenderTime = 0.0;
+}
+void moveScreen()
+{
+	r_dRenderTime += r_cswRenderTimer->getElapsedTime();
+	if (r_cRenderOffset.X == r_cTargetRenderOffset.X) // If moving left or right
+	{
+		if (r_dRenderTime >= (r_dTargetRenderTime / (ROOM_Y + 2)))
+		{
+			r_cRenderOffset.Y += (r_cTargetRenderOffset.Y > r_cRenderOffset.Y) ? (1) : (-1);
+			r_dRenderTime -= r_dTargetRenderTime / (ROOM_Y + 2);
+		}
+	}
+	else // If moving up or down
+	{
+		if (r_dRenderTime >= (r_dTargetRenderTime / (ROOM_X + 2)))
+		{
+			r_cRenderOffset.X += (r_cTargetRenderOffset.X > r_cRenderOffset.X) ? (1) : (-1);
+			r_dRenderTime -= r_dTargetRenderTime / (ROOM_X + 2);
+		}
+	}
+
+	if (r_cRenderOffset.X == r_cTargetRenderOffset.X && r_cRenderOffset.Y == r_cTargetRenderOffset.Y)
+	{
+		delete r_cswRenderTimer;
+	}
+}
+
 void renderLevel()
 {
 	// Start from offset of 1,1
@@ -948,6 +1006,15 @@ void renderLevel()
 					break;
 				case 2:
 					render(c, "    ", "    ", 0x20);
+					break;
+				case 3:
+					render(c, "    ", "    ", 0x30);
+					break;
+				case 4:
+					render(c, "    ", "    ", 0x60);
+					break;
+				case 5:
+					render(c, "    ", "    ", 0x50);
 					break;
 				}
 				break;
@@ -993,33 +1060,35 @@ void renderMiniMap()
 	COORD c;
 	c.X = g_Console.getConsoleSize().X - ((1 + (GRID_Y << 1)) << 1);
 	c.Y = g_Console.getConsoleSize().Y - (1 + (GRID_X << 1));
-
-	for (int row = 0; row < (GRID_X << 1) + 1; row++)
+	if (g_mEvent.bMinimap)
 	{
-		for (int column = 0; column < (GRID_Y << 1) + 1; column++)
+		for (int row = 0; row < (GRID_X << 1) + 1; row++)
 		{
-			switch (g_sLevel.miniMap->map[row][column])
+			for (int column = 0; column < (GRID_Y << 1) + 1; column++)
 			{
-			case '#':
-				g_Console.writeToBuffer(c, "  ", 0x70);
-				break;
-			case '$':
-				g_Console.writeToBuffer(c, "  ", 0x80);
-				break;
-			case '@':
-				g_Console.writeToBuffer(c, "  ", 0x40);
-				break;
-			case '!':
-				g_Console.writeToBuffer(c, "  ", 0x20);
-				break;
-			case '&':
-				g_Console.writeToBuffer(c, "  ", 0x30);
-				break;
+				switch (g_sLevel.miniMap->map[row][column])
+				{
+				case '#':
+					g_Console.writeToBuffer(c, "  ", 0x70);
+					break;
+				case '$':
+					g_Console.writeToBuffer(c, "  ", 0x80);
+					break;
+				case '@':
+					g_Console.writeToBuffer(c, "  ", 0x40);
+					break;
+				case '!':
+					g_Console.writeToBuffer(c, "  ", 0x20);
+					break;
+				case '&':
+					g_Console.writeToBuffer(c, "  ", 0x30);
+					break;
+				}
+				c.X += 2;
 			}
-			c.X += 2;
+			c.Y++;
+			c.X = g_Console.getConsoleSize().X - ((1 + (GRID_Y << 1)) << 1);
 		}
-		c.Y++;
-		c.X = g_Console.getConsoleSize().X - ((1 + (GRID_Y << 1)) << 1);
 	}
 }
 
@@ -1033,7 +1102,24 @@ void renderPellets()
 			switch (pellet.m_bHitReason)
 			{
 			case pellet::P_WALL:
-				render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x89);
+				switch (g_sLevel.floor)
+				{
+				case 1:
+					render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x89);
+					break;
+				case 2:
+					render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x29);
+					break;
+				case 3:
+					render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x39);
+					break;
+				case 4:
+					render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x69);
+					break;
+				case 5:
+					render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x59);
+					break;
+				}
 				break;
 			case pellet::P_DOOR:
 				if (g_sEntities.g_sChar.m_bInBattle)
@@ -1067,7 +1153,24 @@ void renderPellets()
 			switch (pellet.m_bHitReason)
 			{
 			case pellet::P_WALL:
-				render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x84);
+				switch (g_sLevel.floor)
+				{
+				case 1:
+					render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x84);
+					break;
+				case 2:
+					render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x24);
+					break;
+				case 3:
+					render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x34);
+					break;
+				case 4:
+					render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x64);
+					break;
+				case 5:
+					render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x54);
+					break;
+				}
 				break;
 			case pellet::P_DOOR:
 				if (g_sEntities.g_sChar.m_bInBattle)
@@ -1099,6 +1202,19 @@ void renderEnemy()
 {
 	for (auto& enemy : g_sEntities.m_vEnemy)
 	{
+		if (enemy->isDying()) continue;
+		COORD c = enemy->getRealLocation();
+		c.X += (r_cTargetRenderOffset.Y - r_cRenderOffset.Y) << 2;
+		c.Y += (r_cTargetRenderOffset.X - r_cRenderOffset.X) << 1;
+		if (c.X < 1 || c.X >= 1 + ((ROOM_Y + 2) << 2) || c.Y < 1 || c.Y >= 1 + ((ROOM_X + 2) << 1)) continue;
+		render(c, enemy->getIdentifier()[0], enemy->getIdentifier()[1], enemy->getColor());
+	}
+}
+void renderDeadEnemy()
+{
+	for (auto& enemy : g_sEntities.m_vEnemy)
+	{
+		if (!enemy->isDying()) continue;
 		render(enemy->getRealLocation(), enemy->getIdentifier()[0], enemy->getIdentifier()[1], enemy->getColor());
 	}
 }
@@ -1162,28 +1278,6 @@ void checkHitPellets()
 			continue;
 		}
 
-
-		// Check for exceed lifespan
-		if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[0].m_bHasWeapon) //Index 1 (Heaven Cracker): Doubles the pellet lifespan to 5 seconds.
-		{
-			g_sEntities.g_sChar.m_dRange *= 2; //!Current issue!: if player has weapon, both player and enemy receives the range increase
-			if (pellet->m_dLifespan >= g_sEntities.g_sChar.m_dRange)  //Check if the pellet has reached its lifespan of 5 seconds, if it does, clear the pellet and show the "><" hit effect.
-			{
-				pellet->m_bHit = true;
-				pellet->m_bHitReason = pellet::P_FLOOR;
-				continue;
-			}
-		}
-		else
-		{
-			if (pellet->m_dLifespan >= g_sEntities.g_sChar.m_dRange)
-			{
-				pellet->m_bHit = true;
-				pellet->m_bHitReason = pellet::P_FLOOR;
-				continue;
-			}
-		}
-
 		// Check collision with wall
 		if ((pellet->m_cLocation.X - 1) % (ROOM_X + 2) == 0 ||
 			pellet->m_cLocation.X % (ROOM_X + 2) == 0 ||
@@ -1223,22 +1317,22 @@ void checkHitPellets()
 			{
 				switch (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[3].m_iWeaponLevel)
 				{
-					case 1: //Glass Canon Level 1: All Enemies deal 2 more damage to the player
+					case 0: //Glass Canon Level 1: All Enemies deal 2 more damage to the player
 						{
 							g_sEntities.g_sChar.m_iPlayerHealth -= (pellet->m_iDamage + 2);
 							break;
 						}
-					case 2: //Glass Canon Level 2: All Enemies deal 3 more damage to the player
+					case 1: //Glass Canon Level 2: All Enemies deal 3 more damage to the player
 						{
 							g_sEntities.g_sChar.m_iPlayerHealth -= (pellet->m_iDamage + 3);
 							break;
 						}
-					case 3: //Glass Canon Level 3: All Enemies deal 4 more damage to the player
+					case 2: //Glass Canon Level 3: All Enemies deal 4 more damage to the player
 						{
 							g_sEntities.g_sChar.m_iPlayerHealth -= (pellet->m_iDamage + 4);
 							break;
 						}
-					case 4: //Glass Canon Level 4: All Enemies deal 5 more damage to the player
+					case 3: //Glass Canon Level 4: All Enemies deal 5 more damage to the player
 						{
 							g_sEntities.g_sChar.m_iPlayerHealth -= (pellet->m_iDamage + 5);
 							break;
@@ -1249,6 +1343,13 @@ void checkHitPellets()
 			{
 				g_sEntities.g_sChar.m_iPlayerHealth -= pellet->m_iDamage;
 			}
+
+			//If player takes damage from a pellet, -5 score. If score is already 0, do not minus.
+			if (g_sEntities.g_sChar.m_iPlayerScore != 0)
+			{
+				g_sEntities.g_sChar.m_iPlayerScore -= 5;
+			}
+
 			// TODO: Check for death
 
 			pellet++;
@@ -1272,6 +1373,32 @@ void checkHitPellets()
 			}
 		}
 
+		// Check for exceeded lifespan
+		if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[0].m_bHasWeapon) //Index 1 (Heaven Cracker): Doubles the pellet lifespan to 5 seconds.
+		{
+			g_sEntities.g_sChar.m_dRange *= 2;
+			if ((pellet->m_dEnemyLifespan >= 2.5) && (pellet->m_bFriendly == false)) //Erase enemy pellets after 2.5 seconds
+			{
+				pellet->m_bHit = true;
+				pellet->m_bHitReason = pellet::P_FLOOR;
+			}
+			if ((pellet->m_dPlayerLifespan >= g_sEntities.g_sChar.m_dRange) && (pellet->m_bFriendly == true))  //Check if the pellet has reached its lifespan of 5 seconds, if it does, clear the pellet and show the "><" hit effect.
+			{
+				pellet->m_bHit = true; //Erase player bullets after 5 seconds, updated from Heaven Cracker
+				pellet->m_bHitReason = pellet::P_FLOOR;
+				continue;
+			}
+		}
+		else
+		{
+			if (pellet->m_dPlayerLifespan >= g_sEntities.g_sChar.m_dRange) //Erase both player and enemy pellets after 2.5 seconds
+			{
+				pellet->m_bHit = true;
+				pellet->m_bHitReason = pellet::P_FLOOR;
+				continue;
+			}
+		}
+
 		pellet++;
 	}
 }
@@ -1290,12 +1417,22 @@ void render(COORD c, std::string& text, std::string& text2, WORD color)
 	g_Console.writeToBuffer(c, text2.c_str(), color);
 }
 
+void changedRoomUpdate()
+{
+	g_sEntities.clearPellets();
+	g_sEntities.clearEnemies();
+	if (loadEnemiesFromRoom())
+		g_sEntities.g_sChar.m_bInBattle = true;
+	g_sLevel.miniMap->enteredRoom[(g_sEntities.g_sChar.m_cLocation.X - 1) / (ROOM_X + 2) * GRID_Y + (g_sEntities.g_sChar.m_cLocation.Y - 1) / (ROOM_Y + 2)] = true;
+	g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
+}
+
 bool loadEnemiesFromRoom()
 {
 	bool roomHasEnemies = false;
-	for (int row = r_cRenderOffset.X; row < r_cRenderOffset.X + ROOM_X + 2; row++)
+	for (int row = r_cTargetRenderOffset.X; row < r_cTargetRenderOffset.X + ROOM_X + 2; row++)
 	{
-		for (int column = r_cRenderOffset.Y; column < r_cRenderOffset.Y + ROOM_Y + 2; column++)
+		for (int column = r_cTargetRenderOffset.Y; column < r_cTargetRenderOffset.Y + ROOM_Y + 2; column++)
 		{
 			COORD c = fastCoord(row, column);
 			switch (g_sLevel.level[row][column])
@@ -1307,6 +1444,11 @@ bool loadEnemiesFromRoom()
 				break;
 			case 'm':
 				addEnemy(UNIQUE_ENEMY_MAGE);
+				roomHasEnemies = true;
+				g_sLevel.level[row][column] = ' ';
+				break;
+			case 'k':
+				addEnemy(UNIQUE_ENEMY_KNIGHT);
 				roomHasEnemies = true;
 				g_sLevel.level[row][column] = ' ';
 				break;

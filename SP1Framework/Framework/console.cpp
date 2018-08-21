@@ -34,7 +34,7 @@ void gotoXY(SHORT iX, SHORT iY)
 void colour(WORD wAttrib)
 {
 	HANDLE hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
-	SetConsoleTextAttribute( hStdout, wAttrib );        
+	SetConsoleTextAttribute( hStdout, wAttrib );
 }
 
 //--------------------------------------------------------------

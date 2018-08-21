@@ -26,6 +26,7 @@ void SAllEntities::updateEnemies()
 		
 		if ((*enemy)->isDead())
 		{
+			(*enemy)->scoreGiven(&this->g_sChar);
 			enemy = this->m_vEnemy.erase(enemy);
 			continue;
 		}

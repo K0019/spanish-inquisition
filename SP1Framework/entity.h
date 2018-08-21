@@ -23,7 +23,7 @@ struct SAllEntities
 
 	/*ENEMY RELATED*/
 	std::vector<std::unique_ptr<Enemy>> m_vEnemy; // Container for enemies
-	void updateEnemies(); // Update movement and attack of enemies
+	void updateEnemies(); // Update movement and attack of enemies, also update enemy alive/dead status
 	void clearEnemies(); // Erase the enemies that are dead
 };
 

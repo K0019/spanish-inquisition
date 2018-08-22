@@ -1,7 +1,7 @@
 #include "item.h"
 
 //Constructor to initialise all item information
-SItem::SItem(std::string name, int index, int damage, int healthGiven, float attackSpeed, float velocity, float moveSpeed, bool hasWeapon, int weaponLevel)
+SItem::SItem(std::string name, int index, int damage, int healthGiven, float attackSpeed, float velocity, float moveSpeed, bool hasWeapon, int weaponLevel, int cost)
 {
 	this->m_sName = name;
 	this->m_iWeaponIndex = index;
@@ -12,18 +12,19 @@ SItem::SItem(std::string name, int index, int damage, int healthGiven, float att
 	this->m_fweaponMovementSpeed = moveSpeed;
 	this->m_bHasWeapon = hasWeapon;
 	this->m_iWeaponLevel = weaponLevel;
+	this->m_iWeaponCost = cost;
 }
 
 
 SAllItems::SAllItems() //Constructor to initialise each unique item and their stats.
 {
-	this->addItem(SItem("Heaven Cracker", 0, 0, 0, 0.0, 0.0, 0.0, false, 0));
-	this->addItem(SItem("Enchanted Sword", 1, 2, 3, 0.0, 0.0, 0.0, false, 0));
-	this->addItem(SItem("Health Potion", 2, 0, 5, 0.0, 0.0, 0.0, false, 0));
-	this->addItem(SItem("Glass Canon", 3, 4, 0, 0.0, 0.0, 0.0, false, 0));
-	this->addItem(SItem("Magic Potion", 4, 0, 0, (float)1.0, (float)1.0, 0.0, false, 0));
-	this->addItem(SItem("Bonus!", 5, 0, 0, 0.0, 0.0, 0.0, false, 0));
-	this->addItem(SItem("Blue Feather", 6, 0, 0, 0.0, 0.0, (float)1.0, false, 0));
+	this->addItem(SItem("Heaven Cracker", 0, 0, 0, 0.0, 0.0, 0.0, false, 0, 500));
+	this->addItem(SItem("Enchanted Sword", 1, 2, 3, 0.0, 0.0, 0.0, false, 0, 500));
+	this->addItem(SItem("Health Potion", 2, 0, 5, 0.0, 0.0, 0.0, false, 0, 500));
+	this->addItem(SItem("Glass Canon", 3, 4, 0, 0.0, 0.0, 0.0, false, 0, 500));
+	this->addItem(SItem("Magic Potion", 4, 0, 0, (float)1.0, (float)1.0, 0.0, false, 0, 500));
+	this->addItem(SItem("Bonus!", 5, 0, 0, 0.0, 0.0, 0.0, false, 0, 500));
+	this->addItem(SItem("Blue Feather", 6, 0, 0, 0.0, 0.0, (float)1.0, false, 0, 500));
 }
 
 

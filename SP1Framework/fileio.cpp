@@ -18,7 +18,7 @@ void g_LoadFromSave(unsigned int* SaveDataArray)
 		std::ofstream SaveFileData("../res/SaveData/saves.txt");
 		if (SaveFileData.is_open())
 		{
-			for (int i = 0; i < 9; i++)
+			for (int i = 0; i < 8; i++)
 			{
 				SaveFileData << 0 << '\n';
 			}

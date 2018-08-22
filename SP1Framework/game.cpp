@@ -84,15 +84,7 @@ void init(void)
 	c.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
     // sets the width, height and the font name to use in the console
     g_Console.setConsoleFont(0, 16, L"Consolas");
-	g_LoadFromSave(currDataStorage.g_iSaveData);
-	g_LoadOptions(currDataStorage.g_shOptionsData);
-	g_mEvent.wPlayerColor = 
-		(currDataStorage.g_shOptionsData[0] == 2 ? 0x0d : 
-		(currDataStorage.g_shOptionsData[0] == 1) ? 0x0b : 0x0a);
-	g_mEvent.shPlayerCharColourChoice = 
-		(currDataStorage.g_shOptionsData[0] == 2 ? 2 :
-		(currDataStorage.g_shOptionsData[0] == 1) ? 1 : 0);
-	g_mEvent.bMinimap = ((currDataStorage.g_shOptionsData[1] == 0) ? false : true);
+	loadGame();
 }
 //--------------------------------------------------------------
 // Purpose  : Reset before exiting the program
@@ -209,6 +201,34 @@ void render(CStopWatch * timer)
 	}
 }
 
+void loadGame()
+{
+	g_LoadFromSave(currDataStorage.g_iSaveData);
+	g_LoadOptions(currDataStorage.g_shOptionsData);
+	g_mEvent.wPlayerColor =
+		(currDataStorage.g_shOptionsData[0] == 2 ? 0x0d :
+		(currDataStorage.g_shOptionsData[0] == 1) ? 0x0b : 0x0a);
+	g_mEvent.shPlayerCharColourChoice =
+		(currDataStorage.g_shOptionsData[0] == 2 ? 2 :
+		(currDataStorage.g_shOptionsData[0] == 1) ? 1 : 0);
+	g_mEvent.bMinimap = ((currDataStorage.g_shOptionsData[1] == 0) ? false : true);
+	for (int i = 0; i < g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList.size(); i++)
+	{
+		g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[i].m_iWeaponLevel = currDataStorage.g_iSaveData[1 + i];
+	}
+	g_sEntities.g_sChar.m_iGlobalScore = currDataStorage.g_iSaveData[0];
+}
+
+void saveGame()
+{
+	currDataStorage.g_iSaveData[0] = g_sEntities.g_sChar.m_iGlobalScore;
+	for (int i = 0; i < 8; i++)
+	{
+		currDataStorage.g_iSaveData[1 + i] = g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[i].m_iWeaponLevel;
+	}
+	g_SaveToSave(currDataStorage.g_iSaveData);
+}
+
 void splashScreenWait()		// waits for time to pass in splash screen
 {
 	//processUserInput(); // checks if you should change states or do something else with the game, e.g. pause, exit
@@ -310,6 +330,12 @@ void submenuNav()
 		{
 			g_mEvent.sh_shopItemSel++;
 			g_adBounceTime[K_SHOOTRIGHT] = g_dElapsedTime + 0.15;
+		}
+		if (g_abKeyPressed[K_ENTER] && g_adBounceTime[K_ENTER] < g_dElapsedTime)
+		{
+			if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[g_mEvent.sh_shopItemSel].m_iWeaponLevel < 3)
+				g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[g_mEvent.sh_shopItemSel].m_iWeaponLevel++;
+			g_adBounceTime[K_ENTER] = g_dElapsedTime + 0.15;
 		}
 	}
 	else if (g_mEvent.shMenuState == 3)
@@ -719,11 +745,11 @@ void doomButton()
 
 void detectPauseMenuProc()
 {
-	if (g_abKeyPressed[K_ESCAPE] && g_adBounceTime[K_ENTER] < g_dElapsedTime)
+	if (g_abKeyPressed[K_ESCAPE] && g_adBounceTime[K_ESCAPE] < g_dElapsedTime)
 	{
 		/*g_mEvent.bHasPaused = true;*/
 		g_mEvent.bPausedGame = !g_mEvent.bPausedGame;
-		g_adBounceTime[K_ENTER] = g_dElapsedTime + 0.25;
+		g_adBounceTime[K_ESCAPE] = g_dElapsedTime + 0.25;
 	}
 	if (g_mEvent.bPausedGame)
 		g_eGameState = S_PAUSED;
@@ -738,16 +764,51 @@ void pauseScreen()
 
 void renderSplashScreen()  // renders the splash screen
 {
-	COORD c = g_Console.getConsoleSize();
-	c.Y /= 3;
-	c.X = g_Console.getConsoleSize().X / 2 - 20;
-	g_Console.writeToBuffer(c, "A game in 3 seconds", 0x03);
-	c.Y += 1;
-	g_Console.writeToBuffer(c, "Press WASD to move the character", 0x09);
-	c.Y += 1;
-	g_Console.writeToBuffer(c, "Press Arrow keys to shoot", 0x09);
-	c.Y += 1;
-	g_Console.writeToBuffer(c, "Press 'Esc' to quit", 0x09);
+	COORD c;
+	c.X = 0;
+	c.Y = 0;
+	for (int i = 0; i < g_Console.getConsoleSize().Y; i++)
+	{
+		for (int j = 0; j < g_Console.getConsoleSize().X; j++)
+		{
+			g_Console.writeToBuffer(c, " ", 0x60);
+			c.X++;
+		}
+		c.X = 0;
+		c.Y++;
+	}
+	c = g_Console.getConsoleSize();
+	(c.X >>= 1) -= 16;
+	(c.Y >>= 1) -= 3;
+	for (int i = 0; i < 9; i++)
+	{
+		for (int j = 0; j < 33; j++)
+		{
+			g_Console.writeToBuffer(c, " ", 0x00);
+			c.X++;
+		}
+		c.X = (g_Console.getConsoleSize().X >> 1) - 16;
+		c.Y++;
+	}
+	std::string TeamName[9];
+	TeamName[0] = "                                 ";
+	TeamName[1] = " ллллл ллллл  ллл   л л     лл   ";
+	TeamName[2] = "   л   л     л   л л л л   л л   ";
+	TeamName[3] = "   л   л     л   л л л л     л   ";
+	TeamName[4] = "   л   лллл  ллллл л л л     л   ";
+	TeamName[5] = "   л   л     л   л л л л     л   ";
+	TeamName[6] = "   л   л     л   л л   л     л   ";
+	TeamName[7] = "   л   ллллл л   л л   л   ллллл ";
+	TeamName[8] = "                                 ";
+	c = g_Console.getConsoleSize();
+	(c.X >>= 1) -= 17;
+	(c.Y >>= 1) -= 4;
+	for (int i = 0; i < 9; i++)
+	{
+		g_Console.writeToBuffer(c, TeamName[i], 0x84);
+		c.Y++;
+	}
+
 }
 
 void renderMenu()
@@ -840,6 +901,7 @@ void renderFramerate()
 		// TODO: Show dropped frames
 	}
 }
+
 void renderToScreen()
 {
     // Writes the buffer to the console, hence you will see what you have written
@@ -1510,10 +1572,12 @@ void addEnemy(EnemyMelee * enemy)
 {
 	g_sEntities.m_vEnemy.push_back(std::move(std::unique_ptr<EnemyMelee>(enemy)));
 }
+
 void addEnemy(EnemyRanged * enemy)
 {
 	g_sEntities.m_vEnemy.push_back(std::move(std::unique_ptr<EnemyRanged>(enemy)));
 }
+
 void CharacterDeath()
 {
 	if (g_sEntities.g_sChar.m_iPlayerHealth <= 0)

@@ -313,5 +313,8 @@
     <Text Include="..\res\MapData\RoomData\ItemRooms\30.txt">
       <Filter>Resource Files\MapData\RoomData\ItemRooms</Filter>
     </Text>
+    <Text Include="..\res\MapData\RoomData\NormalRooms\31.txt">
+      <Filter>Resource Files\MapData\RoomData\NormalRooms</Filter>
+    </Text>
   </ItemGroup>
 </Project>

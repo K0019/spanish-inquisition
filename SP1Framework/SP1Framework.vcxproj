@@ -168,6 +168,7 @@
     <Text Include="..\res\MapData\RoomData\NormalRooms\2c.txt" />
     <Text Include="..\res\MapData\RoomData\NormalRooms\2e.txt" />
     <Text Include="..\res\MapData\RoomData\NormalRooms\2f.txt" />
+    <Text Include="..\res\MapData\RoomData\NormalRooms\31.txt" />
     <Text Include="..\res\SaveData\options.txt" />
     <Text Include="..\res\SaveData\saves.txt" />
   </ItemGroup>

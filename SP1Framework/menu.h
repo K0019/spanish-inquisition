@@ -32,6 +32,8 @@ struct MenuEvent
 
 	void MenuRender(unsigned short* OptionsDataArray, std::vector<SItem> * itemList);
 
+	void renderMenuControls();
+
 	void renderTitle();						// renders banner in title screen
 	void renderMenu();						// renders menu options
 	void renderMenuCursor();				// renders the cursor

@@ -52,10 +52,11 @@ void update      ( CStopWatch * timer, double missedTime ); /* FRAMEWORK */ // u
 void render      ( CStopWatch * timer ); /* FRAMEWORK */ // renders the current state of the game to the console
 void shutdown    ( void ); /* FRAMEWORK */ // do clean up, free memory
 void RestartGame();
-
 /*
 	THE UPDATE FUNCTIONS
 */
+void loadGame();
+void saveGame();
 void splashScreenWait();	// waits for time to pass in splash screen
 void playerShoot();			// allows the player to shoot
 void gameplay();			// gameplay logic

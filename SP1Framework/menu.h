@@ -14,6 +14,7 @@ struct MenuEvent
 	WORD wPlayerColor = 0x0A;				// the color of player (to change in options)
 	bool bCredits;							// event processor: if player selected credits
 	bool bHasPressedButton;					// event processor: the button has been pressed
+	bool bPreventAccident;					// here
 	bool bMinimap;							// event processor: if the minimap option is toggled
 	bool bPausedGame;
 	bool bQuitGame;

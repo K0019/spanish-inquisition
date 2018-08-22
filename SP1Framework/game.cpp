@@ -222,7 +222,7 @@ void loadGame()
 void saveGame()
 {
 	currDataStorage.g_iSaveData[0] = g_sEntities.g_sChar.m_iGlobalScore;
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < 7; i++)
 	{
 		currDataStorage.g_iSaveData[1 + i] = g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[i].m_iWeaponLevel;
 	}
@@ -279,7 +279,7 @@ void menuNav()
 		g_mEvent.r_menucurspos.Y--;
 		g_adBounceTime[K_SHOOTUP] = g_dElapsedTime + 0.15;
 	}
-	if (g_abKeyPressed[K_ENTER] && !g_mEvent.bHasPressedButton)
+	if (g_abKeyPressed[K_ENTER] && !g_mEvent.bHasPressedButton && g_mEvent.shMenuState == 0)
 	{
 		switch (g_mEvent.sh_cursSel)
 		{
@@ -291,6 +291,7 @@ void menuNav()
 			break;
 		case 2:
 			g_mEvent.shMenuState = 2;
+			g_mEvent.bPreventAccident = true;
 			break;
 		case 3:
 			g_mEvent.shMenuState = 3;
@@ -333,9 +334,27 @@ void submenuNav()
 		}
 		if (g_abKeyPressed[K_ENTER] && g_adBounceTime[K_ENTER] < g_dElapsedTime)
 		{
-			if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[g_mEvent.sh_shopItemSel].m_iWeaponLevel < 3)
-				g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[g_mEvent.sh_shopItemSel].m_iWeaponLevel++;
-			g_adBounceTime[K_ENTER] = g_dElapsedTime + 0.15;
+			if (!g_mEvent.bPreventAccident)
+			{
+				if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[g_mEvent.sh_shopItemSel].m_iWeaponLevel < 3)
+				{
+					if (g_sEntities.g_sChar.m_iGlobalScore >= g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[g_mEvent.sh_shopItemSel].m_iWeaponCost)
+					{
+						saveGame();
+						loadGame();
+						g_sEntities.g_sChar.m_iGlobalScore -= g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[g_mEvent.sh_shopItemSel].m_iWeaponCost;
+						g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[g_mEvent.sh_shopItemSel].m_iWeaponLevel++;
+					}
+				}
+				g_adBounceTime[K_ENTER] = g_dElapsedTime + 0.15;
+			}
+		}
+		else
+		{
+			if (!g_abKeyPressed[K_ENTER])
+			{
+				g_mEvent.bPreventAccident = false;
+			}
 		}
 	}
 	else if (g_mEvent.shMenuState == 3)
@@ -413,7 +432,7 @@ void submenuNav()
 			currDataStorage.g_shOptionsData[0] = g_mEvent.shPlayerCharColourChoice;
 			currDataStorage.g_shOptionsData[1] = g_mEvent.bMinimap;
 			g_SaveOptions(currDataStorage.g_shOptionsData);
-			g_adBounceTime[K_ENTER] = g_dElapsedTime + 0.15;
+			g_adBounceTime[K_ENTER] = g_dElapsedTime + 1;
 		}
 		doomButton();
 	}
@@ -814,6 +833,7 @@ void renderSplashScreen()  // renders the splash screen
 void renderMenu()
 {
 	g_mEvent.MenuRender(currDataStorage.g_shOptionsData, &g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList);
+	renderScore();
 }
 
 void renderGame()
@@ -845,14 +865,16 @@ void renderPause()
 
 void renderScore() 
 {
-	unsigned int LoadedScore = currDataStorage.g_iSaveData[0];
-	std::string g_sScore = std::to_string(LoadedScore);
-	COORD c = g_Console.getConsoleSize();
-	c.X -= (SHORT)g_sScore.length();
-	c.Y = 3;
-	g_Console.writeToBuffer(c, g_sScore, 0x0f);
-	c.X -= 7;
-	g_Console.writeToBuffer(c, "Score: ", 0x0f);
+	if (g_mEvent.shMenuState == 0 || g_mEvent.shMenuState == 2)
+	{
+		std::string g_sScore = std::to_string(g_sEntities.g_sChar.m_iGlobalScore);
+		COORD c = g_Console.getConsoleSize();
+		c.X -= (SHORT)g_sScore.length() + 5;
+		c.Y -= 3;
+		g_Console.writeToBuffer(c, g_sScore, 0x0f);
+		c.X -= 7;
+		g_Console.writeToBuffer(c, "Score: ", 0x0f);
+	}
 }
 
 void renderCharacter()
@@ -873,30 +895,30 @@ void renderCharacter()
 
 void renderFramerate()
 {
-	COORD c;
-	// displays the framerate
-	std::ostringstream ss;
-	ss << std::fixed << std::setprecision(3);
-	ss << 1.0 / g_dDeltaTime << "fps";
-	c.X = g_Console.getConsoleSize().X - 15;
-	c.Y = 0;
-	g_Console.writeToBuffer(c, ss.str());
-
-	// displays average fps
-	ss.str("");
-	ss << g_iLastFrameCount << "avg";
-	c.Y++;
-	g_Console.writeToBuffer(c, ss.str());
-
-	// displays the elapsed time
-	ss.str("");
-	ss << g_dAccurateElapsedTime << "secs";
-	c.X = 0;
-	c.Y = 0;
-	g_Console.writeToBuffer(c, ss.str(), 0x59);
-
 	if (DEBUG)
 	{
+		COORD c;
+		// displays the framerate
+		std::ostringstream ss;
+		ss << std::fixed << std::setprecision(3);
+		ss << 1.0 / g_dDeltaTime << "fps";
+		c.X = g_Console.getConsoleSize().X - 15;
+		c.Y = 0;
+		g_Console.writeToBuffer(c, ss.str());
+
+		// displays average fps
+		ss.str("");
+		ss << g_iLastFrameCount << "avg";
+		c.Y++;
+		g_Console.writeToBuffer(c, ss.str());
+
+		// displays the elapsed time
+		ss.str("");
+		ss << g_dAccurateElapsedTime << "secs";
+		c.X = 0;
+		c.Y = 0;
+		g_Console.writeToBuffer(c, ss.str(), 0x59);
+
 		ss.str("");
 		// TODO: Show dropped frames
 	}

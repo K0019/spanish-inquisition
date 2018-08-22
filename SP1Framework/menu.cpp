@@ -45,7 +45,6 @@ void MenuEvent::renderMenuControls()
 	COORD c = this->mainConsole->getConsoleSize();
 	c.Y--;
 	c.X >>= 1;
-
 }
 
 // title banner

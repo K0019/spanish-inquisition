@@ -753,7 +753,7 @@ void doomButton()
 			g_SaveToSave(NukedSaveData);
 			g_mEvent.shMenuState = 0;
 			g_mEvent.bHasPressedButton = true;
-			g_LoadFromSave(currDataStorage.g_iSaveData);
+			loadGame();
 		}
 	}
 	else

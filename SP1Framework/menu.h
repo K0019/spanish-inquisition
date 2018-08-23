@@ -3,16 +3,18 @@
 #define _MENU_H
 #include "Framework/console.h"
 #include "definitions.h"
+#include "item.h"
+#include <sstream>
 // here we go
 struct MenuEvent
 {
 	Console* mainConsole;					// pointer to the main console (to write to it)
-	COORD r_menucurspos;					// the cursor position
-	COORD r_optioncurspos;					// the cursor position
-	COORD r_shopcurspos;					// the cursor position
+	COORD r_menucurspos;					// the menu cursor position
+	COORD r_pausecurspos;					// the pause cursor position
 	WORD wPlayerColor = 0x0A;				// the color of player (to change in options)
 	bool bCredits;							// event processor: if player selected credits
 	bool bHasPressedButton;					// event processor: the button has been pressed
+	bool bPreventAccident;					// here
 	bool bMinimap;							// event processor: if the minimap option is toggled
 	bool bPausedGame;
 	bool bQuitGame;
@@ -24,12 +26,16 @@ struct MenuEvent
 	short sh_cursSel = 0;					// menu selector: stores the menu cursor's selection
 	short sh_optionSel = 0;					// menu selector: stores the options cursor's selection
 	short sh_shopItemSel = 0;				// menu selector: stores the shop cursor's selection
+	short sh_pauseSel = 0;
 	unsigned int CreditsOffsetY = 0;		// scrapped idea: how much the credits should go up by
+	int tipIndex;
 	MenuEvent(Console* mainConsole);		// Construcc
 
 	// RENDER FUNCTIONS
 
-	void MenuRender(unsigned short* OptionsDataArray);
+	void MenuRender(unsigned short* OptionsDataArray, std::vector<SItem> * itemList);
+
+	void renderMenuControls();
 
 	void renderTitle();						// renders banner in title screen
 	void renderMenu();						// renders menu options
@@ -40,11 +46,8 @@ struct MenuEvent
 	void renderCreditsRollAnimation();		// scrapped idea: see above
 	void renderCreditsRollText();			// scrapped idea: converted into just static text
 
-	void renderItemTitleSelected();			// shop: selected item name 
-	void renderItemPriceSelected();			// shop: selected item's price 
-	void renderItemDescSelected();			// shop: selected item desc
-	void renderItemCurrTSelected();			// shop: selected item's current tier
-	void renderItemNextTSelected();			// shop: selected item's next tier
+	void renderItemSelected(std::vector<SItem> * itemList);			// shop: selected item name 
+	void renderShopBorder();
 
 	void renderDoomButton();				// heehee
 	void renderDoomButtonBrackets();		// heehee's brackets when selected

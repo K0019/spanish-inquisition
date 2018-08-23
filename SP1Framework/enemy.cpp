@@ -145,6 +145,16 @@ void Enemy::scoreGiven(SGameChar * player)
 			player->m_iPlayerScore += this->m_iScoreGiven;
 			break;
 		}
+		case 4:
+		{
+			player->m_iPlayerScore += this->m_iScoreGiven;
+			break;
+		}
+		case 5:
+		{
+			player->m_iPlayerScore += this->m_iScoreGiven;
+			break;
+		}
 	}
 }
 
@@ -283,7 +293,7 @@ bool Enemy::move(int direction)
 bool Enemy::checkOutOfBounds()
 {
 	char tile = this->levelPointer->getTile(this->m_cLocation);
-	if (tile != ' ' && tile != '&' && tile != '\0' && tile != '%' && tile != '1' && tile != '2' && tile != '3' && tile != '4')
+	if (tile != ' ' && tile != '&' && tile != '\0' && tile != '%' && tile != '1' && tile != '2' && tile != '3' && tile != '4' && tile != '^')
 	{
 		return true;
 	}
@@ -292,7 +302,7 @@ bool Enemy::checkOutOfBounds()
 bool Enemy::checkOutOfBounds(COORD c)
 {
 	char tile = this->levelPointer->getTile(c);
-	if (tile != ' ' && tile != '&' && tile != '\0' && tile != '%' && tile != '1' && tile != '2' && tile != '3' && tile != '4')
+	if (tile != ' ' && tile != '&' && tile != '\0' && tile != '%' && tile != '1' && tile != '2' && tile != '3' && tile != '4' && tile !='^')
 	{
 		return true;
 	}

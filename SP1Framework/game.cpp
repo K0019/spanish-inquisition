@@ -8,6 +8,7 @@
 
 double	g_dElapsedTime;
 double	g_dDeltaTime;
+double g_dTrappedTime;
 int		g_iCurrentFrameCount, g_iLastFrameCount, g_iLastMeasuredSecond;
 double	g_dAccurateElapsedTime;
 bool	g_abKeyPressed[K_COUNT];
@@ -48,17 +49,21 @@ void init(void)
 	g_iCurrentFrameCount = g_iLastMeasuredSecond = 0;
 	g_adBounceTime[K_SHOOTUP] = 0.0;
 	for (int i = 0; i < K_COUNT; i++) g_adBounceTime[i] = 0.0;
-	g_eRestartGame = false;
 	// sets the initial state for the game
 	g_eGameState = S_SPLASHSCREEN;
-	if (DEBUG) g_eGameState = S_MENU;
+	/*if (DEBUG) g_eGameState = S_MENU;*/
+	if (g_eRestartGame) g_eGameState = S_GAME;
+	g_eRestartGame = false;
 
+	g_sEntities.clearEnemies();
+	g_sEntities.clearPellets();
 	g_bHasShot = false;
 	g_sEntities.g_sChar.m_cLocation.X = 2 + (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
 	g_sEntities.g_sChar.m_cLocation.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
 	g_sEntities.g_sChar.m_bDefeatedBoss = false;
 	g_sLevel.playerStartRoom.X = GRID_X >> 1;
 	g_sLevel.playerStartRoom.Y = GRID_Y >> 1;
+	g_sEntities.g_sChar.m_iPlayerHealth = g_sEntities.g_sChar.m_iMaxHealth = 10;
 	g_sEntities.g_sChar.m_cRoom = g_sLevel.playerStartRoom;
 	/*if (DEBUG)
 	{
@@ -73,9 +78,10 @@ void init(void)
 	r_cRenderOffset.Y = r_cTargetRenderOffset.Y = 1 + g_sEntities.g_sChar.m_cRoom.Y * (ROOM_Y + 2);
 	r_dTargetRenderTime = SCREEN_SCROLL_LENGTH;
 	g_mEvent.r_menucurspos.X = g_Console.getConsoleSize().X / 5;
-	g_mEvent.r_menucurspos.Y = g_Console.getConsoleSize().Y / 10 * 8 - 1;
+	g_mEvent.r_menucurspos.Y = g_Console.getConsoleSize().Y / 10 * 8 - 6;
+	g_mEvent.r_pausecurspos.X = g_Console.getConsoleSize().X / 10 - 2;
+	g_mEvent.r_pausecurspos.Y = g_Console.getConsoleSize().Y / 5;
 	g_sLevel.floor = 1;
-	if (DEBUG) g_sLevel.floor = 1;
 	g_sLevel.generateLevel();
 	g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
 	COORD c;
@@ -83,15 +89,7 @@ void init(void)
 	c.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
     // sets the width, height and the font name to use in the console
     g_Console.setConsoleFont(0, 16, L"Consolas");
-	g_LoadFromSave(currDataStorage.g_iSaveData);
-	g_LoadOptions(currDataStorage.g_shOptionsData);
-	g_mEvent.wPlayerColor = 
-		(currDataStorage.g_shOptionsData[0] == 2 ? 0x0d : 
-		(currDataStorage.g_shOptionsData[0] == 1) ? 0x0b : 0x0a);
-	g_mEvent.shPlayerCharColourChoice = 
-		(currDataStorage.g_shOptionsData[0] == 2 ? 2 :
-		(currDataStorage.g_shOptionsData[0] == 1) ? 1 : 0);
-	g_mEvent.bMinimap = ((currDataStorage.g_shOptionsData[1] == 0) ? false : true);
+	loadGame();
 }
 //--------------------------------------------------------------
 // Purpose  : Reset before exiting the program
@@ -208,9 +206,37 @@ void render(CStopWatch * timer)
 	}
 }
 
+void loadGame()
+{
+	g_LoadFromSave(currDataStorage.g_iSaveData);
+	g_LoadOptions(currDataStorage.g_shOptionsData);
+	g_mEvent.wPlayerColor =
+		(currDataStorage.g_shOptionsData[0] == 2 ? 0x0d :
+		(currDataStorage.g_shOptionsData[0] == 1) ? 0x0b : 0x0a);
+	g_mEvent.shPlayerCharColourChoice =
+		(currDataStorage.g_shOptionsData[0] == 2 ? 2 :
+		(currDataStorage.g_shOptionsData[0] == 1) ? 1 : 0);
+	g_mEvent.bMinimap = ((currDataStorage.g_shOptionsData[1] == 0) ? false : true);
+	for (unsigned int i = 0; i < g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList.size(); i++)
+	{
+		g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[i].m_iWeaponLevel = currDataStorage.g_iSaveData[1 + i];
+	}
+	g_sEntities.g_sChar.m_iGlobalScore = currDataStorage.g_iSaveData[0];
+}
+
+void saveGame()
+{
+	currDataStorage.g_iSaveData[0] = g_sEntities.g_sChar.m_iGlobalScore;
+	for (int i = 0; i < 7; i++)
+	{
+		currDataStorage.g_iSaveData[1 + i] = g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[i].m_iWeaponLevel;
+	}
+	g_SaveToSave(currDataStorage.g_iSaveData);
+}
+
 void splashScreenWait()		// waits for time to pass in splash screen
 {
-	processUserInput(); // checks if you should change states or do something else with the game, e.g. pause, exit
+	//processUserInput(); // checks if you should change states or do something else with the game, e.g. pause, exit
 	if (g_dAccurateElapsedTime > 3.0) // wait for 3 seconds to switch to game mode, else do nothing
 		g_eGameState = S_MENU;
 }
@@ -231,6 +257,7 @@ void gameplay()            // gameplay logic
 			g_sEntities.updateEnemies(); // update locations of enemies and add pellets of the enemies'
 			g_sEntities.updateBoss(); // update the boss
 			// sound can be played here too.
+			checkTrapCollision();
 		}
 	}
 	else
@@ -251,19 +278,21 @@ void menuNav()
 	{
 		g_mEvent.sh_cursSel++;
 		g_mEvent.r_menucurspos.Y++;
-		g_adBounceTime[K_SHOOTDOWN] = g_dElapsedTime + 0.15;
+		g_adBounceTime[K_SHOOTDOWN] = g_dElapsedTime + 0.25;
 	}
 	else if (g_abKeyPressed[K_SHOOTUP] && g_mEvent.sh_cursSel > 0 && g_adBounceTime[K_SHOOTUP] < g_dElapsedTime && g_mEvent.shMenuState == 0)
 	{
 		g_mEvent.sh_cursSel--;
 		g_mEvent.r_menucurspos.Y--;
-		g_adBounceTime[K_SHOOTUP] = g_dElapsedTime + 0.15;
+		g_adBounceTime[K_SHOOTUP] = g_dElapsedTime + 0.25;
 	}
-	if (g_abKeyPressed[K_ENTER] && !g_mEvent.bHasPressedButton)
+	if (g_abKeyPressed[K_ENTER] && !g_mEvent.bHasPressedButton && g_mEvent.shMenuState == 0 && g_adBounceTime[K_ENTER] < g_dElapsedTime)
 	{
 		switch (g_mEvent.sh_cursSel)
 		{
 		case 0:
+			g_sEntities.g_sChar.m_iGlobalScore = unsigned int(double(g_sEntities.g_sChar.m_iGlobalScore) * 0.10);
+			saveGame();
 			g_eGameState = S_GAME;
 			break;
 		case 1:
@@ -271,6 +300,7 @@ void menuNav()
 			break;
 		case 2:
 			g_mEvent.shMenuState = 2;
+			g_mEvent.bPreventAccident = true;
 			break;
 		case 3:
 			g_mEvent.shMenuState = 3;
@@ -301,9 +331,39 @@ void submenuNav()
 {
 	if (g_mEvent.shMenuState == 2)
 	{
-		if (g_abKeyPressed[K_SHOOTLEFT] && g_mEvent.sh_cursSel < 5 && g_adBounceTime[K_SHOOTLEFT] < g_dElapsedTime)
+		if (g_abKeyPressed[K_SHOOTLEFT] && g_mEvent.sh_shopItemSel > 0 && g_adBounceTime[K_SHOOTLEFT] < g_dElapsedTime)
 		{
-			
+			g_mEvent.sh_shopItemSel--;
+			g_adBounceTime[K_SHOOTLEFT] = g_dElapsedTime + 0.25;
+		}
+		if (g_abKeyPressed[K_SHOOTRIGHT] && g_mEvent.sh_shopItemSel < 6 && g_adBounceTime[K_SHOOTRIGHT] < g_dElapsedTime)
+		{
+			g_mEvent.sh_shopItemSel++;
+			g_adBounceTime[K_SHOOTRIGHT] = g_dElapsedTime + 0.25;
+		}
+		if (g_abKeyPressed[K_ENTER] && g_adBounceTime[K_ENTER] < g_dElapsedTime)
+		{
+			if (!g_mEvent.bPreventAccident)
+			{
+				if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[g_mEvent.sh_shopItemSel].m_iWeaponLevel < 3)
+				{
+					if (g_sEntities.g_sChar.m_iGlobalScore >= (unsigned int)g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[g_mEvent.sh_shopItemSel].m_iWeaponCost)
+					{
+						g_sEntities.g_sChar.m_iGlobalScore -= g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[g_mEvent.sh_shopItemSel].m_iWeaponCost;
+						g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[g_mEvent.sh_shopItemSel].m_iWeaponLevel++;
+						saveGame();
+						loadGame();
+					}
+				}
+				g_adBounceTime[K_ENTER] = g_dElapsedTime + 0.25;
+			}
+		}
+		else
+		{
+			if (!g_abKeyPressed[K_ENTER])
+			{
+				g_mEvent.bPreventAccident = false;
+			}
 		}
 	}
 	else if (g_mEvent.shMenuState == 3)
@@ -311,12 +371,12 @@ void submenuNav()
 		if (g_abKeyPressed[K_SHOOTUP] && g_adBounceTime[K_SHOOTUP] < g_dElapsedTime && g_mEvent.sh_optionSel > 0)
 		{
 			g_mEvent.sh_optionSel--;
-			g_adBounceTime[K_SHOOTUP] = g_dElapsedTime + 0.15;
+			g_adBounceTime[K_SHOOTUP] = g_dElapsedTime + 0.25;
 		}
 		if (g_abKeyPressed[K_SHOOTDOWN] && g_adBounceTime[K_SHOOTDOWN] < g_dElapsedTime && g_mEvent.sh_optionSel < 3)
 		{
 			g_mEvent.sh_optionSel++;
-			g_adBounceTime[K_SHOOTDOWN] = g_dElapsedTime + 0.15;
+			g_adBounceTime[K_SHOOTDOWN] = g_dElapsedTime + 0.25;
 		}
 		if (g_abKeyPressed[K_SHOOTLEFT] && g_adBounceTime[K_SHOOTLEFT] < g_dElapsedTime)
 		{
@@ -344,7 +404,7 @@ void submenuNav()
 			{
 				g_mEvent.bMinimap = !g_mEvent.bMinimap;
 			}
-			g_adBounceTime[K_SHOOTLEFT] = g_dElapsedTime + 0.15;
+			g_adBounceTime[K_SHOOTLEFT] = g_dElapsedTime + 0.25;
 
 		}
 		if (g_abKeyPressed[K_SHOOTRIGHT] && g_adBounceTime[K_SHOOTRIGHT] < g_dElapsedTime)
@@ -373,8 +433,15 @@ void submenuNav()
 			{
 				g_mEvent.bMinimap = !g_mEvent.bMinimap;
 			}
-			g_adBounceTime[K_SHOOTRIGHT] = g_dElapsedTime + 0.15;
+			g_adBounceTime[K_SHOOTRIGHT] = g_dElapsedTime + 0.25;
 
+		}
+		if (g_abKeyPressed[K_ENTER] && g_adBounceTime[K_ENTER] < g_dElapsedTime && g_mEvent.sh_optionSel == 3)
+		{
+			currDataStorage.g_shOptionsData[0] = g_mEvent.shPlayerCharColourChoice;
+			currDataStorage.g_shOptionsData[1] = g_mEvent.bMinimap;
+			g_SaveOptions(currDataStorage.g_shOptionsData);
+			g_adBounceTime[K_ENTER] = g_dElapsedTime + 1;
 		}
 		doomButton();
 	}
@@ -404,6 +471,8 @@ void controlPlayer()
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '2' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '3' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '4' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '^' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '+' &&
 			(g_sEntities.g_sChar.m_bInBattle || g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '$'))
 		{
 			g_sEntities.g_sChar.m_cLocation.X++;
@@ -456,6 +525,8 @@ void controlPlayer()
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '2' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '3' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '4' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '^' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '+' &&
 			(g_sEntities.g_sChar.m_bInBattle || g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '$'))
 		{
 			g_sEntities.g_sChar.m_cLocation.Y++;
@@ -508,6 +579,8 @@ void controlPlayer()
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '2' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '3' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '4' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '^' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '+' &&
 			(g_sEntities.g_sChar.m_bInBattle || g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '$'))
 		{
 			g_sEntities.g_sChar.m_cLocation.X--;
@@ -560,6 +633,8 @@ void controlPlayer()
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '2' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '3' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '4' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '^' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '+' &&
 			(g_sEntities.g_sChar.m_bInBattle || g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '$'))
 		{
 			g_sEntities.g_sChar.m_cLocation.Y--;
@@ -678,43 +753,36 @@ void controlPlayer()
 		{
 			if (g_abKeyPressed[i])
 			{
-				g_adBounceTime[i] = g_dElapsedTime + 0.200; //0.200 acts as the movement delay of the player, decreasing it makes the player go faster
+				g_adBounceTime[i] = g_dElapsedTime + 0.175; //0.200 acts as the movement delay of the player, decreasing it makes the player go faster
 				if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_bHasWeapon) // Index 7 (Blue Feather): Decrease movement delay by 20/30/40/50%
 				{
 					switch (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_iWeaponLevel)
 					{
 					case 0: //Blue Feather Level 1: Decrease movement delay by 20%
-						{
-							g_adBounceTime[i] = g_dElapsedTime + ((g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.20) * 0.250);
-							break;
-						}
+					{
+						g_adBounceTime[i] = g_dElapsedTime + ((g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.20) * 0.175);
+						break;
+					}
 					case 1: //Blue Feather Level 2: Decrease movement delay by 30%
-						{
-						g_adBounceTime[i] = g_dElapsedTime + ((g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.30) * 0.250);
-							break;
-						}
+					{
+						g_adBounceTime[i] = g_dElapsedTime + ((g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.30) * 0.175);
+						break;
+					}
 					case 2: //Blue Feather Level 3: Decrease movement delay by 40%
-						{
-						g_adBounceTime[i] = g_dElapsedTime + ((g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.40) * 0.250);
-							break;
-						}
+					{
+						g_adBounceTime[i] = g_dElapsedTime + ((g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.40) * 0.175);
+						break;
+					}
 					case 3: //Blue Feather Level 4: Decrease movement delay by 50%
-						{
-						g_adBounceTime[i] = g_dElapsedTime + ((g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.50) * 0.250);
-							break;
-						}
+					{
+						g_adBounceTime[i] = g_dElapsedTime + ((g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.50) * 0.175);
+						break;
+					}
 					}
 				}
 			}
 		}
 	}
-}
-
-void processUserInput()
-{
-	// quits the game if player hits the escape key
-	if (g_abKeyPressed[K_ESCAPE])
-		g_bQuitGame = true;
 }
 
 void clearScreen()
@@ -742,7 +810,7 @@ void doomButton()
 			g_SaveToSave(NukedSaveData);
 			g_mEvent.shMenuState = 0;
 			g_mEvent.bHasPressedButton = true;
-			g_LoadFromSave(currDataStorage.g_iSaveData);
+			loadGame();
 		}
 	}
 	else
@@ -753,10 +821,11 @@ void doomButton()
 
 void detectPauseMenuProc()
 {
-	if (g_abKeyPressed[K_ESCAPE])
+	if (g_abKeyPressed[K_ESCAPE] && g_adBounceTime[K_ESCAPE] < g_dElapsedTime)
 	{
 		/*g_mEvent.bHasPaused = true;*/
 		g_mEvent.bPausedGame = !g_mEvent.bPausedGame;
+		g_adBounceTime[K_ESCAPE] = g_dElapsedTime + 0.25;
 	}
 	if (g_mEvent.bPausedGame)
 		g_eGameState = S_PAUSED;
@@ -767,25 +836,103 @@ void detectPauseMenuProc()
 void pauseScreen()
 {
 	detectPauseMenuProc();
+	pauseScreenNav();
+}
+
+void pauseScreenNav()
+{
+	if (g_abKeyPressed[K_SHOOTDOWN] && g_mEvent.sh_pauseSel < 3 && g_adBounceTime[K_SHOOTDOWN] < g_dElapsedTime && g_mEvent.shMenuState == 0)
+	{
+		g_mEvent.sh_pauseSel++;
+		g_mEvent.r_pausecurspos.Y++;
+		g_adBounceTime[K_SHOOTDOWN] = g_dElapsedTime + 0.15;
+	}
+	else if (g_abKeyPressed[K_SHOOTUP] && g_mEvent.sh_pauseSel > 0 && g_adBounceTime[K_SHOOTUP] < g_dElapsedTime && g_mEvent.shMenuState == 0)
+	{
+		g_mEvent.sh_pauseSel--;
+		g_mEvent.r_pausecurspos.Y--;
+		g_adBounceTime[K_SHOOTUP] = g_dElapsedTime + 0.15;
+	}
+	if (g_abKeyPressed[K_ENTER] && g_adBounceTime[K_ENTER] < g_dElapsedTime)
+	{
+		switch (g_mEvent.sh_pauseSel)
+		{
+		case 0:
+			g_mEvent.bPausedGame = false;
+			break;
+		case 1:
+			init();
+			g_mEvent.sh_pauseSel = 0;
+			g_eGameState = S_GAME;
+			g_mEvent.bPausedGame = false;
+			break;
+		case 2:
+			init();
+			g_mEvent.sh_pauseSel = 0;
+			g_mEvent.bPausedGame = false;
+			g_mEvent.bPreventAccident = true;
+			g_eGameState = S_MENU;
+			break;
+		case 3:
+			g_bQuitGame = true;
+			break;
+		}
+		g_adBounceTime[K_ENTER] = g_dElapsedTime + 0.25;
+	}
 }
 
 void renderSplashScreen()  // renders the splash screen
 {
-	COORD c = g_Console.getConsoleSize();
-	c.Y /= 3;
-	c.X = g_Console.getConsoleSize().X / 2 - 20;
-	g_Console.writeToBuffer(c, "A game in 3 seconds", 0x03);
-	c.Y += 1;
-	g_Console.writeToBuffer(c, "Press WASD to move the character", 0x09);
-	c.Y += 1;
-	g_Console.writeToBuffer(c, "Press Arrow keys to shoot", 0x09);
-	c.Y += 1;
-	g_Console.writeToBuffer(c, "Press 'Esc' to quit", 0x09);
+	COORD c;
+	c.X = 0;
+	c.Y = 0;
+	for (int i = 0; i < g_Console.getConsoleSize().Y; i++)
+	{
+		for (int j = 0; j < g_Console.getConsoleSize().X; j++)
+		{
+			g_Console.writeToBuffer(c, " ", 0x60);
+			c.X++;
+		}
+		c.X = 0;
+		c.Y++;
+	}
+	c = g_Console.getConsoleSize();
+	(c.X >>= 1) -= 16;
+	(c.Y >>= 1) -= 3;
+	for (int i = 0; i < 9; i++)
+	{
+		for (int j = 0; j < 33; j++)
+		{
+			g_Console.writeToBuffer(c, " ", 0x00);
+			c.X++;
+		}
+		c.X = (g_Console.getConsoleSize().X >> 1) - 16;
+		c.Y++;
+	}
+	std::string TeamName[9];
+	TeamName[0] = "                                 ";
+	TeamName[1] = " ллллл ллллл  ллл   л л     лл   ";
+	TeamName[2] = "   л   л     л   л л л л   л л   ";
+	TeamName[3] = "   л   л     л   л л л л     л   ";
+	TeamName[4] = "   л   лллл  ллллл л л л     л   ";
+	TeamName[5] = "   л   л     л   л л л л     л   ";
+	TeamName[6] = "   л   л     л   л л   л     л   ";
+	TeamName[7] = "   л   ллллл л   л л   л   ллллл ";
+	TeamName[8] = "                                 ";
+	c = g_Console.getConsoleSize();
+	(c.X >>= 1) -= 17;
+	(c.Y >>= 1) -= 4;
+	for (int i = 0; i < 9; i++)
+	{
+		g_Console.writeToBuffer(c, TeamName[i], 0x84);
+		c.Y++;
+	}
 }
 
 void renderMenu()
 {
-	g_mEvent.MenuRender(currDataStorage.g_shOptionsData);
+	g_mEvent.MenuRender(currDataStorage.g_shOptionsData, &g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList);
+	renderScore();
 }
 
 void renderGame()
@@ -809,22 +956,53 @@ void renderPause()
 	{
 		for (; c.Y < g_Console.getConsoleSize().Y; c.Y++)
 		{
-			g_Console.writeToBuffer(c, " ", 0x40);
+			g_Console.writeToBuffer(c, " ", 0x80);
 		}
 		c.Y = 0;
 	}
+	renderPauseMenu();
+	renderPauseCursor();
+}
+
+void renderPauseCursor()
+{
+	g_Console.writeToBuffer(g_mEvent.r_pausecurspos, "[");
+	g_mEvent.r_pausecurspos.X += 18;
+	g_Console.writeToBuffer(g_mEvent.r_pausecurspos, "]");
+	g_mEvent.r_pausecurspos.X -= 18;
+}
+
+void renderPauseMenu()
+{
+	COORD c = g_Console.getConsoleSize();
+	c.X /= 10;
+	(c.Y /= 5) -= 2;
+	g_Console.writeToBuffer(c, ((unsigned int)g_dElapsedTime % 2 == 0 ? " PAUSED " : "        "));
+	c = g_Console.getConsoleSize();
+	(c.X /= 10) -= 1;
+	c.Y /= 5;
+	g_Console.writeToBuffer(c, "     RESUME      ");
+	c.Y++;
+	g_Console.writeToBuffer(c, "     RESTART     ");
+	c.Y++;
+	g_Console.writeToBuffer(c, "   QUIT TO MENU  ");
+	c.Y++;
+	g_Console.writeToBuffer(c, " QUIT TO DESKTOP ");
+
 }
 
 void renderScore() 
 {
-	unsigned int LoadedScore = currDataStorage.g_iSaveData[0];
-	std::string g_sScore = std::to_string(LoadedScore);
-	COORD c = g_Console.getConsoleSize();
-	c.X -= (SHORT)g_sScore.length();
-	c.Y -= 1;
-	g_Console.writeToBuffer(c, g_sScore, 0x0f);
-	c.X -= 7;
-	g_Console.writeToBuffer(c, "Score: ", 0x0f);
+	if (g_mEvent.shMenuState == 0 || g_mEvent.shMenuState == 2)
+	{
+		std::string g_sScore = std::to_string(g_sEntities.g_sChar.m_iGlobalScore);
+		COORD c = g_Console.getConsoleSize();
+		c.X -= (SHORT)g_sScore.length() + 5;
+		c.Y -= 3;
+		g_Console.writeToBuffer(c, g_sScore, 0x0f);
+		c.X -= 7;
+		g_Console.writeToBuffer(c, "Score: ", 0x0f);
+	}
 }
 
 void renderCharacter()
@@ -837,7 +1015,6 @@ void renderCharacter()
 	if (c.X < 1 || c.X >= 1 + ((ROOM_Y + 2) << 2) || c.Y < 1 || c.Y >= 1 + ((ROOM_X + 2) << 1)) return;
 
 	WORD charColor = g_mEvent.wPlayerColor;
-	//WORD charColor = 0x0A;
 	g_Console.writeToBuffer(c, "@@@@", charColor);
 	c.Y++;
 	g_Console.writeToBuffer(c, "@@@@", charColor);
@@ -845,34 +1022,35 @@ void renderCharacter()
 
 void renderFramerate()
 {
-	COORD c;
-	// displays the framerate
-	std::ostringstream ss;
-	ss << std::fixed << std::setprecision(3);
-	ss << 1.0 / g_dDeltaTime << "fps";
-	c.X = g_Console.getConsoleSize().X - 15;
-	c.Y = 0;
-	g_Console.writeToBuffer(c, ss.str());
-
-	// displays average fps
-	ss.str("");
-	ss << g_iLastFrameCount << "avg";
-	c.Y++;
-	g_Console.writeToBuffer(c, ss.str());
-
-	// displays the elapsed time
-	ss.str("");
-	ss << g_dAccurateElapsedTime << "secs";
-	c.X = 0;
-	c.Y = 0;
-	g_Console.writeToBuffer(c, ss.str(), 0x59);
-
 	if (DEBUG)
 	{
+		COORD c;
+		// displays the framerate
+		std::ostringstream ss;
+		ss << std::fixed << std::setprecision(3);
+		ss << 1.0 / g_dDeltaTime << "fps";
+		c.X = g_Console.getConsoleSize().X - 15;
+		c.Y = 0;
+		g_Console.writeToBuffer(c, ss.str());
+
+		// displays average fps
+		ss.str("");
+		ss << g_iLastFrameCount << "avg";
+		c.Y++;
+		g_Console.writeToBuffer(c, ss.str());
+
+		// displays the elapsed time
+		ss.str("");
+		ss << g_dAccurateElapsedTime << "secs";
+		c.X = 0;
+		c.Y = 0;
+		g_Console.writeToBuffer(c, ss.str(), 0x59);
+
 		ss.str("");
 		// TODO: Show dropped frames
 	}
 }
+
 void renderToScreen()
 {
     // Writes the buffer to the console, hence you will see what you have written
@@ -1106,6 +1284,12 @@ void renderLevel()
 			case '4':
 				render(c, " SS ", " SS ", 0x02);
 				break;
+			case '^':
+				render(c, " ^^ ", " ^^ ", 0x04);
+				break;
+			case '+':
+				render(c, " ++ ", " ++ ", 0x04);
+				break;
 			}
 		}
 		c.Y += 2;
@@ -1328,6 +1512,17 @@ void renderStat()
 	g_Console.writeToBuffer(c, ss.str());
 }
 
+void checkTrapCollision()
+{
+	if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '^') //If player steps on a spike trap, take damage equal to spike trap's damage
+	{
+		g_sEntities.g_sChar.m_iPlayerHealth -= g_sEntities.m_vTrapList.m_vTrapList[0].m_iTrapDamage;
+		g_sEntities.g_sChar.m_iPlayerScore -= 5;
+		COORD c = g_sEntities.g_sChar.m_cLocation;
+		g_sLevel.modifyTile(c, '\0');
+	}
+}
+
 void checkHitPellets()
 {
 	for (std::vector<SPellet>::iterator pellet = g_sEntities.m_vPellets.begin(); pellet != g_sEntities.m_vPellets.end(); )
@@ -1367,20 +1562,10 @@ void checkHitPellets()
 		// Check collision with rock
 		if (g_sLevel.getTile(pellet->m_cLocation) == '*')
 		{
-			if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[0].m_bHasWeapon == true)
-			{
-				if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[0].m_iWeaponLevel == 3)
-				{
-					pellet->m_bHit = false;
-				}
-			}
-			else
-			{
-				pellet->m_bHit = true;
-				pellet->m_bHitReason = pellet::P_ROCK;
-				pellet++;
-				continue;
-			}
+			pellet->m_bHit = true;
+			pellet->m_bHitReason = pellet::P_ROCK;
+			pellet++;
+			continue;
 		}
 		else if (g_sLevel.getTile(pellet->m_cLocation) == '!') //Collision with invisible rock
 		{
@@ -1552,6 +1737,16 @@ bool loadEnemiesFromRoom()
 				roomHasEnemies = true;
 				g_sLevel.level[row][column] = ' ';
 				break;
+			case 'e':
+				addEnemy(UNIQUE_ENEMY_ENHANCEDSORCERER);
+				roomHasEnemies = true;
+				g_sLevel.level[row][column] = ' ';
+				break;
+			case 'g':
+				addEnemy(UNIQUE_ENEMY_GUARDIAN);
+				roomHasEnemies = true;
+				g_sLevel.level[row][column] = ' ';
+				break;
 			}
 		}
 	}
@@ -1577,22 +1772,23 @@ void addEnemy(EnemyMelee * enemy)
 {
 	g_sEntities.m_vEnemy.push_back(std::move(std::unique_ptr<EnemyMelee>(enemy)));
 }
+
 void addEnemy(EnemyRanged * enemy)
 {
 	g_sEntities.m_vEnemy.push_back(std::move(std::unique_ptr<EnemyRanged>(enemy)));
 }
+
 void CharacterDeath()
 {
 	if (g_sEntities.g_sChar.m_iPlayerHealth <= 0)
 	{
 		COORD c = g_Console.getConsoleSize();
+		g_eGameState = S_PAUSED;
 		c.X = 5;
 		c.Y = 5;
 		g_Console.writeToBuffer(c, "Game Over", 0x64);
 		c.Y++;
 		g_Console.writeToBuffer(c, "Press 'Space' to play again.", 0xE4);
-		c.Y++;
-		g_Console.writeToBuffer(c, "Press 'Enter' to exit to Shop.", 0xE4);
 		c.Y++;
 		g_Console.writeToBuffer(c, "Press 'V' to exit to Main Menu.", 0xE4);
 		c.Y++;
@@ -1601,102 +1797,24 @@ void CharacterDeath()
 		if (g_abKeyPressed[K_SPACE])
 		{
 			g_eRestartGame = true;
+		}
 			if (g_eRestartGame == true)
 			{
-				g_sEntities.g_sChar.m_iPlayerHealth = 10;
-				g_sEntities.g_sChar.m_iPlayerScore = 0;
-				g_sEntities.g_sChar.m_iMaxHealth = 10;
-				g_sEntities.g_sChar.m_iPlayerDamage = 3;
-				g_bHasShot = false;
-				g_sEntities.g_sChar.m_cLocation.X = 2 + (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
-				g_sEntities.g_sChar.m_cLocation.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
-				g_sLevel.playerStartRoom.X = GRID_X >> 1;
-				g_sLevel.playerStartRoom.Y = GRID_Y >> 1;
-				g_sEntities.g_sChar.m_cRoom = g_sLevel.playerStartRoom;
-				//if (DEBUG) g_sEntities.g_sChar.m_bInBattle = true;
-				r_cRenderOffset.X = 1 + g_sEntities.g_sChar.m_cRoom.X * (ROOM_X + 2);
-				r_cRenderOffset.Y = 1 + g_sEntities.g_sChar.m_cRoom.Y * (ROOM_Y + 2);
-				g_mEvent.r_menucurspos.X = g_Console.getConsoleSize().X / 5;
-				g_mEvent.r_menucurspos.Y = g_Console.getConsoleSize().Y / 10 * 8;
-				g_sLevel.floor = 1;
-				g_sLevel.generateLevel();
-				g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
-				COORD c;
-				c.X = (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
-				c.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
-				//addEnemy(UNIQUE_ENEMY_MELEETEST);
-				//addEnemy(UNIQUE_ENEMY_RANGEDTEST);
-				// sets the width, height and the font name to use in the console
-				g_Console.setConsoleFont(0, 16, L"Consolas");
-				g_LoadFromSave(currDataStorage.g_iSaveData);
-				g_sEntities.clearEnemies();
+				init();
 			}
-		}
-		else if (g_abKeyPressed[K_ENTER])
-		{
-			//g_eGameState = S_SHOP;
-			//g_sEntities.g_sChar.m_iPlayerHealth = 10;
-			//g_sEntities.g_sChar.m_iPlayerScore = 0;
-			//g_sEntities.g_sChar.m_iMaxHealth = 10;
-			//g_sEntities.g_sChar.m_iPlayerDamage = 3;
-			//g_bHasShot = false;
-			//g_sEntities.g_sChar.m_cLocation.X = 2 + (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
-			//g_sEntities.g_sChar.m_cLocation.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
-			//g_sLevel.playerStartRoom.X = GRID_X >> 1;
-			//g_sLevel.playerStartRoom.Y = GRID_Y >> 1;
-			//g_sEntities.g_sChar.m_cRoom = g_sLevel.playerStartRoom;
-			////if (DEBUG) g_sEntities.g_sChar.m_bInBattle = true;
-			//r_cRenderOffset.X = 1 + g_sEntities.g_sChar.m_cRoom.X * (ROOM_X + 2);
-			//r_cRenderOffset.Y = 1 + g_sEntities.g_sChar.m_cRoom.Y * (ROOM_Y + 2);
-			//g_mEvent.r_curspos.X = g_Console.getConsoleSize().X / 5;
-			//g_mEvent.r_curspos.Y = g_Console.getConsoleSize().Y / 10 * 8;
-			//g_sLevel.floor = 1;
-			//g_sLevel.generateLevel();
-			//g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
-			//COORD c;
-			//c.X = (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
-			//c.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
-			////addEnemy(UNIQUE_ENEMY_MELEETEST);
-			////addEnemy(UNIQUE_ENEMY_RANGEDTEST);
-			//// sets the width, height and the font name to use in the console
-			//g_Console.setConsoleFont(0, 16, L"Consolas");
-			//g_LoadFromSave(saveDataStorage.g_iSaveData);
-			//g_sEntities.clearEnemies();
-		}
 		else if(g_abKeyPressed[K_V])
 		{
-			//g_eGameState = S_MENU;
-			//g_sEntities.g_sChar.m_iPlayerHealth = 10;
-			//g_sEntities.g_sChar.m_iPlayerScore = 0;
-			//g_sEntities.g_sChar.m_iMaxHealth = 10;
-			//g_sEntities.g_sChar.m_iPlayerDamage = 3;
-			//g_bHasShot = false;
-			//g_sEntities.g_sChar.m_cLocation.X = 2 + (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
-			//g_sEntities.g_sChar.m_cLocation.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
-			//g_sLevel.playerStartRoom.X = GRID_X >> 1;
-			//g_sLevel.playerStartRoom.Y = GRID_Y >> 1;
-			//g_sEntities.g_sChar.m_cRoom = g_sLevel.playerStartRoom;
-			////if (DEBUG) g_sEntities.g_sChar.m_bInBattle = true;
-			//r_cRenderOffset.X = 1 + g_sEntities.g_sChar.m_cRoom.X * (ROOM_X + 2);
-			//r_cRenderOffset.Y = 1 + g_sEntities.g_sChar.m_cRoom.Y * (ROOM_Y + 2);
-			//g_mEvent.r_curspos.X = g_Console.getConsoleSize().X / 5;
-			//g_mEvent.r_curspos.Y = g_Console.getConsoleSize().Y / 10 * 8;
-			//g_sLevel.floor = 1;
-			//g_sLevel.generateLevel();
-			//g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
-			//COORD c;
-			//c.X = (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
-			//c.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
-			////addEnemy(UNIQUE_ENEMY_MELEETEST);
-			////addEnemy(UNIQUE_ENEMY_RANGEDTEST);
-			//// sets the width, height and the font name to use in the console
-			//g_Console.setConsoleFont(0, 16, L"Consolas");
-			//g_LoadFromSave(saveDataStorage.g_iSaveData);
-			//g_sEntities.clearEnemies();
+			g_sEntities.g_sChar.m_iGlobalScore += g_sEntities.g_sChar.m_iPlayerScore;
+			saveGame();
+			init();
+			g_eGameState = S_MENU;
 		}
 		else if (g_abKeyPressed[K_ESCAPE])
 		{
+			g_sEntities.g_sChar.m_iGlobalScore += g_sEntities.g_sChar.m_iPlayerScore;
+			saveGame();
 			g_bQuitGame = true;
 		}
+		g_eRestartGame = false;
 	}
 }

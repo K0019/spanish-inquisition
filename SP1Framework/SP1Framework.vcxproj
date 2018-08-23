@@ -92,6 +92,7 @@
     <ClCompile Include="menu.cpp" />
     <ClCompile Include="pellet.cpp" />
     <ClCompile Include="player.cpp" />
+    <ClCompile Include="trap.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="boss.h" />
@@ -109,6 +110,7 @@
     <ClInclude Include="pellet.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="stat.h" />
+    <ClInclude Include="trap.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\res\MapData\FloorData\ItemRooms\Floor1.txt" />
@@ -129,6 +131,12 @@
     <Text Include="..\res\MapData\RoomData\ItemRooms\15.txt" />
     <Text Include="..\res\MapData\RoomData\ItemRooms\19.txt" />
     <Text Include="..\res\MapData\RoomData\ItemRooms\1d.txt" />
+    <Text Include="..\res\MapData\RoomData\ItemRooms\1f.txt" />
+    <Text Include="..\res\MapData\RoomData\ItemRooms\24.txt" />
+    <Text Include="..\res\MapData\RoomData\ItemRooms\27.txt" />
+    <Text Include="..\res\MapData\RoomData\ItemRooms\29.txt" />
+    <Text Include="..\res\MapData\RoomData\ItemRooms\2d.txt" />
+    <Text Include="..\res\MapData\RoomData\ItemRooms\30.txt" />
     <Text Include="..\res\MapData\RoomData\NormalRooms\01.txt" />
     <Text Include="..\res\MapData\RoomData\NormalRooms\02.txt" />
     <Text Include="..\res\MapData\RoomData\NormalRooms\03.txt" />
@@ -151,6 +159,20 @@
     <Text Include="..\res\MapData\RoomData\NormalRooms\1a.txt" />
     <Text Include="..\res\MapData\RoomData\NormalRooms\1b.txt" />
     <Text Include="..\res\MapData\RoomData\NormalRooms\1c.txt" />
+    <Text Include="..\res\MapData\RoomData\NormalRooms\1e.txt" />
+    <Text Include="..\res\MapData\RoomData\NormalRooms\20.txt" />
+    <Text Include="..\res\MapData\RoomData\NormalRooms\21.txt" />
+    <Text Include="..\res\MapData\RoomData\NormalRooms\22.txt" />
+    <Text Include="..\res\MapData\RoomData\NormalRooms\23.txt" />
+    <Text Include="..\res\MapData\RoomData\NormalRooms\25.txt" />
+    <Text Include="..\res\MapData\RoomData\NormalRooms\26.txt" />
+    <Text Include="..\res\MapData\RoomData\NormalRooms\28.txt" />
+    <Text Include="..\res\MapData\RoomData\NormalRooms\2a.txt" />
+    <Text Include="..\res\MapData\RoomData\NormalRooms\2b.txt" />
+    <Text Include="..\res\MapData\RoomData\NormalRooms\2c.txt" />
+    <Text Include="..\res\MapData\RoomData\NormalRooms\2e.txt" />
+    <Text Include="..\res\MapData\RoomData\NormalRooms\2f.txt" />
+    <Text Include="..\res\MapData\RoomData\NormalRooms\31.txt" />
     <Text Include="..\res\SaveData\options.txt" />
     <Text Include="..\res\SaveData\saves.txt" />
   </ItemGroup>

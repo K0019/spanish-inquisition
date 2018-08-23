@@ -18,7 +18,7 @@ void g_LoadFromSave(unsigned int* SaveDataArray)
 		std::ofstream SaveFileData("../res/SaveData/saves.txt");
 		if (SaveFileData.is_open())
 		{
-			for (int i = 0; i < 9; i++)
+			for (int i = 0; i < 8; i++)
 			{
 				SaveFileData << 0 << '\n';
 			}
@@ -127,6 +127,8 @@ void g_LoadOptions(unsigned short* OptionsDataArray)
 			PlayerOptions << "0\n";
 			PlayerOptions << "1\n";
 		}
+		OptionsDataArray[0] = 0;
+		OptionsDataArray[1] = 1;
 	}
 }
 
@@ -137,7 +139,7 @@ void g_SaveOptions(unsigned short* OptionsDataArray)
 	{
 		if (PlayerOptions.is_open())
 		{
-			for (int i = 0; i < 9; i++)
+			for (int i = 0; i < 2; i++)
 			{
 				PlayerOptions << OptionsDataArray[i] << '\n';
 			}

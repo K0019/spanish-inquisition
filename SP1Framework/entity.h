@@ -13,6 +13,7 @@
 #include <vector>
 #include <memory>
 #include "level.h"
+#include "trap.h"
 
 struct SAllEntities
 {
@@ -28,6 +29,9 @@ struct SAllEntities
 	void updateEnemies(); // Update movement and attack of enemies, also update enemy alive/dead status
 	void updateBoss(); // Update the boss
 	void clearEnemies(); // Erase the enemies that are dead
+
+	/*TRAP RELATED*/
+	SAllTraps m_vTrapList; //Container for traps
 
 	~SAllEntities();
 };

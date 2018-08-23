@@ -19,8 +19,9 @@ struct SItem //Struct that holds item information
 	float m_fweaponMovementSpeed;
 	bool m_bHasWeapon;
 	int m_iWeaponLevel;
+	int m_iWeaponCost;
 
-	SItem(std::string name, int index, int damage, int healthGiven, float attackSpeed, float velocity, float moveSpeed, bool hasWeapon, int weaponLevel);
+	SItem(std::string name, int index, int damage, int healthGiven, float attackSpeed, float velocity, float moveSpeed, bool hasWeapon, int weaponLevel, int cost);
 };
 
 struct SAllItems //Struct that holds all items as indiviual items

@@ -457,6 +457,7 @@ bool Boss1::move(Boss::Direction dir)
 		this->m_dLocationCoord.Y--;
 		return true;
 	}
+	return false;
 }
 
 void Boss1::updateMovement()

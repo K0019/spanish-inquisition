@@ -65,6 +65,7 @@ void submenuNav();
 void resetLevel(int floor); // Generate a new map, with input floor for what to put inside the rooms
 void controlPlayer();		// moves the character, collision detection, physics, etc
 void checkHitPellets();		// Check if pellets have hit anything
+void checkTrapCollision(); //Check if player is standing on a trap
 void doomButton();			// heehee
 void detectPauseMenuProc();
 void pauseScreen();

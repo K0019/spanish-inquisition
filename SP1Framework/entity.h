@@ -12,6 +12,7 @@
 #include <vector>
 #include <memory>
 #include "level.h"
+#include "trap.h"
 
 struct SAllEntities
 {
@@ -25,6 +26,9 @@ struct SAllEntities
 	std::vector<std::unique_ptr<Enemy>> m_vEnemy; // Container for enemies
 	void updateEnemies(); // Update movement and attack of enemies, also update enemy alive/dead status
 	void clearEnemies(); // Erase the enemies that are dead
+
+	/*TRAP RELATED*/
+	SAllTraps m_vTrapList; //Container for traps
 };
 
 #endif // !ENTITYHEAD

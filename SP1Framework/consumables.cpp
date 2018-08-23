@@ -12,10 +12,8 @@ SAllConsumables::SAllConsumables() //Constructor to initialise each unique consu
 {
 	this->addConsumable(SConsumable("Minor Health Pack", 1, 5, 0));
 	this->addConsumable(SConsumable("Greater Health Pack", 2, 10, 0));
-	//this->addConsumable(SConsumable("Minor health pack", 1, 5, 0));
-	//this->addconsumable(SConsumable("greater health pack", 2, 10, 0));
 	this->addConsumable(SConsumable("Small Medal", 3, 0, 20));
-	this->addConsumable(SConsumable("Large Medal", 3, 0, 50));
+	this->addConsumable(SConsumable("Large Medal", 4, 0, 50));
 }
 
 void SAllConsumables::addConsumable(SConsumable& consumable)

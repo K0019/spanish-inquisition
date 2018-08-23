@@ -12,3 +12,6 @@ e = Enhanced Sorcerer (ranged enemy)
 2 = Greater Health Pack
 3 = Small Medal
 4 = Large Medal
+^ = Spike Trap
++ = Snare Trap
+| = Turret Trap

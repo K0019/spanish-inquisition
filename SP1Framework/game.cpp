@@ -8,6 +8,7 @@
 
 double	g_dElapsedTime;
 double	g_dDeltaTime;
+double g_dTrappedTime;
 int		g_iCurrentFrameCount, g_iLastFrameCount, g_iLastMeasuredSecond;
 double	g_dAccurateElapsedTime;
 bool	g_abKeyPressed[K_COUNT];
@@ -78,7 +79,7 @@ void init(void)
 	g_mEvent.r_menucurspos.Y = g_Console.getConsoleSize().Y / 10 * 8 - 6;
 	g_mEvent.r_pausecurspos.X = g_Console.getConsoleSize().X / 10 - 2;
 	g_mEvent.r_pausecurspos.Y = g_Console.getConsoleSize().Y / 5;
-	g_sLevel.floor = 1;
+	g_sLevel.floor = 3;
 	g_sLevel.generateLevel();
 	g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
 	COORD c;
@@ -253,6 +254,7 @@ void gameplay()            // gameplay logic
 			checkHitPellets(); // checks if the pellets have hit anything, and update stats accordingly
 			g_sEntities.updateEnemies(); // update locations of enemies and add pellets of the enemies'
 			// sound can be played here too.
+			checkTrapCollision();
 		}
 	}
 	else
@@ -466,6 +468,8 @@ void controlPlayer()
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '2' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '3' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '4' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '^' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '+' &&
 			(g_sEntities.g_sChar.m_bInBattle || g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '$'))
 		{
 			g_sEntities.g_sChar.m_cLocation.X++;
@@ -508,6 +512,8 @@ void controlPlayer()
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '2' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '3' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '4' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '^' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '+' &&
 			(g_sEntities.g_sChar.m_bInBattle || g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '$'))
 		{
 			g_sEntities.g_sChar.m_cLocation.Y++;
@@ -550,6 +556,8 @@ void controlPlayer()
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '2' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '3' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '4' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '^' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '+' &&
 			(g_sEntities.g_sChar.m_bInBattle || g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '$'))
 		{
 			g_sEntities.g_sChar.m_cLocation.X--;
@@ -592,6 +600,8 @@ void controlPlayer()
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '2' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '3' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '4' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '^' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '+' &&
 			(g_sEntities.g_sChar.m_bInBattle || g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '$'))
 		{
 			g_sEntities.g_sChar.m_cLocation.Y--;
@@ -1223,6 +1233,12 @@ void renderLevel()
 			case '4':
 				render(c, " SS ", " SS ", 0x02);
 				break;
+			case '^':
+				render(c, " ^^ ", " ^^ ", 0x04);
+				break;
+			case '+':
+				render(c, " ++ ", " ++ ", 0x04);
+				break;
 			}
 		}
 		c.Y += 2;
@@ -1434,6 +1450,16 @@ void renderStat()
 	c.X = g_Console.getConsoleSize().X - 83;
 	c.Y = 27;
 	g_Console.writeToBuffer(c, ss.str());
+}
+
+void checkTrapCollision()
+{
+	if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '^') //If player steps on a spike trap, take damage equal to spike trap's damage
+	{
+		g_sEntities.g_sChar.m_iPlayerHealth -= g_sEntities.m_vTrapList.m_vTrapList[0].m_iTrapDamage;
+		COORD c = g_sEntities.g_sChar.m_cLocation;
+		g_sLevel.modifyTile(c, '\0');
+	}
 }
 
 void checkHitPellets()

@@ -15,7 +15,7 @@ void MenuEvent::MenuRender(unsigned short* OptionsDataArray, std::vector<SItem> 
 {
 	if (shMenuState > 0)
 	{
-		tipIndex = rand() % 4;
+		tipIndex = rand() % 5;
 	}
 	renderMenuControls();
 	switch (shMenuState)
@@ -208,6 +208,11 @@ void MenuEvent::renderMenu()
 	case 3:
 	{
 		this->mainConsole->writeToBuffer(c, "~Two walls on a diagonal, a bullet in between~", 0x0f);
+		break;
+	}
+	case 4:
+	{
+		this->mainConsole->writeToBuffer(c, "~Symmetry is key~", 0x0f);
 		break;
 	}
 	}

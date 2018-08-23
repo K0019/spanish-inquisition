@@ -91,6 +91,7 @@
     <ClCompile Include="menu.cpp" />
     <ClCompile Include="pellet.cpp" />
     <ClCompile Include="player.cpp" />
+    <ClCompile Include="trap.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="consumables.h" />
@@ -107,6 +108,7 @@
     <ClInclude Include="pellet.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="stat.h" />
+    <ClInclude Include="trap.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\res\MapData\FloorData\ItemRooms\Floor1.txt" />

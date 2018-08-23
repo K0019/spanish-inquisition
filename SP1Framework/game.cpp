@@ -821,7 +821,7 @@ void doomButton()
 
 void detectPauseMenuProc()
 {
-	if (g_abKeyPressed[K_ESCAPE] && g_adBounceTime[K_ESCAPE] < g_dElapsedTime)
+	if (g_abKeyPressed[K_ESCAPE] && g_adBounceTime[K_ESCAPE] < g_dElapsedTime && g_sEntities.g_sChar.m_iPlayerHealth > 0)
 	{
 		/*g_mEvent.bHasPaused = true;*/
 		g_mEvent.bPausedGame = !g_mEvent.bPausedGame;

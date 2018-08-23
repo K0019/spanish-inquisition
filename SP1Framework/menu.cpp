@@ -238,31 +238,70 @@ void MenuEvent::renderTutorialDetails()
 	c.Y = this->mainConsole->getConsoleSize().Y / 10 + 2;
 	this->mainConsole->writeToBuffer(c, "In-game", 0x0f);
 	c.Y += 2;
-	this->mainConsole->writeToBuffer(c, "@", 0x0A);
+	this->mainConsole->writeToBuffer(c, "@", wPlayerColor);
 	c.X += 2;
 	this->mainConsole->writeToBuffer(c, " - You", 0x0f);
 	c.X -= 2;
 	c.Y++;
-	this->mainConsole->writeToBuffer(c, "b", 0x01);
+	this->mainConsole->writeToBuffer(c, "oo", 0x0A);
+	c.X += 2;
+	this->mainConsole->writeToBuffer(c, " - Minor Health Pack", 0x0f);
+	c.X -= 2;
+	c.Y++;
+	this->mainConsole->writeToBuffer(c, "OO", 0x02);
+	c.X += 2;
+	this->mainConsole->writeToBuffer(c, " - Greater Health Pack", 0x0f);
+	c.X -= 2;
+	c.Y++;
+	this->mainConsole->writeToBuffer(c, "ss", 0x0A);
+	c.X += 2;
+	this->mainConsole->writeToBuffer(c, " - Small Medal", 0x0f);
+	c.X -= 2;
+	c.Y++;
+	this->mainConsole->writeToBuffer(c, "SS", 0x02);
+	c.X += 2;
+	this->mainConsole->writeToBuffer(c, " - Large Medal", 0x0f);
+	c.X -= 2;
+	c.Y++;
+	this->mainConsole->writeToBuffer(c, "  ", 0x60);
+	c.X += 2;
+	this->mainConsole->writeToBuffer(c, " - Item", 0x0f);
+	c.X -= 2;
+	c.Y++;
+	this->mainConsole->writeToBuffer(c, "##&_ ", 0x09);
+	c.X += 4;
+	this->mainConsole->writeToBuffer(c, " - Exit", 0x0f);
+	c.X -= 4;
+	c.Y -= 7;
+	c.X += 25;
+	this->mainConsole->writeToBuffer(c, "(Enemies)", 0x0f);
+	c.Y++;
+	this->mainConsole->writeToBuffer(c, "B", 0x0E);
 	c.X += 2;
 	this->mainConsole->writeToBuffer(c, " - Bandit", 0x0f);
 	c.X -= 2;
 	c.Y++;
-	this->mainConsole->writeToBuffer(c, "(Melee Enemies)", 0x0f);
-	c.Y++;
-	this->mainConsole->writeToBuffer(c, "M", 0x01);
+	this->mainConsole->writeToBuffer(c, "M", 0x0E);
 	c.X += 2;
 	this->mainConsole->writeToBuffer(c, " - Mage", 0x0f);
 	c.X -= 2;
 	c.Y++;
-	this->mainConsole->writeToBuffer(c, " - Ranged Enemy", 0x0f);
+	this->mainConsole->writeToBuffer(c, "K", 0x0E);
+	c.X += 2;
+	this->mainConsole->writeToBuffer(c, " - Knight", 0x0f);
+	c.X -= 2;
 	c.Y++;
-	this->mainConsole->writeToBuffer(c, "#&_ ", 0x01);
-	c.X += 4;
-	this->mainConsole->writeToBuffer(c, " - Staircase", 0x0f);
-	c.X -= 4;
+	this->mainConsole->writeToBuffer(c, "E", 0x0E);
+	c.X += 2;
+	this->mainConsole->writeToBuffer(c, " - Enhanced Sorcerer", 0x0f);
+	c.X -= 2;
 	c.Y++;
-	this->mainConsole->writeToBuffer(c, "##&_ ", 0x01);
+	this->mainConsole->writeToBuffer(c, "G", 0x0E);
+	c.X += 2;
+	this->mainConsole->writeToBuffer(c, " - Guardian", 0x0f);
+	c.X -= 2;
+	c.X -= 25;
+
 }
 
 // ye... scrapped :/
@@ -299,9 +338,12 @@ void MenuEvent::renderCreditsRollText()
 	c.Y++;
 	this->mainConsole->writeToBuffer(c, "Lim Yan Quan", 0x0f);
 	c.Y++;
-	this->mainConsole->writeToBuffer(c, "Winston Ngoui", 0x0f);
-	c.Y++;
 	this->mainConsole->writeToBuffer(c, "Pi Jo Chu", 0x0f);
+	c.Y++;
+	this->mainConsole->writeToBuffer(c, "Winston Ngoui", 0x0f);
+	c.Y += 2;
+	this->mainConsole->writeToBuffer(c, "Developed in Visual Studios 2015/2017", 0x0f);
+
 }
 
 //UNDONE

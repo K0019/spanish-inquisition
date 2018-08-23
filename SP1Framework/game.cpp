@@ -76,7 +76,7 @@ void init(void)
 	r_dTargetRenderTime = SCREEN_SCROLL_LENGTH;
 	g_mEvent.r_menucurspos.X = g_Console.getConsoleSize().X / 5;
 	g_mEvent.r_menucurspos.Y = g_Console.getConsoleSize().Y / 10 * 8 - 1;
-	g_sLevel.floor = 5;
+	g_sLevel.floor = 1;
 	g_sLevel.generateLevel();
 	g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
 	COORD c;
@@ -340,10 +340,10 @@ void submenuNav()
 				{
 					if (g_sEntities.g_sChar.m_iGlobalScore >= g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[g_mEvent.sh_shopItemSel].m_iWeaponCost)
 					{
-						saveGame();
-						loadGame();
 						g_sEntities.g_sChar.m_iGlobalScore -= g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[g_mEvent.sh_shopItemSel].m_iWeaponCost;
 						g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[g_mEvent.sh_shopItemSel].m_iWeaponLevel++;
+						saveGame();
+						loadGame();
 					}
 				}
 				g_adBounceTime[K_ENTER] = g_dElapsedTime + 0.15;
@@ -887,7 +887,6 @@ void renderCharacter()
 	if (c.X < 1 || c.X >= 1 + ((ROOM_Y + 2) << 2) || c.Y < 1 || c.Y >= 1 + ((ROOM_X + 2) << 1)) return;
 
 	WORD charColor = g_mEvent.wPlayerColor;
-	//WORD charColor = 0x0A;
 	g_Console.writeToBuffer(c, "@@@@", charColor);
 	c.Y++;
 	g_Console.writeToBuffer(c, "@@@@", charColor);

@@ -84,6 +84,8 @@ void renderSplashScreen();	// renders the splash screen
 void renderMenu();			// renders the main menu
 void renderGame();			// renders the game stuff
 void renderPause();
+void renderPauseCursor();
+void renderPauseMenu();
 void renderScore();			// render the current score from
 void renderCharacter();		// renders the character into the buffer
 void renderFramerate();		// renders debug information, frame rate, elapsed time, etc
@@ -92,7 +94,7 @@ void renderLevel();			// renders the borders of the rooms
 void renderPellets();		// render pellets to buffer
 void renderMiniMap();		// render minimap to buffer
 void renderEnemy();			// renders all alive enemies to the buffer
-void renderDeadEnemy(); // renders all dead enemies to the buffer
+void renderDeadEnemy();		// renders all dead enemies to the buffer
 void renderStat();			//renders the player stats on the right side of the console
 void render(COORD c, LPCSTR text, LPCSTR text2, WORD color); // Render sprite to screen
 void render(COORD c, std::string& text, std::string& text2, WORD color); // Render sprite to screen

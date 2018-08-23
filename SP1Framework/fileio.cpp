@@ -127,6 +127,8 @@ void g_LoadOptions(unsigned short* OptionsDataArray)
 			PlayerOptions << "0\n";
 			PlayerOptions << "1\n";
 		}
+		OptionsDataArray[0] = 0;
+		OptionsDataArray[1] = 1;
 	}
 }
 

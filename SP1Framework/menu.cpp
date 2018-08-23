@@ -11,8 +11,9 @@ MenuEvent::MenuEvent(Console* mainConsole)
 	this->bMinimap = true;
 }
 
-void MenuEvent::MenuRender(unsigned short* OptionsDataArray)
+void MenuEvent::MenuRender(unsigned short* OptionsDataArray, std::vector<SItem> * itemList)
 {
+	renderMenuControls();
 	switch (shMenuState)
 	{
 	case 0:
@@ -24,11 +25,7 @@ void MenuEvent::MenuRender(unsigned short* OptionsDataArray)
 		renderTutorialDetails();
 		break;
 	case 2:
-		renderItemTitleSelected();
-		renderItemDescSelected();
-		renderItemPriceSelected();
-		renderItemCurrTSelected();
-		renderItemNextTSelected();
+		renderItemSelected(itemList);
 		break;
 	case 3:
 		renderDoomButton();
@@ -41,6 +38,13 @@ void MenuEvent::MenuRender(unsigned short* OptionsDataArray)
 		renderCreditsRollText();
 		break;
 	}
+}
+
+void MenuEvent::renderMenuControls()
+{
+	COORD c = this->mainConsole->getConsoleSize();
+	c.Y--;
+	c.X >>= 1;
 }
 
 // title banner
@@ -301,33 +305,351 @@ void MenuEvent::renderCreditsRollText()
 }
 
 //UNDONE
-void MenuEvent::renderItemTitleSelected()
+void MenuEvent::renderItemSelected(std::vector<SItem> * itemList)
 {
+	std::string nameOfItem = (*itemList)[sh_shopItemSel].m_sName;
+	COORD c;
+	c.Y = 3;
+	c.X = 2;
+	this->mainConsole->writeToBuffer(c, "Current Tier");
+	c.X = this->mainConsole->getConsoleSize().X >> 1;
+	this->mainConsole->writeToBuffer(c, "Next Tier");
+	c.X = c.Y = 2;
+	this->mainConsole->writeToBuffer(c, nameOfItem, 0x1f);
+	int currentTier = (*itemList)[sh_shopItemSel].m_iWeaponLevel;
+	switch (sh_shopItemSel)
+	{
+		case 0:
+		{
+			switch (currentTier)
+			{
+				case 0:
+				{
+					c.Y += 3;
+					this->mainConsole->writeToBuffer(c, "Pellets pass through invisible rocks.");
+					c.Y++;
+					this->mainConsole->writeToBuffer(c, "Pellet lifespan doubled.");
+					c.X = this->mainConsole->getConsoleSize().X >> 1;
+				}
+				case 1:
+				{
+					c.Y += 3;
+					if (currentTier == 0) c.Y = 5;
+					this->mainConsole->writeToBuffer(c, "Pellets pass through invisible rocks.");
+					c.Y++;
+					this->mainConsole->writeToBuffer(c, "Pellet lifespan doubled.");
+					c.Y++;
+					this->mainConsole->writeToBuffer(c, "Increases damage by 2.");
+					c.X = this->mainConsole->getConsoleSize().X >> 1;
+					if (currentTier == 0) break;
+				}
+				case 2:
+				{
+					c.Y += 3;
+					if (currentTier == 1) c.Y = 5;
+					this->mainConsole->writeToBuffer(c, "Pellets pass through invisible rocks.");
+					c.Y++;
+					this->mainConsole->writeToBuffer(c, "Pellet lifespan doubled.");
+					c.Y++;
+					this->mainConsole->writeToBuffer(c, "Increases damage by 3.");
+					c.X = this->mainConsole->getConsoleSize().X >> 1;
+					if (currentTier == 1) break;
+				}
+				case 3:
+				{
+					c.Y += 3;
+					if (currentTier == 2) c.Y = 5;
+					this->mainConsole->writeToBuffer(c, "Pellets pass through invisible rocks.");
+					c.Y++;
+					this->mainConsole->writeToBuffer(c, "Pellet lifespan doubled.");
+					c.Y++;
+					this->mainConsole->writeToBuffer(c, "Increases damage by 4.");
+					c.X = this->mainConsole->getConsoleSize().X >> 1;
+					if (currentTier == 2) break;
+				}
+				default:
+					c.Y = 5;
+					this->mainConsole->writeToBuffer(c, "No valid higher tier");
+					break;
+			}
+			break;
+		}
+		case 1:
+		{
+			switch (currentTier)
+			{
+				case 0:
+				{
+					c.Y += 3;
+					this->mainConsole->writeToBuffer(c, "Damage increased by 2.");
+					c.Y++;
+					this->mainConsole->writeToBuffer(c, "Health increased by 3.");
+					c.X = this->mainConsole->getConsoleSize().X >> 1;
 
-}
-
-//UNDONE
-void MenuEvent::renderItemPriceSelected()
-{
-
-}
-
-//UNDONE
-void MenuEvent::renderItemDescSelected()
-{
-
-}
-
-//UNDONE
-void MenuEvent::renderItemCurrTSelected()
-{
-
-}
-
-//UNDONE
-void MenuEvent::renderItemNextTSelected()
-{
-
+				}
+				case 1:
+				{
+					c.Y += 3;
+					if (currentTier == 0) c.Y = 5;
+					this->mainConsole->writeToBuffer(c, "Damage increased by 3.");
+					c.Y++;
+					this->mainConsole->writeToBuffer(c, "Health increased by 4.");
+					c.X = this->mainConsole->getConsoleSize().X >> 1;
+					if (currentTier == 0) break;
+				}
+				case 2:
+				{
+					c.Y += 3;
+					if (currentTier == 1) c.Y = 5;
+					this->mainConsole->writeToBuffer(c, "Damage increased by 4.");
+					c.Y++;
+					this->mainConsole->writeToBuffer(c, "Health increased by 5.");
+					c.X = this->mainConsole->getConsoleSize().X >> 1;
+					if (currentTier == 1) break;
+				}
+				case 3:
+				{
+					c.Y += 3;
+					if (currentTier == 2) c.Y = 5;
+					this->mainConsole->writeToBuffer(c, "Damage increased by 5.");
+					c.Y++;
+					this->mainConsole->writeToBuffer(c, "Health increased by 6.");
+					c.X = this->mainConsole->getConsoleSize().X >> 1;
+					if (currentTier == 2) break;
+				}
+				default:
+					c.Y = 5;
+					this->mainConsole->writeToBuffer(c, "No valid higher tier");
+					break;
+			}
+			break;
+		}
+		case 2:
+		{
+			switch (currentTier)
+			{
+				case 0:
+				{
+					c.Y += 3;
+					this->mainConsole->writeToBuffer(c, "Increases the HP stat of the player by 5 hp.");
+					c.X = this->mainConsole->getConsoleSize().X >> 1;
+				}
+				case 1:
+				{
+					c.Y += 3;
+					if (currentTier == 0) c.Y = 5;
+					this->mainConsole->writeToBuffer(c, "Increases the HP stat of the player by 7 hp.");
+					c.X = this->mainConsole->getConsoleSize().X >> 1;
+					if (currentTier == 0) break;
+				}
+				case 2:
+				{
+					c.Y += 3;
+					if (currentTier == 1) c.Y = 5;
+					this->mainConsole->writeToBuffer(c, "Increases the HP stat of the player by 9 hp.");
+					c.X = this->mainConsole->getConsoleSize().X >> 1;
+					if (currentTier == 1) break;
+				}
+				case 3:
+				{
+					c.Y += 3;
+					if (currentTier == 2) c.Y = 5;
+					this->mainConsole->writeToBuffer(c, "Increases the HP stat of the player by 11 hp.");
+					c.X = this->mainConsole->getConsoleSize().X >> 1;
+					if (currentTier == 2) break;
+				}
+				default:
+					c.Y = 5;
+					this->mainConsole->writeToBuffer(c, "No valid higher tier");
+					break;
+			}
+			break;
+		}
+		case 3:
+		{
+			switch (currentTier)
+			{
+			case 0:
+			{
+				c.Y += 3;
+				this->mainConsole->writeToBuffer(c, "All enemies deal 2 more damage.");
+				c.Y++;
+				this->mainConsole->writeToBuffer(c, "Player deals 4 more damage.");
+				c.X = this->mainConsole->getConsoleSize().X >> 1;
+			}
+			case 1:
+			{
+				c.Y += 3;
+				if (currentTier == 0) c.Y = 5;
+				this->mainConsole->writeToBuffer(c, "All enemies deal 3 more damage.");
+				c.Y++;
+				this->mainConsole->writeToBuffer(c, "Player deals 5 more damage.");
+				c.X = this->mainConsole->getConsoleSize().X >> 1;
+				if (currentTier == 0) break;
+			}
+			case 2:
+			{
+				c.Y += 3;
+				if (currentTier == 1) c.Y = 5;
+				this->mainConsole->writeToBuffer(c, "All enemies deal 4 more damage.");
+				c.Y++;
+				this->mainConsole->writeToBuffer(c, "Player deals 6 more damage.");
+				c.X = this->mainConsole->getConsoleSize().X >> 1;
+				if (currentTier == 1) break;
+			}
+			case 3:
+			{
+				c.Y += 3;
+				if (currentTier == 2) c.Y = 5;
+				this->mainConsole->writeToBuffer(c, "All enemies deal 5 more damage.");
+				c.Y++;
+				this->mainConsole->writeToBuffer(c, "Player deals 7 more damage.");
+				c.X = this->mainConsole->getConsoleSize().X >> 1;
+				if (currentTier == 2) break;
+			}
+			default:
+				c.Y = 5;
+				this->mainConsole->writeToBuffer(c, "No valid higher tier");
+				break;
+			}
+			break;
+		}
+		case 4:
+		{
+			switch (currentTier)
+			{
+			case 0:
+			{
+				c.Y += 3;
+				this->mainConsole->writeToBuffer(c, "Attack speed increased by 20%");
+				c.Y++;
+				this->mainConsole->writeToBuffer(c, "Pellet velocity increased by 20%.");
+				c.X = this->mainConsole->getConsoleSize().X >> 1;
+			}
+			case 1:
+			{
+				c.Y += 3;
+				if (currentTier == 0) c.Y = 5;
+				this->mainConsole->writeToBuffer(c, "Attack speed increased by 30%");
+				c.Y++;
+				this->mainConsole->writeToBuffer(c, "Pellet velocity increased by 30%.");
+				c.X = this->mainConsole->getConsoleSize().X >> 1;
+				if (currentTier == 0) break;
+			}
+			case 2:
+			{
+				c.Y += 3;
+				if (currentTier == 1) c.Y = 5;
+				this->mainConsole->writeToBuffer(c, "Attack speed increased by 40%");
+				c.Y++;
+				this->mainConsole->writeToBuffer(c, "Pellet velocity increased by 40%.");
+				c.X = this->mainConsole->getConsoleSize().X >> 1;
+				if (currentTier == 1) break;
+			}
+			case 3:
+			{
+				c.Y += 3;
+				if (currentTier == 2) c.Y = 5;
+				this->mainConsole->writeToBuffer(c, "Attack speed increased by 50%");
+				c.Y++;
+				this->mainConsole->writeToBuffer(c, "Pellet velocity increased by 50%.");
+				c.X = this->mainConsole->getConsoleSize().X >> 1;
+				if (currentTier == 2) break;
+			}
+			default:
+				c.Y = 5;
+				this->mainConsole->writeToBuffer(c, "No valid higher tier");
+				break;
+			}
+			break;
+		}
+		case 5:
+		{
+			switch (currentTier)
+			{
+			case 0:
+			{
+				c.Y += 3;
+				this->mainConsole->writeToBuffer(c, "Increases player's score by 1.5x");
+				c.X = this->mainConsole->getConsoleSize().X >> 1;
+			}
+			case 1:
+			{
+				c.Y += 3;
+				if (currentTier == 0) c.Y = 5;
+				this->mainConsole->writeToBuffer(c, "Increases player's score by 2x.");
+				c.X = this->mainConsole->getConsoleSize().X >> 1;
+				if (currentTier == 0) break;
+			}
+			case 2:
+			{
+				c.Y += 3;
+				if (currentTier == 1) c.Y = 5;
+				this->mainConsole->writeToBuffer(c, "Increases player's score by 2.5x.");
+				c.X = this->mainConsole->getConsoleSize().X >> 1;
+				if (currentTier == 1) break;
+			}
+			case 3:
+			{
+				c.Y += 3;
+				if (currentTier == 2) c.Y = 5;
+				this->mainConsole->writeToBuffer(c, "Increases player's score by 3x.");
+				c.X = this->mainConsole->getConsoleSize().X >> 1;
+				if (currentTier == 2) break;
+			}
+			default:
+				c.Y = 5;
+				this->mainConsole->writeToBuffer(c, "No valid higher tier");
+				break;
+			}
+			break;
+		}
+		case 6:
+		{
+			switch (currentTier)
+			{
+			case 0:
+			{
+				c.Y += 3;
+				this->mainConsole->writeToBuffer(c, "Increases player's movement speed by 20%.");
+				c.X = this->mainConsole->getConsoleSize().X >> 1;
+			}
+			case 1:
+			{
+				c.Y += 3;
+				if (currentTier == 0) c.Y = 5;
+				this->mainConsole->writeToBuffer(c, "Increases player's movement speed by 30%.");
+				c.X = this->mainConsole->getConsoleSize().X >> 1;
+				if (currentTier == 0) break;
+			}
+			case 2:
+			{
+				c.Y += 3;
+				if (currentTier == 1) c.Y = 5;
+				this->mainConsole->writeToBuffer(c, "Increases player's movement speed by 40%.");
+				c.X = this->mainConsole->getConsoleSize().X >> 1;
+				if (currentTier == 1) break;
+			}
+			case 3:
+			{
+				c.Y += 3;
+				if (currentTier == 2) c.Y = 5;
+				this->mainConsole->writeToBuffer(c, "50%.");
+				c.X = this->mainConsole->getConsoleSize().X >> 1;
+				if (currentTier == 2) break;
+			}
+			default:
+				this->mainConsole->writeToBuffer(c, "No valid higher tier");
+				break;
+			}
+			break;
+		}
+		default:
+		{
+			this->mainConsole->writeToBuffer(c, "Invalid Item");
+		}
+	}
+	
 }
 
 // heehee

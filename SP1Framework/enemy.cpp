@@ -145,6 +145,16 @@ void Enemy::scoreGiven(SGameChar * player)
 			player->m_iPlayerScore += this->m_iScoreGiven;
 			break;
 		}
+		case 4:
+		{
+			player->m_iPlayerScore += this->m_iScoreGiven;
+			break;
+		}
+		case 5:
+		{
+			player->m_iPlayerScore += this->m_iScoreGiven;
+			break;
+		}
 	}
 }
 

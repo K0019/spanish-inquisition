@@ -50,7 +50,7 @@ void init(void)
 	for (int i = 0; i < K_COUNT; i++) g_adBounceTime[i] = 0.0;
 	// sets the initial state for the game
 	g_eGameState = S_SPLASHSCREEN;
-	if (DEBUG) g_eGameState = S_MENU;
+	/*if (DEBUG) g_eGameState = S_MENU;*/
 	if (g_eRestartGame) g_eGameState = S_GAME;
 	g_eRestartGame = false;
 
@@ -212,7 +212,7 @@ void loadGame()
 		(currDataStorage.g_shOptionsData[0] == 2 ? 2 :
 		(currDataStorage.g_shOptionsData[0] == 1) ? 1 : 0);
 	g_mEvent.bMinimap = ((currDataStorage.g_shOptionsData[1] == 0) ? false : true);
-	for (int i = 0; i < g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList.size(); i++)
+	for (unsigned int i = 0; i < g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList.size(); i++)
 	{
 		g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[i].m_iWeaponLevel = currDataStorage.g_iSaveData[1 + i];
 	}
@@ -271,19 +271,21 @@ void menuNav()
 	{
 		g_mEvent.sh_cursSel++;
 		g_mEvent.r_menucurspos.Y++;
-		g_adBounceTime[K_SHOOTDOWN] = g_dElapsedTime + 0.15;
+		g_adBounceTime[K_SHOOTDOWN] = g_dElapsedTime + 0.25;
 	}
 	else if (g_abKeyPressed[K_SHOOTUP] && g_mEvent.sh_cursSel > 0 && g_adBounceTime[K_SHOOTUP] < g_dElapsedTime && g_mEvent.shMenuState == 0)
 	{
 		g_mEvent.sh_cursSel--;
 		g_mEvent.r_menucurspos.Y--;
-		g_adBounceTime[K_SHOOTUP] = g_dElapsedTime + 0.15;
+		g_adBounceTime[K_SHOOTUP] = g_dElapsedTime + 0.25;
 	}
 	if (g_abKeyPressed[K_ENTER] && !g_mEvent.bHasPressedButton && g_mEvent.shMenuState == 0)
 	{
 		switch (g_mEvent.sh_cursSel)
 		{
 		case 0:
+			g_sEntities.g_sChar.m_iGlobalScore = unsigned int(double(g_sEntities.g_sChar.m_iGlobalScore) * 0.10);
+			saveGame();
 			g_eGameState = S_GAME;
 			break;
 		case 1:
@@ -325,12 +327,12 @@ void submenuNav()
 		if (g_abKeyPressed[K_SHOOTLEFT] && g_mEvent.sh_shopItemSel > 0 && g_adBounceTime[K_SHOOTLEFT] < g_dElapsedTime)
 		{
 			g_mEvent.sh_shopItemSel--;
-			g_adBounceTime[K_SHOOTLEFT] = g_dElapsedTime + 0.15;
+			g_adBounceTime[K_SHOOTLEFT] = g_dElapsedTime + 0.25;
 		}
 		if (g_abKeyPressed[K_SHOOTRIGHT] && g_mEvent.sh_shopItemSel < 6 && g_adBounceTime[K_SHOOTRIGHT] < g_dElapsedTime)
 		{
 			g_mEvent.sh_shopItemSel++;
-			g_adBounceTime[K_SHOOTRIGHT] = g_dElapsedTime + 0.15;
+			g_adBounceTime[K_SHOOTRIGHT] = g_dElapsedTime + 0.25;
 		}
 		if (g_abKeyPressed[K_ENTER] && g_adBounceTime[K_ENTER] < g_dElapsedTime)
 		{
@@ -338,7 +340,7 @@ void submenuNav()
 			{
 				if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[g_mEvent.sh_shopItemSel].m_iWeaponLevel < 3)
 				{
-					if (g_sEntities.g_sChar.m_iGlobalScore >= g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[g_mEvent.sh_shopItemSel].m_iWeaponCost)
+					if (g_sEntities.g_sChar.m_iGlobalScore >= (unsigned int)g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[g_mEvent.sh_shopItemSel].m_iWeaponCost)
 					{
 						g_sEntities.g_sChar.m_iGlobalScore -= g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[g_mEvent.sh_shopItemSel].m_iWeaponCost;
 						g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[g_mEvent.sh_shopItemSel].m_iWeaponLevel++;
@@ -346,7 +348,7 @@ void submenuNav()
 						loadGame();
 					}
 				}
-				g_adBounceTime[K_ENTER] = g_dElapsedTime + 0.15;
+				g_adBounceTime[K_ENTER] = g_dElapsedTime + 0.25;
 			}
 		}
 		else
@@ -362,12 +364,12 @@ void submenuNav()
 		if (g_abKeyPressed[K_SHOOTUP] && g_adBounceTime[K_SHOOTUP] < g_dElapsedTime && g_mEvent.sh_optionSel > 0)
 		{
 			g_mEvent.sh_optionSel--;
-			g_adBounceTime[K_SHOOTUP] = g_dElapsedTime + 0.15;
+			g_adBounceTime[K_SHOOTUP] = g_dElapsedTime + 0.25;
 		}
 		if (g_abKeyPressed[K_SHOOTDOWN] && g_adBounceTime[K_SHOOTDOWN] < g_dElapsedTime && g_mEvent.sh_optionSel < 3)
 		{
 			g_mEvent.sh_optionSel++;
-			g_adBounceTime[K_SHOOTDOWN] = g_dElapsedTime + 0.15;
+			g_adBounceTime[K_SHOOTDOWN] = g_dElapsedTime + 0.25;
 		}
 		if (g_abKeyPressed[K_SHOOTLEFT] && g_adBounceTime[K_SHOOTLEFT] < g_dElapsedTime)
 		{
@@ -395,7 +397,7 @@ void submenuNav()
 			{
 				g_mEvent.bMinimap = !g_mEvent.bMinimap;
 			}
-			g_adBounceTime[K_SHOOTLEFT] = g_dElapsedTime + 0.15;
+			g_adBounceTime[K_SHOOTLEFT] = g_dElapsedTime + 0.25;
 
 		}
 		if (g_abKeyPressed[K_SHOOTRIGHT] && g_adBounceTime[K_SHOOTRIGHT] < g_dElapsedTime)
@@ -424,7 +426,7 @@ void submenuNav()
 			{
 				g_mEvent.bMinimap = !g_mEvent.bMinimap;
 			}
-			g_adBounceTime[K_SHOOTRIGHT] = g_dElapsedTime + 0.15;
+			g_adBounceTime[K_SHOOTRIGHT] = g_dElapsedTime + 0.25;
 
 		}
 		if (g_abKeyPressed[K_ENTER] && g_adBounceTime[K_ENTER] < g_dElapsedTime && g_mEvent.sh_optionSel == 3)
@@ -1625,12 +1627,15 @@ void CharacterDeath()
 			}
 		else if(g_abKeyPressed[K_V])
 		{
+			g_sEntities.g_sChar.m_iGlobalScore += g_sEntities.g_sChar.m_iPlayerScore;
+			saveGame();
 			init();
 			g_eGameState = S_MENU;
 		}
 		else if (g_abKeyPressed[K_ESCAPE])
 		{
-			g_sEntities.g_sChar.m_iGlobalScore = g_sEntities.g_sChar.m_iPlayerScore;
+			g_sEntities.g_sChar.m_iGlobalScore += g_sEntities.g_sChar.m_iPlayerScore;
+			saveGame();
 			g_bQuitGame = true;
 		}
 		g_eRestartGame = false;

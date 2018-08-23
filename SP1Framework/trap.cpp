@@ -1,6 +1,6 @@
 #include "trap.h"
 
-STrap::STrap(char name[], int index, int health, int damage, double time)
+STrap::STrap(char name[], int index, int health, int damage, double time) //Constructor to initialise trap information
 {
 	this->m_sName = name;
 	this->m_iTrapIndex = index;
@@ -9,11 +9,9 @@ STrap::STrap(char name[], int index, int health, int damage, double time)
 	this->m_dTrapTime = time;
 }
 
-SAllTraps::SAllTraps()
+SAllTraps::SAllTraps() //Constructor to initialise each unique trap and their stats.
 {
 	this->addTrap(STrap("Spike", 1, 0, 4, 0));
-	this->addTrap(STrap("Snare", 2, 0, 0, 2));
-	this->addTrap(STrap("Turret", 3, 10, 2, 0));
 }
 
 void SAllTraps::addTrap(STrap& trap)

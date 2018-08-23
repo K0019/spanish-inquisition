@@ -21,8 +21,8 @@
 #define PELLET_CHARACTER_HIT_TOP "\\/"
 #define PELLET_CHARACTER_HIT_BOTTOM "/\\"
 
-#define UNIQUE_ENEMY_BANDIT new EnemyMelee(&g_sLevel, "Bandit", "BBBB", "BBBB", c, (WORD)0x0E, 15, 3, 0.3, 0.25, 0.1, 0.3, 10, 1)
-#define UNIQUE_ENEMY_MAGE new EnemyRanged(&g_sLevel, &g_sEntities.m_vPellets, "Mage", "MMMM", "MMMM", c, (WORD)0x0E, 10, 2, 0.4, 0.3, 0.1, 0.3, false, 0.25, 10, 2)
+#define UNIQUE_ENEMY_BANDIT new EnemyMelee(&g_sLevel, "Bandit", "BBBB", "BBBB", c, (WORD)0x0E, 12, 3, 0.3, 0.25, 0.1, 0.3, 10, 1)
+#define UNIQUE_ENEMY_MAGE new EnemyRanged(&g_sLevel, &g_sEntities.m_vPellets, "Mage", "MMMM", "MMMM", c, (WORD)0x0E, 9, 2, 0.4, 0.3, 0.1, 0.3, false, 0.25, 10, 2)
 #define UNIQUE_ENEMY_KNIGHT new EnemyMelee(&g_sLevel, "Knight", "KKKK", "KKKK", c, (WORD)0x0E, 25, 5, 0.2, 0.3, 0.1, 0.3, 20, 3)
 #define UNIQUE_ENEMY_ENHANCEDSORCERER new EnemyRanged(&g_sLevel, &g_sEntities.m_vPellets, "Enhanced Sorcerer", "EEEE", "EEEE", c, (WORD)0x0E, 20, 2, 0.35, 0.4, 0.1, 0.2, true, 0.2, 30, 4)
 #define UNIQUE_ENEMY_GUARDIAN new EnemyMelee(&g_sLevel, "Guardian", "GGGG", "GGGG", c, (WORD)0x0E, 35, 5, 0.18, 0.3, 0.1, 0.3, 40, 5)

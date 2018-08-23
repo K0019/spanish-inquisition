@@ -30,6 +30,7 @@ void MenuEvent::MenuRender(unsigned short* OptionsDataArray, std::vector<SItem> 
 		break;
 	case 2:
 		renderItemSelected(itemList);
+		renderShopBorder();
 		break;
 	case 3:
 		renderDoomButton();
@@ -382,32 +383,65 @@ void MenuEvent::renderCreditsRollAnimation()
 void MenuEvent::renderCreditsRollText()
 {
 	COORD c = this->mainConsole->getConsoleSize();
-	c.X /= 10;
+	c.X = (c.X >> 1) - 4;
 	c.Y = (c.Y >> 1) >> 1;
 	this->mainConsole->writeToBuffer(c, "Credits", 0x0f);
+	c = this->mainConsole->getConsoleSize();
+	c.X = (c.X >> 1) - 8;
+	c.Y = ((c.Y >> 1) >> 1) + 2;
+	this->mainConsole->writeToBuffer(c, " Kendrick Sim  ", 0x5f);
+	c.Y++;
+	this->mainConsole->writeToBuffer(c, " Lim Yan Quan  ", 0x2f);
+	c.Y++;
+	this->mainConsole->writeToBuffer(c, "   Pi Jo Chu   ", 0x6f);
+	c.Y++;
+	this->mainConsole->writeToBuffer(c, " Winston Ngoui ", 0x1f);
+	c.X -= 10;
 	c.Y += 2;
-	this->mainConsole->writeToBuffer(c, "Kendrick Sim", 0x5f);
-	c.Y++;
-	this->mainConsole->writeToBuffer(c, "Lim Yan Quan", 0x2f);
-	c.Y++;
-	this->mainConsole->writeToBuffer(c, "Pi Jo Chu", 0x6f);
-	c.Y++;
-	this->mainConsole->writeToBuffer(c, "Winston Ngoui", 0x1f);
-	c.Y += 2;
-	this->mainConsole->writeToBuffer(c, "Developed in Visual Studios 2015/2017", 0x0f);
+	this->mainConsole->writeToBuffer(c, "Developed in Visual Studio 2015/2017", 0x0f);
 
 }
 
-//UNDONE
+void MenuEvent::renderShopBorder()
+{
+	for (int i = 0; i < this->mainConsole->getConsoleSize().Y - 5; i++)
+	{
+		this->mainConsole->writeToBuffer(0, i, "||", 0x08);
+	}
+	for (int i = 0; i < this->mainConsole->getConsoleSize().Y - 5; i++)
+	{
+		this->mainConsole->writeToBuffer((this->mainConsole->getConsoleSize().X >> 1) - 2, i, "||", 0x08);
+	}
+	for (int i = 0; i < this->mainConsole->getConsoleSize().Y - 5; i++)
+	{
+		this->mainConsole->writeToBuffer(this->mainConsole->getConsoleSize().X - 2, i, "||", 0x08);
+	}
+	for (int i = 0; i < this->mainConsole->getConsoleSize().X; i++)
+	{
+		this->mainConsole->writeToBuffer(i, 3, "=", 0x08);
+	}
+	for (int i = 0; i < this->mainConsole->getConsoleSize().X; i++)
+	{
+		this->mainConsole->writeToBuffer(i, 5, "=", 0x08);
+	}
+}
+
+// SHOP MENU
 void MenuEvent::renderItemSelected(std::vector<SItem> * itemList)
 {
 	std::string nameOfItem = (*itemList)[sh_shopItemSel].m_sName;
 	COORD c;
-	c.Y = 3;
+	c.Y = 4;
 	c.X = 2;
 	this->mainConsole->writeToBuffer(c, "Current Tier");
 	c.X = this->mainConsole->getConsoleSize().X >> 1;
 	this->mainConsole->writeToBuffer(c, "Next Tier");
+	c.X = this->mainConsole->getConsoleSize().X - strlen("Cost: ") - std::to_string((*itemList)[sh_shopItemSel].m_iWeaponCost).length() - 5;
+	c.Y = this->mainConsole->getConsoleSize().Y - 4;
+	std::ostringstream cost;
+	cost.str("");
+	cost << "Cost: " << (*itemList)[sh_shopItemSel].m_iWeaponCost;
+	this->mainConsole->writeToBuffer(c, cost.str());
 	c.X = c.Y = 2;
 	this->mainConsole->writeToBuffer(c, nameOfItem, 0x1f);
 	int currentTier = (*itemList)[sh_shopItemSel].m_iWeaponLevel;
@@ -419,7 +453,7 @@ void MenuEvent::renderItemSelected(std::vector<SItem> * itemList)
 			{
 				case 0:
 				{
-					c.Y += 3;
+					c.Y += 4;
 					this->mainConsole->writeToBuffer(c, "Pellets pass through invisible rocks.");
 					c.Y++;
 					this->mainConsole->writeToBuffer(c, "Pellet lifespan doubled.");
@@ -427,8 +461,8 @@ void MenuEvent::renderItemSelected(std::vector<SItem> * itemList)
 				}
 				case 1:
 				{
-					c.Y += 3;
-					if (currentTier == 0) c.Y = 5;
+					c.Y += 4;
+					if (currentTier == 0) c.Y = 6;
 					this->mainConsole->writeToBuffer(c, "Pellets pass through invisible rocks.");
 					c.Y++;
 					this->mainConsole->writeToBuffer(c, "Pellet lifespan doubled.");
@@ -439,8 +473,8 @@ void MenuEvent::renderItemSelected(std::vector<SItem> * itemList)
 				}
 				case 2:
 				{
-					c.Y += 3;
-					if (currentTier == 1) c.Y = 5;
+					c.Y += 4;
+					if (currentTier == 1) c.Y = 6;
 					this->mainConsole->writeToBuffer(c, "Pellets pass through invisible rocks.");
 					c.Y++;
 					this->mainConsole->writeToBuffer(c, "Pellet lifespan doubled.");
@@ -451,8 +485,8 @@ void MenuEvent::renderItemSelected(std::vector<SItem> * itemList)
 				}
 				case 3:
 				{
-					c.Y += 3;
-					if (currentTier == 2) c.Y = 5;
+					c.Y += 4;
+					if (currentTier == 2) c.Y = 6;
 					this->mainConsole->writeToBuffer(c, "Pellets pass through invisible rocks.");
 					c.Y++;
 					this->mainConsole->writeToBuffer(c, "Pellet lifespan doubled.");
@@ -462,7 +496,7 @@ void MenuEvent::renderItemSelected(std::vector<SItem> * itemList)
 					if (currentTier == 2) break;
 				}
 				default:
-					c.Y = 5;
+					c.Y = 6;
 					this->mainConsole->writeToBuffer(c, "No valid higher tier");
 					break;
 			}
@@ -474,7 +508,7 @@ void MenuEvent::renderItemSelected(std::vector<SItem> * itemList)
 			{
 				case 0:
 				{
-					c.Y += 3;
+					c.Y += 4;
 					this->mainConsole->writeToBuffer(c, "Damage increased by 2.");
 					c.Y++;
 					this->mainConsole->writeToBuffer(c, "Health increased by 3.");
@@ -483,8 +517,8 @@ void MenuEvent::renderItemSelected(std::vector<SItem> * itemList)
 				}
 				case 1:
 				{
-					c.Y += 3;
-					if (currentTier == 0) c.Y = 5;
+					c.Y += 4;
+					if (currentTier == 0) c.Y = 6;
 					this->mainConsole->writeToBuffer(c, "Damage increased by 3.");
 					c.Y++;
 					this->mainConsole->writeToBuffer(c, "Health increased by 4.");
@@ -493,8 +527,8 @@ void MenuEvent::renderItemSelected(std::vector<SItem> * itemList)
 				}
 				case 2:
 				{
-					c.Y += 3;
-					if (currentTier == 1) c.Y = 5;
+					c.Y += 4;
+					if (currentTier == 1) c.Y = 6;
 					this->mainConsole->writeToBuffer(c, "Damage increased by 4.");
 					c.Y++;
 					this->mainConsole->writeToBuffer(c, "Health increased by 5.");
@@ -503,8 +537,8 @@ void MenuEvent::renderItemSelected(std::vector<SItem> * itemList)
 				}
 				case 3:
 				{
-					c.Y += 3;
-					if (currentTier == 2) c.Y = 5;
+					c.Y += 4;
+					if (currentTier == 2) c.Y = 6;
 					this->mainConsole->writeToBuffer(c, "Damage increased by 5.");
 					c.Y++;
 					this->mainConsole->writeToBuffer(c, "Health increased by 6.");
@@ -512,7 +546,7 @@ void MenuEvent::renderItemSelected(std::vector<SItem> * itemList)
 					if (currentTier == 2) break;
 				}
 				default:
-					c.Y = 5;
+					c.Y = 6;
 					this->mainConsole->writeToBuffer(c, "No valid higher tier");
 					break;
 			}
@@ -524,36 +558,36 @@ void MenuEvent::renderItemSelected(std::vector<SItem> * itemList)
 			{
 				case 0:
 				{
-					c.Y += 3;
+					c.Y += 4;
 					this->mainConsole->writeToBuffer(c, "Increases the HP stat of the player by 5 hp.");
 					c.X = this->mainConsole->getConsoleSize().X >> 1;
 				}
 				case 1:
 				{
-					c.Y += 3;
-					if (currentTier == 0) c.Y = 5;
+					c.Y += 4;
+					if (currentTier == 0) c.Y = 6;
 					this->mainConsole->writeToBuffer(c, "Increases the HP stat of the player by 7 hp.");
 					c.X = this->mainConsole->getConsoleSize().X >> 1;
 					if (currentTier == 0) break;
 				}
 				case 2:
 				{
-					c.Y += 3;
-					if (currentTier == 1) c.Y = 5;
+					c.Y += 4;
+					if (currentTier == 1) c.Y = 6;
 					this->mainConsole->writeToBuffer(c, "Increases the HP stat of the player by 9 hp.");
 					c.X = this->mainConsole->getConsoleSize().X >> 1;
 					if (currentTier == 1) break;
 				}
 				case 3:
 				{
-					c.Y += 3;
-					if (currentTier == 2) c.Y = 5;
+					c.Y += 4;
+					if (currentTier == 2) c.Y = 6;
 					this->mainConsole->writeToBuffer(c, "Increases the HP stat of the player by 11 hp.");
 					c.X = this->mainConsole->getConsoleSize().X >> 1;
 					if (currentTier == 2) break;
 				}
 				default:
-					c.Y = 5;
+					c.Y = 6;
 					this->mainConsole->writeToBuffer(c, "No valid higher tier");
 					break;
 			}
@@ -565,7 +599,7 @@ void MenuEvent::renderItemSelected(std::vector<SItem> * itemList)
 			{
 			case 0:
 			{
-				c.Y += 3;
+				c.Y += 4;
 				this->mainConsole->writeToBuffer(c, "All enemies deal 2 more damage.");
 				c.Y++;
 				this->mainConsole->writeToBuffer(c, "Player deals 4 more damage.");
@@ -573,8 +607,8 @@ void MenuEvent::renderItemSelected(std::vector<SItem> * itemList)
 			}
 			case 1:
 			{
-				c.Y += 3;
-				if (currentTier == 0) c.Y = 5;
+				c.Y += 4;
+				if (currentTier == 0) c.Y = 6;
 				this->mainConsole->writeToBuffer(c, "All enemies deal 3 more damage.");
 				c.Y++;
 				this->mainConsole->writeToBuffer(c, "Player deals 5 more damage.");
@@ -583,8 +617,8 @@ void MenuEvent::renderItemSelected(std::vector<SItem> * itemList)
 			}
 			case 2:
 			{
-				c.Y += 3;
-				if (currentTier == 1) c.Y = 5;
+				c.Y += 4;
+				if (currentTier == 1) c.Y = 6;
 				this->mainConsole->writeToBuffer(c, "All enemies deal 4 more damage.");
 				c.Y++;
 				this->mainConsole->writeToBuffer(c, "Player deals 6 more damage.");
@@ -593,8 +627,8 @@ void MenuEvent::renderItemSelected(std::vector<SItem> * itemList)
 			}
 			case 3:
 			{
-				c.Y += 3;
-				if (currentTier == 2) c.Y = 5;
+				c.Y += 4;
+				if (currentTier == 2) c.Y = 6;
 				this->mainConsole->writeToBuffer(c, "All enemies deal 5 more damage.");
 				c.Y++;
 				this->mainConsole->writeToBuffer(c, "Player deals 7 more damage.");
@@ -602,7 +636,7 @@ void MenuEvent::renderItemSelected(std::vector<SItem> * itemList)
 				if (currentTier == 2) break;
 			}
 			default:
-				c.Y = 5;
+				c.Y = 6;
 				this->mainConsole->writeToBuffer(c, "No valid higher tier");
 				break;
 			}
@@ -614,7 +648,7 @@ void MenuEvent::renderItemSelected(std::vector<SItem> * itemList)
 			{
 			case 0:
 			{
-				c.Y += 3;
+				c.Y += 4;
 				this->mainConsole->writeToBuffer(c, "Attack speed increased by 20%");
 				c.Y++;
 				this->mainConsole->writeToBuffer(c, "Pellet velocity increased by 20%.");
@@ -622,8 +656,8 @@ void MenuEvent::renderItemSelected(std::vector<SItem> * itemList)
 			}
 			case 1:
 			{
-				c.Y += 3;
-				if (currentTier == 0) c.Y = 5;
+				c.Y += 4;
+				if (currentTier == 0) c.Y = 6;
 				this->mainConsole->writeToBuffer(c, "Attack speed increased by 30%");
 				c.Y++;
 				this->mainConsole->writeToBuffer(c, "Pellet velocity increased by 30%.");
@@ -632,8 +666,8 @@ void MenuEvent::renderItemSelected(std::vector<SItem> * itemList)
 			}
 			case 2:
 			{
-				c.Y += 3;
-				if (currentTier == 1) c.Y = 5;
+				c.Y += 4;
+				if (currentTier == 1) c.Y = 6;
 				this->mainConsole->writeToBuffer(c, "Attack speed increased by 40%");
 				c.Y++;
 				this->mainConsole->writeToBuffer(c, "Pellet velocity increased by 40%.");
@@ -642,8 +676,8 @@ void MenuEvent::renderItemSelected(std::vector<SItem> * itemList)
 			}
 			case 3:
 			{
-				c.Y += 3;
-				if (currentTier == 2) c.Y = 5;
+				c.Y += 4;
+				if (currentTier == 2) c.Y = 6;
 				this->mainConsole->writeToBuffer(c, "Attack speed increased by 50%");
 				c.Y++;
 				this->mainConsole->writeToBuffer(c, "Pellet velocity increased by 50%.");
@@ -651,7 +685,7 @@ void MenuEvent::renderItemSelected(std::vector<SItem> * itemList)
 				if (currentTier == 2) break;
 			}
 			default:
-				c.Y = 5;
+				c.Y = 6;
 				this->mainConsole->writeToBuffer(c, "No valid higher tier");
 				break;
 			}
@@ -663,36 +697,36 @@ void MenuEvent::renderItemSelected(std::vector<SItem> * itemList)
 			{
 			case 0:
 			{
-				c.Y += 3;
+				c.Y += 4;
 				this->mainConsole->writeToBuffer(c, "Increases player's score by 1.5x");
 				c.X = this->mainConsole->getConsoleSize().X >> 1;
 			}
 			case 1:
 			{
-				c.Y += 3;
-				if (currentTier == 0) c.Y = 5;
+				c.Y += 4;
+				if (currentTier == 0) c.Y = 6;
 				this->mainConsole->writeToBuffer(c, "Increases player's score by 2x.");
 				c.X = this->mainConsole->getConsoleSize().X >> 1;
 				if (currentTier == 0) break;
 			}
 			case 2:
 			{
-				c.Y += 3;
-				if (currentTier == 1) c.Y = 5;
+				c.Y += 4;
+				if (currentTier == 1) c.Y = 6;
 				this->mainConsole->writeToBuffer(c, "Increases player's score by 2.5x.");
 				c.X = this->mainConsole->getConsoleSize().X >> 1;
 				if (currentTier == 1) break;
 			}
 			case 3:
 			{
-				c.Y += 3;
-				if (currentTier == 2) c.Y = 5;
+				c.Y += 4;
+				if (currentTier == 2) c.Y = 6;
 				this->mainConsole->writeToBuffer(c, "Increases player's score by 3x.");
 				c.X = this->mainConsole->getConsoleSize().X >> 1;
 				if (currentTier == 2) break;
 			}
 			default:
-				c.Y = 5;
+				c.Y = 6;
 				this->mainConsole->writeToBuffer(c, "No valid higher tier");
 				break;
 			}
@@ -704,30 +738,30 @@ void MenuEvent::renderItemSelected(std::vector<SItem> * itemList)
 			{
 			case 0:
 			{
-				c.Y += 3;
+				c.Y += 4;
 				this->mainConsole->writeToBuffer(c, "Increases player's movement speed by 20%.");
 				c.X = this->mainConsole->getConsoleSize().X >> 1;
 			}
 			case 1:
 			{
-				c.Y += 3;
-				if (currentTier == 0) c.Y = 5;
+				c.Y += 4;
+				if (currentTier == 0) c.Y = 6;
 				this->mainConsole->writeToBuffer(c, "Increases player's movement speed by 30%.");
 				c.X = this->mainConsole->getConsoleSize().X >> 1;
 				if (currentTier == 0) break;
 			}
 			case 2:
 			{
-				c.Y += 3;
-				if (currentTier == 1) c.Y = 5;
+				c.Y += 4;
+				if (currentTier == 1) c.Y = 6;
 				this->mainConsole->writeToBuffer(c, "Increases player's movement speed by 40%.");
 				c.X = this->mainConsole->getConsoleSize().X >> 1;
 				if (currentTier == 1) break;
 			}
 			case 3:
 			{
-				c.Y += 3;
-				if (currentTier == 2) c.Y = 5;
+				c.Y += 4;
+				if (currentTier == 2) c.Y = 6;
 				this->mainConsole->writeToBuffer(c, "50%.");
 				c.X = this->mainConsole->getConsoleSize().X >> 1;
 				if (currentTier == 2) break;

@@ -43,8 +43,30 @@ void MenuEvent::MenuRender(unsigned short* OptionsDataArray, std::vector<SItem> 
 void MenuEvent::renderMenuControls()
 {
 	COORD c = this->mainConsole->getConsoleSize();
-	c.Y--;
-	c.X >>= 1;
+	c.Y -= 2;
+	switch (shMenuState)
+	{
+	case 0:
+		c.X = (c.X >> 1) + 16;
+		this->mainConsole->writeToBuffer(c, "[UP] & [DOWN] - Choose | [ENTER] - Select");
+		break;
+	case 1:
+		c.X = (c.X >> 1) - 20;
+		this->mainConsole->writeToBuffer(c, "[ESCAPE] - Back");
+		break;
+	case 2:
+		c.X = (c.X >> 1) - 20;
+		this->mainConsole->writeToBuffer(c, "[LEFT] & [RIGHT] - Choose | [ENTER] - Buy|[ESCAPE] - Back");
+		break;
+	case 3:
+		c.X = (c.X >> 1) - 40;
+		this->mainConsole->writeToBuffer(c, "[UP] & [DOWN] - Choose | [ENTER] - Select | [LEFT] & [RIGHT] - Switch | [ESCAPE] - Back");
+		break;
+	case 4:
+		c.X = (c.X >> 1) - 20;
+		this->mainConsole->writeToBuffer(c, "[ESCAPE] - Back");
+		break;
+	}
 }
 
 // title banner

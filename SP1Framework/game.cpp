@@ -76,7 +76,7 @@ void init(void)
 	r_dTargetRenderTime = SCREEN_SCROLL_LENGTH;
 	g_mEvent.r_menucurspos.X = g_Console.getConsoleSize().X / 5;
 	g_mEvent.r_menucurspos.Y = g_Console.getConsoleSize().Y / 10 * 8 - 1;
-	g_sLevel.floor = 5;
+	g_sLevel.floor = 1;
 	g_sLevel.generateLevel();
 	g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
 	COORD c;
@@ -779,6 +779,23 @@ void detectPauseMenuProc()
 void pauseScreen()
 {
 	detectPauseMenuProc();
+	pauseScreenNav();
+}
+
+void pauseScreenNav()
+{
+	if (g_abKeyPressed[K_SHOOTDOWN] && g_mEvent.sh_cursSel < 5 && g_adBounceTime[K_SHOOTDOWN] < g_dElapsedTime && g_mEvent.shMenuState == 0)
+	{
+		g_mEvent.sh_cursSel++;
+		g_mEvent.r_menucurspos.Y++;
+		g_adBounceTime[K_SHOOTDOWN] = g_dElapsedTime + 0.15;
+	}
+	else if (g_abKeyPressed[K_SHOOTUP] && g_mEvent.sh_cursSel > 0 && g_adBounceTime[K_SHOOTUP] < g_dElapsedTime && g_mEvent.shMenuState == 0)
+	{
+		g_mEvent.sh_cursSel--;
+		g_mEvent.r_menucurspos.Y--;
+		g_adBounceTime[K_SHOOTUP] = g_dElapsedTime + 0.15;
+	}
 }
 
 void renderSplashScreen()  // renders the splash screen
@@ -857,7 +874,7 @@ void renderPause()
 	{
 		for (; c.Y < g_Console.getConsoleSize().Y; c.Y++)
 		{
-			g_Console.writeToBuffer(c, " ", 0x40);
+			g_Console.writeToBuffer(c, " ", 0x80);
 		}
 		c.Y = 0;
 	}

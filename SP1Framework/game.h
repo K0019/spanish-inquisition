@@ -51,7 +51,6 @@ void getInput    ( void ); /* FRAMEWORK */ // get input from player
 void update      ( CStopWatch * timer, double missedTime ); /* FRAMEWORK */ // update the game and the state of the game
 void render      ( CStopWatch * timer ); /* FRAMEWORK */ // renders the current state of the game to the console
 void shutdown    ( void ); /* FRAMEWORK */ // do clean up, free memory
-void RestartGame();
 /*
 	THE UPDATE FUNCTIONS
 */
@@ -65,23 +64,21 @@ void menuNav();
 void submenuNav();
 void resetLevel(int floor); // Generate a new map, with input floor for what to put inside the rooms
 void controlPlayer();		// moves the character, collision detection, physics, etc
-//void processUserInput();	// checks if you should change states or do something else with the game, e.g. pause, exit
 void checkHitPellets();		// Check if pellets have hit anything
 void doomButton();			// heehee
 void detectPauseMenuProc();
 void pauseScreen();
+void pauseScreenNav();
 void changedRoomUpdate(); // Stuff to do when the player exits current room
 bool loadEnemiesFromRoom(); // Load all enemies from the room that the player entered
 void addEnemy(EnemyMelee * enemy); // Add an enemy to the enemy list
 void addEnemy(EnemyRanged * enemy); // Add an enemy to the enemy list
 void CharacterDeath();
 void setUpMoveScreen(); // Setup variables to move render screen
-void moveScreen(); // Moves the render screen
-
+void moveScreen(); // Moves the render scree
 /*
 	THE RENDER FUNCTIONS
 */
-
 void clearScreen();			// clears the current screen and draw from scratch 
 void renderSplashScreen();	// renders the splash screen
 void renderMenu();			// renders the main menu

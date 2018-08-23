@@ -13,6 +13,10 @@ MenuEvent::MenuEvent(Console* mainConsole)
 
 void MenuEvent::MenuRender(unsigned short* OptionsDataArray, std::vector<SItem> * itemList)
 {
+	if (shMenuState > 0)
+	{
+		tipIndex = rand() % 4;
+	}
 	renderMenuControls();
 	switch (shMenuState)
 	{
@@ -180,6 +184,33 @@ void MenuEvent::renderMenu()
 	this->mainConsole->writeToBuffer(c, "  CREDITS  ", 0x0f);
 	c.Y++;
 	this->mainConsole->writeToBuffer(c, "   QUIT    ", 0x0f);
+
+	c.X = this->mainConsole->getConsoleSize().X / 3 + 15;
+	c.Y = this->mainConsole->getConsoleSize().Y / 10 * 8 - 4;
+
+	switch (tipIndex)
+	{
+	case 0: 
+	{
+		this->mainConsole->writeToBuffer(c, "~Empty rooms may not be as empty as they seem~", 0x0f);
+		break;
+	}
+	case 1: 
+	{
+		this->mainConsole->writeToBuffer(c, "~Ranged enemies aren't trained in the strafing department~", 0x0f);
+		break;
+	}
+	case 2:
+	{
+		this->mainConsole->writeToBuffer(c, "~Kiting and Melee makes for a good pairing~", 0x0f);
+		break;
+	}
+	case 3:
+	{
+		this->mainConsole->writeToBuffer(c, "~Two walls on a diagonal, a bullet in between~", 0x0f);
+		break;
+	}
+	}
 }
 
 // the cursor in the main menu

@@ -4,6 +4,7 @@
 #include "Framework/console.h"
 #include "definitions.h"
 #include "item.h"
+#include <sstream>
 // here we go
 struct MenuEvent
 {
@@ -46,6 +47,7 @@ struct MenuEvent
 	void renderCreditsRollText();			// scrapped idea: converted into just static text
 
 	void renderItemSelected(std::vector<SItem> * itemList);			// shop: selected item name 
+	void renderShopBorder();
 
 	void renderDoomButton();				// heehee
 	void renderDoomButtonBrackets();		// heehee's brackets when selected

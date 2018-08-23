@@ -329,23 +329,22 @@ void MenuEvent::renderTutorialDetails()
 // ye... scrapped :/
 void MenuEvent::renderCreditsRollAnimation()
 {
-	//COORD c = this->mainConsole->getConsoleSize();
-
-	//if (uiCreditsRollTime > 1000)
-	//{
-	//	(c.X >>= 1) -= 9;
-	//	c.Y >>= 1;
-	//	this->mainConsole->writeToBuffer(c, "Press [Enter] to go back", 0x0f);
-	//}
-	//if (!(uiCreditsRollTime % 10))
-	//{
-	//	CreditsOffsetY += 1;
-	//}
-	//if (uiCreditsRollTime == 4294967294)
-	//{
-	//	uiCreditsRollTime = 0;
-	//}
-	//uiCreditsRollTime++;
+	/*COORD c = this->mainConsole->getConsoleSize();
+	if (uiCreditsRollTime > 1000)
+	{
+		(c.X >>= 1) -= 9;
+		c.Y >>= 1;
+		this->mainConsole->writeToBuffer(c, "Press [Enter] to go back", 0x0f);
+	}
+	if (!(uiCreditsRollTime % 10))
+	{
+		CreditsOffsetY += 1;
+	}
+	if (uiCreditsRollTime == 4294967294)
+	{
+		uiCreditsRollTime = 0;
+	}
+	uiCreditsRollTime++;*/
 }
 
 // static text of credits
@@ -356,13 +355,13 @@ void MenuEvent::renderCreditsRollText()
 	c.Y = (c.Y >> 1) >> 1;
 	this->mainConsole->writeToBuffer(c, "Credits", 0x0f);
 	c.Y += 2;
-	this->mainConsole->writeToBuffer(c, "Kendrick Sim", 0x0f);
+	this->mainConsole->writeToBuffer(c, "Kendrick Sim", 0x5f);
 	c.Y++;
-	this->mainConsole->writeToBuffer(c, "Lim Yan Quan", 0x0f);
+	this->mainConsole->writeToBuffer(c, "Lim Yan Quan", 0x2f);
 	c.Y++;
-	this->mainConsole->writeToBuffer(c, "Pi Jo Chu", 0x0f);
+	this->mainConsole->writeToBuffer(c, "Pi Jo Chu", 0x6f);
 	c.Y++;
-	this->mainConsole->writeToBuffer(c, "Winston Ngoui", 0x0f);
+	this->mainConsole->writeToBuffer(c, "Winston Ngoui", 0x1f);
 	c.Y += 2;
 	this->mainConsole->writeToBuffer(c, "Developed in Visual Studios 2015/2017", 0x0f);
 

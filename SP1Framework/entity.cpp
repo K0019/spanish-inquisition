@@ -33,7 +33,7 @@ void SAllEntities::updateEnemies()
 		enemy++;
 	}
 
-	if (this->m_vEnemy.empty())
+	if (this->m_vEnemy.empty() && this->boss == nullptr)
 	{
 		this->g_sChar.m_bInBattle = false;
 	}
@@ -41,4 +41,22 @@ void SAllEntities::updateEnemies()
 	{
 		this->g_sChar.m_bInBattle = true;
 	}
+}
+
+void SAllEntities::updateBoss()
+{
+	if (this->boss != nullptr)
+		this->boss->update();
+	else
+		return;
+	if (this->boss->isDead())
+	{
+		delete this->boss;
+		this->boss = nullptr;
+	}
+}
+
+SAllEntities::~SAllEntities()
+{
+	if (this->boss != nullptr) delete this->boss;
 }

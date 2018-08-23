@@ -72,6 +72,7 @@ void pauseScreen();
 void pauseScreenNav();
 void changedRoomUpdate(); // Stuff to do when the player exits current room
 bool loadEnemiesFromRoom(); // Load all enemies from the room that the player entered
+bool loadBoss(); // Load the boss into the exit room, if player is in floor 5
 void addEnemy(EnemyMelee * enemy); // Add an enemy to the enemy list
 void addEnemy(EnemyRanged * enemy); // Add an enemy to the enemy list
 void CharacterDeath();
@@ -96,8 +97,10 @@ void renderPellets();		// render pellets to buffer
 void renderMiniMap();		// render minimap to buffer
 void renderEnemy();			// renders all alive enemies to the buffer
 void renderDeadEnemy();		// renders all dead enemies to the buffer
+void renderBoss();			// renders boss
 void renderStat();			//renders the player stats on the right side of the console
 void render(COORD c, LPCSTR text, LPCSTR text2, WORD color); // Render sprite to screen
 void render(COORD c, std::string& text, std::string& text2, WORD color); // Render sprite to screen
+void render(COORD c, std::string * text, WORD color); // Render boss to screen
 
 #endif // _GAME_H

@@ -75,7 +75,9 @@ void init(void)
 	r_cRenderOffset.Y = r_cTargetRenderOffset.Y = 1 + g_sEntities.g_sChar.m_cRoom.Y * (ROOM_Y + 2);
 	r_dTargetRenderTime = SCREEN_SCROLL_LENGTH;
 	g_mEvent.r_menucurspos.X = g_Console.getConsoleSize().X / 5;
-	g_mEvent.r_menucurspos.Y = g_Console.getConsoleSize().Y / 10 * 8 - 1;
+	g_mEvent.r_menucurspos.Y = g_Console.getConsoleSize().Y / 10 * 8 - 6;
+	g_mEvent.r_pausecurspos.X = g_Console.getConsoleSize().X / 10 - 2;
+	g_mEvent.r_pausecurspos.Y = g_Console.getConsoleSize().Y / 5;
 	g_sLevel.floor = 1;
 	g_sLevel.generateLevel();
 	g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
@@ -279,7 +281,7 @@ void menuNav()
 		g_mEvent.r_menucurspos.Y--;
 		g_adBounceTime[K_SHOOTUP] = g_dElapsedTime + 0.25;
 	}
-	if (g_abKeyPressed[K_ENTER] && !g_mEvent.bHasPressedButton && g_mEvent.shMenuState == 0)
+	if (g_abKeyPressed[K_ENTER] && !g_mEvent.bHasPressedButton && g_mEvent.shMenuState == 0 && g_adBounceTime[K_ENTER] < g_dElapsedTime)
 	{
 		switch (g_mEvent.sh_cursSel)
 		{
@@ -704,25 +706,25 @@ void controlPlayer()
 					switch (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_iWeaponLevel)
 					{
 					case 0: //Blue Feather Level 1: Decrease movement delay by 20%
-						{
-							g_adBounceTime[i] = g_dElapsedTime + ((g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.20) * 0.175);
-							break;
-						}
+					{
+						g_adBounceTime[i] = g_dElapsedTime + ((g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.20) * 0.175);
+						break;
+					}
 					case 1: //Blue Feather Level 2: Decrease movement delay by 30%
-						{
+					{
 						g_adBounceTime[i] = g_dElapsedTime + ((g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.30) * 0.175);
-							break;
-						}
+						break;
+					}
 					case 2: //Blue Feather Level 3: Decrease movement delay by 40%
-						{
+					{
 						g_adBounceTime[i] = g_dElapsedTime + ((g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.40) * 0.175);
-							break;
-						}
+						break;
+					}
 					case 3: //Blue Feather Level 4: Decrease movement delay by 50%
-						{
+					{
 						g_adBounceTime[i] = g_dElapsedTime + ((g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.50) * 0.175);
-							break;
-						}
+						break;
+					}
 					}
 				}
 			}
@@ -786,17 +788,37 @@ void pauseScreen()
 
 void pauseScreenNav()
 {
-	if (g_abKeyPressed[K_SHOOTDOWN] && g_mEvent.sh_cursSel < 5 && g_adBounceTime[K_SHOOTDOWN] < g_dElapsedTime && g_mEvent.shMenuState == 0)
+	if (g_abKeyPressed[K_SHOOTDOWN] && g_mEvent.sh_pauseSel < 2 && g_adBounceTime[K_SHOOTDOWN] < g_dElapsedTime && g_mEvent.shMenuState == 0)
 	{
-		g_mEvent.sh_cursSel++;
-		g_mEvent.r_menucurspos.Y++;
+		g_mEvent.sh_pauseSel++;
+		g_mEvent.r_pausecurspos.Y++;
 		g_adBounceTime[K_SHOOTDOWN] = g_dElapsedTime + 0.15;
 	}
-	else if (g_abKeyPressed[K_SHOOTUP] && g_mEvent.sh_cursSel > 0 && g_adBounceTime[K_SHOOTUP] < g_dElapsedTime && g_mEvent.shMenuState == 0)
+	else if (g_abKeyPressed[K_SHOOTUP] && g_mEvent.sh_pauseSel > 0 && g_adBounceTime[K_SHOOTUP] < g_dElapsedTime && g_mEvent.shMenuState == 0)
 	{
-		g_mEvent.sh_cursSel--;
-		g_mEvent.r_menucurspos.Y--;
+		g_mEvent.sh_pauseSel--;
+		g_mEvent.r_pausecurspos.Y--;
 		g_adBounceTime[K_SHOOTUP] = g_dElapsedTime + 0.15;
+	}
+	if (g_abKeyPressed[K_ENTER] && g_adBounceTime[K_ENTER] < g_dElapsedTime)
+	{
+		switch (g_mEvent.sh_pauseSel)
+		{
+		case 0:
+			g_mEvent.bPausedGame = false;
+			break;
+		case 1:
+			init();
+			g_mEvent.sh_pauseSel = 0;
+			g_mEvent.bPausedGame = false;
+			g_mEvent.bPreventAccident = true;
+			g_eGameState = S_MENU;
+			break;
+		case 2:
+			g_bQuitGame = true;
+			break;
+		}
+		g_adBounceTime[K_ENTER] = g_dElapsedTime + 0.25;
 	}
 }
 
@@ -846,7 +868,6 @@ void renderSplashScreen()  // renders the splash screen
 		g_Console.writeToBuffer(c, TeamName[i], 0x84);
 		c.Y++;
 	}
-
 }
 
 void renderMenu()
@@ -880,6 +901,33 @@ void renderPause()
 		}
 		c.Y = 0;
 	}
+	renderPauseMenu();
+	renderPauseCursor();
+}
+
+void renderPauseCursor()
+{
+	g_Console.writeToBuffer(g_mEvent.r_pausecurspos, "[");
+	g_mEvent.r_pausecurspos.X += 18;
+	g_Console.writeToBuffer(g_mEvent.r_pausecurspos, "]");
+	g_mEvent.r_pausecurspos.X -= 18;
+}
+
+void renderPauseMenu()
+{
+	COORD c = g_Console.getConsoleSize();
+	c.X /= 10;
+	(c.Y /= 5) -= 2;
+	g_Console.writeToBuffer(c, ((unsigned int)g_dElapsedTime % 2 == 0 ? " PAUSED " : "        "));
+	c = g_Console.getConsoleSize();
+	(c.X /= 10) -= 1;
+	c.Y /= 5;
+	g_Console.writeToBuffer(c, "     RESUME      ");
+	c.Y++;
+	g_Console.writeToBuffer(c, "   QUIT TO MENU  ");
+	c.Y++;
+	g_Console.writeToBuffer(c, " QUIT TO DESKTOP ");
+
 }
 
 void renderScore() 

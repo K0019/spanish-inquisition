@@ -172,7 +172,7 @@ void MenuEvent::renderMenu()
 {
 	COORD c;
 	c.X = this->mainConsole->getConsoleSize().X / 5 + 2;
-	c.Y = this->mainConsole->getConsoleSize().Y / 10 * 8 - 1;
+	c.Y = this->mainConsole->getConsoleSize().Y / 10 * 8 - 6;
 	this->mainConsole->writeToBuffer(c, "   PLAY    ", 0x0f);
 	c.Y++;
 	this->mainConsole->writeToBuffer(c, "HOW TO PLAY", 0x0f);

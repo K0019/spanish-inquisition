@@ -8,7 +8,8 @@
 struct MenuEvent
 {
 	Console* mainConsole;					// pointer to the main console (to write to it)
-	COORD r_menucurspos;					// the cursor position
+	COORD r_menucurspos;					// the menu cursor position
+	COORD r_pausecurspos;					// the pause cursor position
 	WORD wPlayerColor = 0x0A;				// the color of player (to change in options)
 	bool bCredits;							// event processor: if player selected credits
 	bool bHasPressedButton;					// event processor: the button has been pressed

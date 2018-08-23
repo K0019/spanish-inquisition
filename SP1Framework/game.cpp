@@ -798,7 +798,7 @@ void pauseScreen()
 
 void pauseScreenNav()
 {
-	if (g_abKeyPressed[K_SHOOTDOWN] && g_mEvent.sh_pauseSel < 2 && g_adBounceTime[K_SHOOTDOWN] < g_dElapsedTime && g_mEvent.shMenuState == 0)
+	if (g_abKeyPressed[K_SHOOTDOWN] && g_mEvent.sh_pauseSel < 3 && g_adBounceTime[K_SHOOTDOWN] < g_dElapsedTime && g_mEvent.shMenuState == 0)
 	{
 		g_mEvent.sh_pauseSel++;
 		g_mEvent.r_pausecurspos.Y++;
@@ -820,11 +820,17 @@ void pauseScreenNav()
 		case 1:
 			init();
 			g_mEvent.sh_pauseSel = 0;
+			g_eGameState = S_GAME;
+			g_mEvent.bPausedGame = false;
+			break;
+		case 2:
+			init();
+			g_mEvent.sh_pauseSel = 0;
 			g_mEvent.bPausedGame = false;
 			g_mEvent.bPreventAccident = true;
 			g_eGameState = S_MENU;
 			break;
-		case 2:
+		case 3:
 			g_bQuitGame = true;
 			break;
 		}
@@ -933,6 +939,8 @@ void renderPauseMenu()
 	(c.X /= 10) -= 1;
 	c.Y /= 5;
 	g_Console.writeToBuffer(c, "     RESUME      ");
+	c.Y++;
+	g_Console.writeToBuffer(c, "     RESTART     ");
 	c.Y++;
 	g_Console.writeToBuffer(c, "   QUIT TO MENU  ");
 	c.Y++;

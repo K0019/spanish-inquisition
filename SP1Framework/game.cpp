@@ -79,7 +79,7 @@ void init(void)
 	g_mEvent.r_menucurspos.Y = g_Console.getConsoleSize().Y / 10 * 8 - 6;
 	g_mEvent.r_pausecurspos.X = g_Console.getConsoleSize().X / 10 - 2;
 	g_mEvent.r_pausecurspos.Y = g_Console.getConsoleSize().Y / 5;
-	g_sLevel.floor = 3;
+	g_sLevel.floor = 1;
 	g_sLevel.generateLevel();
 	g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
 	COORD c;
@@ -1465,6 +1465,7 @@ void checkTrapCollision()
 	if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '^') //If player steps on a spike trap, take damage equal to spike trap's damage
 	{
 		g_sEntities.g_sChar.m_iPlayerHealth -= g_sEntities.m_vTrapList.m_vTrapList[0].m_iTrapDamage;
+		g_sEntities.g_sChar.m_iPlayerScore -= 5;
 		COORD c = g_sEntities.g_sChar.m_cLocation;
 		g_sLevel.modifyTile(c, '\0');
 	}

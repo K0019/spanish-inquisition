@@ -327,6 +327,11 @@ void MenuEvent::renderTutorialDetails()
 	this->mainConsole->writeToBuffer(c, " - Item", 0x0f);
 	c.X -= 2;
 	c.Y++;
+	this->mainConsole->writeToBuffer(c, "^^", 0x04);
+	c.X += 2;
+	this->mainConsole->writeToBuffer(c, " - Spike Trap", 0x0f);
+	c.X -= 2;
+	c.Y++;
 	this->mainConsole->writeToBuffer(c, "##&_ ", 0x09);
 	c.X += 4;
 	this->mainConsole->writeToBuffer(c, " - Exit", 0x0f);

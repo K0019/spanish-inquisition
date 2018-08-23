@@ -1,6 +1,6 @@
 #include "consumables.h"
 
-SConsumable::SConsumable(char name[], int index, int health, int score)
+SConsumable::SConsumable(char name[], int index, int health, int score) //Constructor to initialise consumable information
 {
 	this->m_sName = name;
 	this->m_iConsumableHealth = health;

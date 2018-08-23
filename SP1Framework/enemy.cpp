@@ -87,7 +87,7 @@ bool Enemy::isFlashingHit()
 }
 WORD Enemy::getFlashColorHit()
 {
-	byte color = (byte)((~this->m_cColor) >> 8) << 8;
+	byte color = (byte)((~this->m_cColor) >> 4) << 4;
 	return color;
 }
 bool Enemy::isFlashingAttacking()

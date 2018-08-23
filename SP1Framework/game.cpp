@@ -56,15 +56,17 @@ void init(void)
 	g_bHasShot = false;
 	g_sEntities.g_sChar.m_cLocation.X = 2 + (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
 	g_sEntities.g_sChar.m_cLocation.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
+	g_sEntities.g_sChar.m_bDefeatedBoss = false;
 	g_sLevel.playerStartRoom.X = GRID_X >> 1;
 	g_sLevel.playerStartRoom.Y = GRID_Y >> 1;
 	g_sEntities.g_sChar.m_cRoom = g_sLevel.playerStartRoom;
 	/*if (DEBUG)
 	{
 		COORD c;
-		c.X = g_sEntities.g_sChar.m_cLocation.X - 3;
-		c.Y = g_sEntities.g_sChar.m_cLocation.Y;
-		addEnemy(UNIQUE_ENEMY_TESTRANGEDMOBILE);
+		c.X = 4;
+		c.Y = 4;
+		std::string identifier[4] = { "GGGGJJJJ", "GGGGJJJJ", "GGGGJJJJ", "GGGGJJJJ" };
+		g_sEntities.boss = new Boss1(&g_sEntities.g_sChar, &g_sEntities.m_vPellets, identifier, 0x0c, 0x0e, 200, 0.0, 2.0, 100.0, 2.0, 0.5, 0.3, 0.5, 0.3, 2.0, -4.0, 0.5);
 		g_sEntities.g_sChar.m_bInBattle = true;
 	}*/
 	r_cRenderOffset.X = r_cTargetRenderOffset.X = 1 + g_sEntities.g_sChar.m_cRoom.X * (ROOM_X + 2);
@@ -227,6 +229,7 @@ void gameplay()            // gameplay logic
 			g_sEntities.updatePellets(); // update locations of pellets
 			checkHitPellets(); // checks if the pellets have hit anything, and update stats accordingly
 			g_sEntities.updateEnemies(); // update locations of enemies and add pellets of the enemies'
+			g_sEntities.updateBoss(); // update the boss
 			// sound can be played here too.
 		}
 	}
@@ -409,7 +412,7 @@ void controlPlayer()
 		{
 			bool skip = false;
 
-			for (auto& enemy : g_sEntities.m_vEnemy)
+			for (auto& enemy : g_sEntities.m_vEnemy) // Collision with enemy
 			{
 				if (!enemy->isDying() && g_sEntities.g_sChar.m_cLocation.X == enemy->getLocation().X && g_sEntities.g_sChar.m_cLocation.Y == enemy->getLocation().Y)
 				{
@@ -418,6 +421,16 @@ void controlPlayer()
 					break;
 				}
 			}
+
+			if (g_sEntities.boss != nullptr) // Collision with boss
+			{
+				if (g_sEntities.boss->isOverlapping(g_sEntities.g_sChar.m_cLocation))
+				{
+					skip = true;
+					g_sEntities.g_sChar.m_cLocation.X++;
+				}
+			}
+
 			if (!skip)
 			{
 				bSomethingHappened = true;
@@ -451,7 +464,7 @@ void controlPlayer()
 		{
 			bool skip = false;
 
-			for (auto& enemy : g_sEntities.m_vEnemy)
+			for (auto& enemy : g_sEntities.m_vEnemy) // Collision with enemy
 			{
 				if (!enemy->isDying() && g_sEntities.g_sChar.m_cLocation.X == enemy->getLocation().X && g_sEntities.g_sChar.m_cLocation.Y == enemy->getLocation().Y)
 				{
@@ -460,6 +473,16 @@ void controlPlayer()
 					break;
 				}
 			}
+
+			if (g_sEntities.boss != nullptr) // Collision with boss
+			{
+				if (g_sEntities.boss->isOverlapping(g_sEntities.g_sChar.m_cLocation))
+				{
+					skip = true;
+					g_sEntities.g_sChar.m_cLocation.Y++;
+				}
+			}
+
 			if (!skip)
 			{
 				bSomethingHappened = true;
@@ -493,7 +516,7 @@ void controlPlayer()
 		{
 			bool skip = false;
 
-			for (auto& enemy : g_sEntities.m_vEnemy)
+			for (auto& enemy : g_sEntities.m_vEnemy) // Collision with enemy
 			{
 				if (!enemy->isDying() && g_sEntities.g_sChar.m_cLocation.X == enemy->getLocation().X && g_sEntities.g_sChar.m_cLocation.Y == enemy->getLocation().Y)
 				{
@@ -502,6 +525,16 @@ void controlPlayer()
 					break;
 				}
 			}
+
+			if (g_sEntities.boss != nullptr) // Collision with boss
+			{
+				if (g_sEntities.boss->isOverlapping(g_sEntities.g_sChar.m_cLocation))
+				{
+					skip = true;
+					g_sEntities.g_sChar.m_cLocation.X--;
+				}
+			}
+
 			if (!skip)
 			{
 				bSomethingHappened = true;
@@ -535,7 +568,7 @@ void controlPlayer()
 		{
 			bool skip = false;
 
-			for (auto& enemy : g_sEntities.m_vEnemy)
+			for (auto& enemy : g_sEntities.m_vEnemy) // Collision with enemy
 			{
 				if (!enemy->isDying() && g_sEntities.g_sChar.m_cLocation.X == enemy->getLocation().X && g_sEntities.g_sChar.m_cLocation.Y == enemy->getLocation().Y)
 				{
@@ -544,6 +577,16 @@ void controlPlayer()
 					break;
 				}
 			}
+
+			if (g_sEntities.boss != nullptr) // Collision with boss
+			{
+				if (g_sEntities.boss->isOverlapping(g_sEntities.g_sChar.m_cLocation))
+				{
+					skip = true;
+					g_sEntities.g_sChar.m_cLocation.Y--;
+				}
+			}
+
 			if (!skip)
 			{
 				bSomethingHappened = true;
@@ -1223,6 +1266,7 @@ void renderEnemy()
 		if (c.X < 1 || c.X >= 1 + ((ROOM_Y + 2) << 2) || c.Y < 1 || c.Y >= 1 + ((ROOM_X + 2) << 1)) continue;
 		render(c, enemy->getIdentifier()[0], enemy->getIdentifier()[1], enemy->getColor());
 	}
+	renderBoss();
 }
 void renderDeadEnemy()
 {
@@ -1230,6 +1274,14 @@ void renderDeadEnemy()
 	{
 		if (!enemy->isDying()) continue;
 		render(enemy->getRealLocation(), enemy->getIdentifier()[0], enemy->getIdentifier()[1], enemy->getColor());
+	}
+}
+
+void renderBoss()
+{
+	if (g_sEntities.boss != nullptr)
+	{
+		render(g_sEntities.boss->getRealLocation(), g_sEntities.boss->getIdentifier(), g_sEntities.boss->getColor());
 	}
 }
 
@@ -1455,12 +1507,22 @@ void render(COORD c, std::string& text, std::string& text2, WORD color)
 	g_Console.writeToBuffer(c, text2.c_str(), color);
 }
 
+void render(COORD c, std::string * text, WORD color)
+{
+	for (int i = 0; i < 4; i++)
+	{
+		g_Console.writeToBuffer(c, text[i], color);
+		c.Y++;
+	}
+}
+
 void changedRoomUpdate()
 {
 	g_sEntities.clearPellets();
 	g_sEntities.clearEnemies();
 	if (loadEnemiesFromRoom())
 		g_sEntities.g_sChar.m_bInBattle = true;
+	loadBoss();
 	g_sLevel.miniMap->enteredRoom[(g_sEntities.g_sChar.m_cLocation.X - 1) / (ROOM_X + 2) * GRID_Y + (g_sEntities.g_sChar.m_cLocation.Y - 1) / (ROOM_Y + 2)] = true;
 	g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
 }
@@ -1494,6 +1556,21 @@ bool loadEnemiesFromRoom()
 		}
 	}
 	return roomHasEnemies;
+}
+
+bool loadBoss()
+{
+	if (g_sLevel.floor == 5 && !g_sEntities.g_sChar.m_bDefeatedBoss && (g_sEntities.g_sChar.m_cLocation.X - 1) / (ROOM_X + 2) == g_sLevel.exitRoom.X && (g_sEntities.g_sChar.m_cLocation.Y - 1) / (ROOM_Y + 2) == g_sLevel.exitRoom.Y)
+	{
+		COORD c;
+		c.X = 4;
+		c.Y = 4;
+		std::string identifier[4] = { "GGGGJJJJ", "GGGGJJJJ", "GGGGJJJJ", "GGGGJJJJ" };
+		g_sEntities.boss = new Boss1(&g_sEntities.g_sChar, &g_sEntities.m_vPellets, identifier, 0x0c, 0x0e, 200, 0.0, 2.0, 100.0, 2.0, 0.5, 0.3, 0.5, 0.3, 2.0, -4.0, 0.5);
+		g_sEntities.g_sChar.m_bInBattle = true;
+		return true;
+	}
+	return false;
 }
 
 void addEnemy(EnemyMelee * enemy)

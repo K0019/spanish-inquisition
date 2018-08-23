@@ -78,6 +78,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="boss.cpp" />
     <ClCompile Include="consumables.cpp" />
     <ClCompile Include="enemy.cpp" />
     <ClCompile Include="entity.cpp" />
@@ -93,6 +94,7 @@
     <ClCompile Include="player.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="boss.h" />
     <ClInclude Include="consumables.h" />
     <ClInclude Include="definitions.h" />
     <ClInclude Include="enemy.h" />
@@ -149,9 +151,8 @@
     <Text Include="..\res\MapData\RoomData\NormalRooms\1a.txt" />
     <Text Include="..\res\MapData\RoomData\NormalRooms\1b.txt" />
     <Text Include="..\res\MapData\RoomData\NormalRooms\1c.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\res\SaveData\saves.SAVE" />
+    <Text Include="..\res\SaveData\options.txt" />
+    <Text Include="..\res\SaveData\saves.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

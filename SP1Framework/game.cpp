@@ -68,8 +68,13 @@ void init(void)
 	g_sEntities.g_sChar.m_bDefeatedBoss = false;
 	g_sLevel.playerStartRoom.X = GRID_X >> 1;
 	g_sLevel.playerStartRoom.Y = GRID_Y >> 1;
-	g_sEntities.g_sChar.m_iPlayerHealth = g_sEntities.g_sChar.m_iMaxHealth = 10;
 	g_sEntities.g_sChar.m_iPlayerScore = 0;
+	g_sEntities.g_sChar.m_iPlayerHealth = g_sEntities.g_sChar.m_iMaxHealth = 10;
+	for (int i = 0; i < 7; i++)
+	{
+		g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[i].m_bHasWeapon = false;
+		g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[i].m_iWeaponTotalCost = g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[i].m_iWeaponCost + (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[i].m_iWeaponIncrement * g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[i].m_iWeaponLevel);
+	}
 	g_sEntities.g_sChar.m_cRoom = g_sLevel.playerStartRoom;
 	//if (DEBUG)
 	//{
@@ -87,7 +92,7 @@ void init(void)
 	g_mEvent.r_menucurspos.Y = g_Console.getConsoleSize().Y / 10 * 8 - 6;
 	g_mEvent.r_pausecurspos.X = g_Console.getConsoleSize().X / 10 - 2;
 	g_mEvent.r_pausecurspos.Y = g_Console.getConsoleSize().Y / 5;
-	g_sLevel.floor = 1;
+	g_sLevel.floor = 5;
 	//if (DEBUG)
 	//{
 	//	g_sLevel.floor = 5;
@@ -99,12 +104,13 @@ void init(void)
 	COORD c;
 	c.X = (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
 	c.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
-    // sets the width, height and the font name to use in the console
-    g_Console.setConsoleFont(0, 16, L"Consolas");
+	// sets the width, height and the font name to use in the console
+	g_Console.setConsoleFont(0, 16, L"Consolas");
 	loadGame();
-	for (int i = 0; i < 7; i++)
-		g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[i].m_iWeaponTotalCost = g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[i].m_iWeaponCost + (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[i].m_iWeaponIncrement * g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[i].m_iWeaponLevel);
-
+	g_sEntities.g_sChar.m_sLastItem = "";
+	g_sEntities.g_sChar.m_sPlayerItems.ItemCount = 0;
+	g_sEntities.g_sChar.m_iPlayerDamage = 30;
+	g_sEntities.g_sChar.m_sPlayerItems.m_vItemsObtained[0];
 }
 //--------------------------------------------------------------
 // Purpose  : Reset before exiting the program
@@ -112,6 +118,7 @@ void init(void)
 //            This is called once just before the game exits
 // Input    : Void
 // Output   : void
+
 //--------------------------------------------------------------
 void shutdown( void )
 {

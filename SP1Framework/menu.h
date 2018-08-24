@@ -4,13 +4,13 @@
 #include "Framework/console.h"
 #include "definitions.h"
 #include "item.h"
+#include <sstream>
 // here we go
 struct MenuEvent
 {
 	Console* mainConsole;					// pointer to the main console (to write to it)
-	COORD r_menucurspos;					// the cursor position
-	COORD r_optioncurspos;					// the cursor position
-	COORD r_shopcurspos;					// the cursor position
+	COORD r_menucurspos;					// the menu cursor position
+	COORD r_pausecurspos;					// the pause cursor position
 	WORD wPlayerColor = 0x0A;				// the color of player (to change in options)
 	bool bCredits;							// event processor: if player selected credits
 	bool bHasPressedButton;					// event processor: the button has been pressed
@@ -26,7 +26,9 @@ struct MenuEvent
 	short sh_cursSel = 0;					// menu selector: stores the menu cursor's selection
 	short sh_optionSel = 0;					// menu selector: stores the options cursor's selection
 	short sh_shopItemSel = 0;				// menu selector: stores the shop cursor's selection
+	short sh_pauseSel = 0;
 	unsigned int CreditsOffsetY = 0;		// scrapped idea: how much the credits should go up by
+	int tipIndex;
 	MenuEvent(Console* mainConsole);		// Construcc
 
 	// RENDER FUNCTIONS
@@ -45,6 +47,7 @@ struct MenuEvent
 	void renderCreditsRollText();			// scrapped idea: converted into just static text
 
 	void renderItemSelected(std::vector<SItem> * itemList);			// shop: selected item name 
+	void renderShopBorder();
 
 	void renderDoomButton();				// heehee
 	void renderDoomButtonBrackets();		// heehee's brackets when selected

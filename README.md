@@ -1,4 +1,4 @@
-# ﻿The Great Escapade
+﻿# ﻿The Great Escapade
 > by
 >
 > Team 01
@@ -14,10 +14,12 @@ Special Thanks to our supervisor Mr Chris Hong for guiding us in this project.
  - Random floor generation, with different preset rooms.
  - 7 Unique items with special effects to aid your tower adventures.
  - 4 Consumables that gives you boosts of health or score when picked up.
- - 4 Unique enemies with different statistics and combat abilities.
+ - 5 Unique enemies with different statistics and combat abilities.
+ - 50 rooms designs total, 10 room designs per level.
+ - A challenging and fun boss fight at the end of the game
  - Scoring system that acts as a currency system for you to purchase item upgrades and unlock new items.
  - A save system that allows you to save your unlockables progress.
- - A whole lot of fun!
+ - A whole lot of fun! (and rage...)
 
 
 This game took inspiration from: The Binding of Isaac, Crypt of the Necrodancer, Risk of Rain, Spelunky, Rogue Legacy

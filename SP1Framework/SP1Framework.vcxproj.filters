@@ -84,6 +84,12 @@
     <ClCompile Include="consumables.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="boss.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Framework\console.h">
@@ -126,6 +132,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="stat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="boss.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -250,10 +262,10 @@
     <Text Include="..\res\MapData\RoomData\ItemRooms\1d.txt">
       <Filter>Resource Files\MapData\RoomData\ItemRooms</Filter>
     </Text>
-    <Text Include="..\res\SaveData\saves.txt">
+    <Text Include="..\res\SaveData\options.txt">
       <Filter>Resource Files\SaveData</Filter>
     </Text>
-    <Text Include="..\res\SaveData\options.txt">
+    <Text Include="..\res\SaveData\saves.txt">
       <Filter>Resource Files\SaveData</Filter>
     </Text>
     <Text Include="..\res\MapData\RoomData\NormalRooms\1e.txt">

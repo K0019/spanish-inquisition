@@ -8,6 +8,7 @@
 
 double	g_dElapsedTime;
 double	g_dDeltaTime;
+double g_dTrappedTime;
 int		g_iCurrentFrameCount, g_iLastFrameCount, g_iLastMeasuredSecond;
 double	g_dAccurateElapsedTime;
 bool	g_abKeyPressed[K_COUNT];
@@ -56,9 +57,15 @@ void init(void)
 
 	g_sEntities.clearEnemies();
 	g_sEntities.clearPellets();
+	if (g_sEntities.boss != nullptr)
+	{
+		delete g_sEntities.boss;
+		g_sEntities.boss = nullptr;
+	}
 	g_bHasShot = false;
 	g_sEntities.g_sChar.m_cLocation.X = 2 + (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
 	g_sEntities.g_sChar.m_cLocation.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
+	g_sEntities.g_sChar.m_bDefeatedBoss = false;
 	g_sLevel.playerStartRoom.X = GRID_X >> 1;
 	g_sLevel.playerStartRoom.Y = GRID_Y >> 1;
 	g_sEntities.g_sChar.m_iPlayerHealth = g_sEntities.g_sChar.m_iMaxHealth = 10;
@@ -70,17 +77,31 @@ void init(void)
 	/*if (DEBUG)
 	{
 		COORD c;
-		c.X = g_sEntities.g_sChar.m_cLocation.X - 3;
-		c.Y = g_sEntities.g_sChar.m_cLocation.Y;
-		addEnemy(UNIQUE_ENEMY_TESTRANGEDMOBILE);
+		c.X = 4;
+		c.Y = 4;
+		std::string identifier[4] = { "GGGGJJJJ", "GGGGJJJJ", "GGGGJJJJ", "GGGGJJJJ" };
+		g_sEntities.boss = new Boss1(&g_sEntities.g_sChar, &g_sEntities.m_vPellets, identifier, 0x0c, 0x0e, 200, 0.0, 2.0, 100.0, 2.0, 0.5, 0.3, 0.5, 0.3, 2.0, -4.0, 0.5);
 		g_sEntities.g_sChar.m_bInBattle = true;
 	}*/
 	r_cRenderOffset.X = r_cTargetRenderOffset.X = 1 + g_sEntities.g_sChar.m_cRoom.X * (ROOM_X + 2);
 	r_cRenderOffset.Y = r_cTargetRenderOffset.Y = 1 + g_sEntities.g_sChar.m_cRoom.Y * (ROOM_Y + 2);
 	r_dTargetRenderTime = SCREEN_SCROLL_LENGTH;
 	g_mEvent.r_menucurspos.X = g_Console.getConsoleSize().X / 5;
+<<<<<<< HEAD
 	g_mEvent.r_menucurspos.Y = g_Console.getConsoleSize().Y / 10 * 8 - 1;
 	g_sLevel.floor = 1;
+=======
+	g_mEvent.r_menucurspos.Y = g_Console.getConsoleSize().Y / 10 * 8 - 6;
+	g_mEvent.r_pausecurspos.X = g_Console.getConsoleSize().X / 10 - 2;
+	g_mEvent.r_pausecurspos.Y = g_Console.getConsoleSize().Y / 5;
+	g_sLevel.floor = 1;
+	if (DEBUG)
+	{
+		g_sLevel.floor = 5;
+		g_sEntities.g_sChar.m_iPlayerDamage = 8;
+		g_sEntities.g_sChar.m_iPlayerHealth = 1000;
+	}
+>>>>>>> e2d5c07ac7ae5a02b1f649d90cc9ec714c8b16fe
 	g_sLevel.generateLevel();
 	g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
 	COORD c;
@@ -221,7 +242,7 @@ void loadGame()
 		(currDataStorage.g_shOptionsData[0] == 2 ? 2 :
 		(currDataStorage.g_shOptionsData[0] == 1) ? 1 : 0);
 	g_mEvent.bMinimap = ((currDataStorage.g_shOptionsData[1] == 0) ? false : true);
-	for (int i = 0; i < g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList.size(); i++)
+	for (unsigned int i = 0; i < g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList.size(); i++)
 	{
 		g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[i].m_iWeaponLevel = currDataStorage.g_iSaveData[1 + i];
 	}
@@ -259,7 +280,12 @@ void gameplay()            // gameplay logic
 			g_sEntities.updatePellets(); // update locations of pellets
 			checkHitPellets(); // checks if the pellets have hit anything, and update stats accordingly
 			g_sEntities.updateEnemies(); // update locations of enemies and add pellets of the enemies'
+			if (g_sEntities.updateBoss()) // update the boss
+			{
+				g_sLevel.createStairs(); // If boss is dead, create stairs
+			}
 			// sound can be played here too.
+			checkTrapCollision();
 		}
 	}
 	else
@@ -280,19 +306,21 @@ void menuNav()
 	{
 		g_mEvent.sh_cursSel++;
 		g_mEvent.r_menucurspos.Y++;
-		g_adBounceTime[K_SHOOTDOWN] = g_dElapsedTime + 0.15;
+		g_adBounceTime[K_SHOOTDOWN] = g_dElapsedTime + 0.25;
 	}
 	else if (g_abKeyPressed[K_SHOOTUP] && g_mEvent.sh_cursSel > 0 && g_adBounceTime[K_SHOOTUP] < g_dElapsedTime && g_mEvent.shMenuState == 0)
 	{
 		g_mEvent.sh_cursSel--;
 		g_mEvent.r_menucurspos.Y--;
-		g_adBounceTime[K_SHOOTUP] = g_dElapsedTime + 0.15;
+		g_adBounceTime[K_SHOOTUP] = g_dElapsedTime + 0.25;
 	}
-	if (g_abKeyPressed[K_ENTER] && !g_mEvent.bHasPressedButton && g_mEvent.shMenuState == 0)
+	if (g_abKeyPressed[K_ENTER] && !g_mEvent.bHasPressedButton && g_mEvent.shMenuState == 0 && g_adBounceTime[K_ENTER] < g_dElapsedTime)
 	{
 		switch (g_mEvent.sh_cursSel)
 		{
 		case 0:
+			g_sEntities.g_sChar.m_iGlobalScore = unsigned int(double(g_sEntities.g_sChar.m_iGlobalScore) * 0.10);
+			saveGame();
 			g_eGameState = S_GAME;
 			break;
 		case 1:
@@ -334,12 +362,12 @@ void submenuNav()
 		if (g_abKeyPressed[K_SHOOTLEFT] && g_mEvent.sh_shopItemSel > 0 && g_adBounceTime[K_SHOOTLEFT] < g_dElapsedTime)
 		{
 			g_mEvent.sh_shopItemSel--;
-			g_adBounceTime[K_SHOOTLEFT] = g_dElapsedTime + 0.15;
+			g_adBounceTime[K_SHOOTLEFT] = g_dElapsedTime + 0.25;
 		}
 		if (g_abKeyPressed[K_SHOOTRIGHT] && g_mEvent.sh_shopItemSel < 6 && g_adBounceTime[K_SHOOTRIGHT] < g_dElapsedTime)
 		{
 			g_mEvent.sh_shopItemSel++;
-			g_adBounceTime[K_SHOOTRIGHT] = g_dElapsedTime + 0.15;
+			g_adBounceTime[K_SHOOTRIGHT] = g_dElapsedTime + 0.25;
 		}
 		if (g_abKeyPressed[K_ENTER] && g_adBounceTime[K_ENTER] < g_dElapsedTime)
 		{
@@ -347,15 +375,15 @@ void submenuNav()
 			{
 				if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[g_mEvent.sh_shopItemSel].m_iWeaponLevel < 3)
 				{
-					if (g_sEntities.g_sChar.m_iGlobalScore >= g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[g_mEvent.sh_shopItemSel].m_iWeaponCost)
+					if (g_sEntities.g_sChar.m_iGlobalScore >= (unsigned int)g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[g_mEvent.sh_shopItemSel].m_iWeaponCost)
 					{
-						saveGame();
-						loadGame();
 						g_sEntities.g_sChar.m_iGlobalScore -= g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[g_mEvent.sh_shopItemSel].m_iWeaponCost;
 						g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[g_mEvent.sh_shopItemSel].m_iWeaponLevel++;
+						saveGame();
+						loadGame();
 					}
 				}
-				g_adBounceTime[K_ENTER] = g_dElapsedTime + 0.15;
+				g_adBounceTime[K_ENTER] = g_dElapsedTime + 0.25;
 			}
 		}
 		else
@@ -371,12 +399,12 @@ void submenuNav()
 		if (g_abKeyPressed[K_SHOOTUP] && g_adBounceTime[K_SHOOTUP] < g_dElapsedTime && g_mEvent.sh_optionSel > 0)
 		{
 			g_mEvent.sh_optionSel--;
-			g_adBounceTime[K_SHOOTUP] = g_dElapsedTime + 0.15;
+			g_adBounceTime[K_SHOOTUP] = g_dElapsedTime + 0.25;
 		}
 		if (g_abKeyPressed[K_SHOOTDOWN] && g_adBounceTime[K_SHOOTDOWN] < g_dElapsedTime && g_mEvent.sh_optionSel < 3)
 		{
 			g_mEvent.sh_optionSel++;
-			g_adBounceTime[K_SHOOTDOWN] = g_dElapsedTime + 0.15;
+			g_adBounceTime[K_SHOOTDOWN] = g_dElapsedTime + 0.25;
 		}
 		if (g_abKeyPressed[K_SHOOTLEFT] && g_adBounceTime[K_SHOOTLEFT] < g_dElapsedTime)
 		{
@@ -404,7 +432,7 @@ void submenuNav()
 			{
 				g_mEvent.bMinimap = !g_mEvent.bMinimap;
 			}
-			g_adBounceTime[K_SHOOTLEFT] = g_dElapsedTime + 0.15;
+			g_adBounceTime[K_SHOOTLEFT] = g_dElapsedTime + 0.25;
 
 		}
 		if (g_abKeyPressed[K_SHOOTRIGHT] && g_adBounceTime[K_SHOOTRIGHT] < g_dElapsedTime)
@@ -433,7 +461,7 @@ void submenuNav()
 			{
 				g_mEvent.bMinimap = !g_mEvent.bMinimap;
 			}
-			g_adBounceTime[K_SHOOTRIGHT] = g_dElapsedTime + 0.15;
+			g_adBounceTime[K_SHOOTRIGHT] = g_dElapsedTime + 0.25;
 
 		}
 		if (g_abKeyPressed[K_ENTER] && g_adBounceTime[K_ENTER] < g_dElapsedTime && g_mEvent.sh_optionSel == 3)
@@ -471,6 +499,8 @@ void controlPlayer()
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '2' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '3' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '4' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '^' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '+' &&
 			(g_sEntities.g_sChar.m_bInBattle || g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '$'))
 		{
 			g_sEntities.g_sChar.m_cLocation.X++;
@@ -479,7 +509,7 @@ void controlPlayer()
 		{
 			bool skip = false;
 
-			for (auto& enemy : g_sEntities.m_vEnemy)
+			for (auto& enemy : g_sEntities.m_vEnemy) // Collision with enemy
 			{
 				if (!enemy->isDying() && g_sEntities.g_sChar.m_cLocation.X == enemy->getLocation().X && g_sEntities.g_sChar.m_cLocation.Y == enemy->getLocation().Y)
 				{
@@ -488,6 +518,16 @@ void controlPlayer()
 					break;
 				}
 			}
+
+			if (g_sEntities.boss != nullptr) // Collision with boss
+			{
+				if (g_sEntities.boss->isOverlapping(g_sEntities.g_sChar.m_cLocation))
+				{
+					skip = true;
+					g_sEntities.g_sChar.m_cLocation.X++;
+				}
+			}
+
 			if (!skip)
 			{
 				bSomethingHappened = true;
@@ -513,6 +553,8 @@ void controlPlayer()
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '2' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '3' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '4' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '^' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '+' &&
 			(g_sEntities.g_sChar.m_bInBattle || g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '$'))
 		{
 			g_sEntities.g_sChar.m_cLocation.Y++;
@@ -521,7 +563,7 @@ void controlPlayer()
 		{
 			bool skip = false;
 
-			for (auto& enemy : g_sEntities.m_vEnemy)
+			for (auto& enemy : g_sEntities.m_vEnemy) // Collision with enemy
 			{
 				if (!enemy->isDying() && g_sEntities.g_sChar.m_cLocation.X == enemy->getLocation().X && g_sEntities.g_sChar.m_cLocation.Y == enemy->getLocation().Y)
 				{
@@ -530,6 +572,16 @@ void controlPlayer()
 					break;
 				}
 			}
+
+			if (g_sEntities.boss != nullptr) // Collision with boss
+			{
+				if (g_sEntities.boss->isOverlapping(g_sEntities.g_sChar.m_cLocation))
+				{
+					skip = true;
+					g_sEntities.g_sChar.m_cLocation.Y++;
+				}
+			}
+
 			if (!skip)
 			{
 				bSomethingHappened = true;
@@ -555,6 +607,8 @@ void controlPlayer()
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '2' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '3' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '4' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '^' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '+' &&
 			(g_sEntities.g_sChar.m_bInBattle || g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '$'))
 		{
 			g_sEntities.g_sChar.m_cLocation.X--;
@@ -563,7 +617,7 @@ void controlPlayer()
 		{
 			bool skip = false;
 
-			for (auto& enemy : g_sEntities.m_vEnemy)
+			for (auto& enemy : g_sEntities.m_vEnemy) // Collision with enemy
 			{
 				if (!enemy->isDying() && g_sEntities.g_sChar.m_cLocation.X == enemy->getLocation().X && g_sEntities.g_sChar.m_cLocation.Y == enemy->getLocation().Y)
 				{
@@ -572,6 +626,16 @@ void controlPlayer()
 					break;
 				}
 			}
+
+			if (g_sEntities.boss != nullptr) // Collision with boss
+			{
+				if (g_sEntities.boss->isOverlapping(g_sEntities.g_sChar.m_cLocation))
+				{
+					skip = true;
+					g_sEntities.g_sChar.m_cLocation.X--;
+				}
+			}
+
 			if (!skip)
 			{
 				bSomethingHappened = true;
@@ -597,6 +661,8 @@ void controlPlayer()
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '2' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '3' &&
 			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '4' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '^' &&
+			g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '+' &&
 			(g_sEntities.g_sChar.m_bInBattle || g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) != '$'))
 		{
 			g_sEntities.g_sChar.m_cLocation.Y--;
@@ -605,7 +671,7 @@ void controlPlayer()
 		{
 			bool skip = false;
 
-			for (auto& enemy : g_sEntities.m_vEnemy)
+			for (auto& enemy : g_sEntities.m_vEnemy) // Collision with enemy
 			{
 				if (!enemy->isDying() && g_sEntities.g_sChar.m_cLocation.X == enemy->getLocation().X && g_sEntities.g_sChar.m_cLocation.Y == enemy->getLocation().Y)
 				{
@@ -614,6 +680,16 @@ void controlPlayer()
 					break;
 				}
 			}
+
+			if (g_sEntities.boss != nullptr) // Collision with boss
+			{
+				if (g_sEntities.boss->isOverlapping(g_sEntities.g_sChar.m_cLocation))
+				{
+					skip = true;
+					g_sEntities.g_sChar.m_cLocation.Y--;
+				}
+			}
+
 			if (!skip)
 			{
 				bSomethingHappened = true;
@@ -711,25 +787,25 @@ void controlPlayer()
 					switch (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_iWeaponLevel)
 					{
 					case 0: //Blue Feather Level 1: Decrease movement delay by 20%
-						{
-							g_adBounceTime[i] = g_dElapsedTime + ((g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.20) * 0.175);
-							break;
-						}
+					{
+						g_adBounceTime[i] = g_dElapsedTime + ((g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.20) * 0.175);
+						break;
+					}
 					case 1: //Blue Feather Level 2: Decrease movement delay by 30%
-						{
+					{
 						g_adBounceTime[i] = g_dElapsedTime + ((g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.30) * 0.175);
-							break;
-						}
+						break;
+					}
 					case 2: //Blue Feather Level 3: Decrease movement delay by 40%
-						{
+					{
 						g_adBounceTime[i] = g_dElapsedTime + ((g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.40) * 0.175);
-							break;
-						}
+						break;
+					}
 					case 3: //Blue Feather Level 4: Decrease movement delay by 50%
-						{
+					{
 						g_adBounceTime[i] = g_dElapsedTime + ((g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_fweaponMovementSpeed - 0.50) * 0.175);
-							break;
-						}
+						break;
+					}
 					}
 				}
 			}
@@ -773,7 +849,7 @@ void doomButton()
 
 void detectPauseMenuProc()
 {
-	if (g_abKeyPressed[K_ESCAPE] && g_adBounceTime[K_ESCAPE] < g_dElapsedTime)
+	if (g_abKeyPressed[K_ESCAPE] && g_adBounceTime[K_ESCAPE] < g_dElapsedTime && g_sEntities.g_sChar.m_iPlayerHealth > 0)
 	{
 		/*g_mEvent.bHasPaused = true;*/
 		g_mEvent.bPausedGame = !g_mEvent.bPausedGame;
@@ -788,6 +864,49 @@ void detectPauseMenuProc()
 void pauseScreen()
 {
 	detectPauseMenuProc();
+	pauseScreenNav();
+}
+
+void pauseScreenNav()
+{
+	if (g_abKeyPressed[K_SHOOTDOWN] && g_mEvent.sh_pauseSel < 3 && g_adBounceTime[K_SHOOTDOWN] < g_dElapsedTime && g_mEvent.shMenuState == 0)
+	{
+		g_mEvent.sh_pauseSel++;
+		g_mEvent.r_pausecurspos.Y++;
+		g_adBounceTime[K_SHOOTDOWN] = g_dElapsedTime + 0.15;
+	}
+	else if (g_abKeyPressed[K_SHOOTUP] && g_mEvent.sh_pauseSel > 0 && g_adBounceTime[K_SHOOTUP] < g_dElapsedTime && g_mEvent.shMenuState == 0)
+	{
+		g_mEvent.sh_pauseSel--;
+		g_mEvent.r_pausecurspos.Y--;
+		g_adBounceTime[K_SHOOTUP] = g_dElapsedTime + 0.15;
+	}
+	if (g_abKeyPressed[K_ENTER] && g_adBounceTime[K_ENTER] < g_dElapsedTime)
+	{
+		switch (g_mEvent.sh_pauseSel)
+		{
+		case 0:
+			g_mEvent.bPausedGame = false;
+			break;
+		case 1:
+			init();
+			g_mEvent.sh_pauseSel = 0;
+			g_eGameState = S_GAME;
+			g_mEvent.bPausedGame = false;
+			break;
+		case 2:
+			init();
+			g_mEvent.sh_pauseSel = 0;
+			g_mEvent.bPausedGame = false;
+			g_mEvent.bPreventAccident = true;
+			g_eGameState = S_MENU;
+			break;
+		case 3:
+			g_bQuitGame = true;
+			break;
+		}
+		g_adBounceTime[K_ENTER] = g_dElapsedTime + 0.25;
+	}
 }
 
 void renderSplashScreen()  // renders the splash screen
@@ -836,7 +955,6 @@ void renderSplashScreen()  // renders the splash screen
 		g_Console.writeToBuffer(c, TeamName[i], 0x84);
 		c.Y++;
 	}
-
 }
 
 void renderMenu()
@@ -866,10 +984,39 @@ void renderPause()
 	{
 		for (; c.Y < g_Console.getConsoleSize().Y; c.Y++)
 		{
-			g_Console.writeToBuffer(c, " ", 0x40);
+			g_Console.writeToBuffer(c, " ", 0x80);
 		}
 		c.Y = 0;
 	}
+	renderPauseMenu();
+	renderPauseCursor();
+}
+
+void renderPauseCursor()
+{
+	g_Console.writeToBuffer(g_mEvent.r_pausecurspos, "[");
+	g_mEvent.r_pausecurspos.X += 18;
+	g_Console.writeToBuffer(g_mEvent.r_pausecurspos, "]");
+	g_mEvent.r_pausecurspos.X -= 18;
+}
+
+void renderPauseMenu()
+{
+	COORD c = g_Console.getConsoleSize();
+	c.X /= 10;
+	(c.Y /= 5) -= 2;
+	g_Console.writeToBuffer(c, ((unsigned int)g_dElapsedTime % 2 == 0 ? " PAUSED " : "        "));
+	c = g_Console.getConsoleSize();
+	(c.X /= 10) -= 1;
+	c.Y /= 5;
+	g_Console.writeToBuffer(c, "     RESUME      ");
+	c.Y++;
+	g_Console.writeToBuffer(c, "     RESTART     ");
+	c.Y++;
+	g_Console.writeToBuffer(c, "   QUIT TO MENU  ");
+	c.Y++;
+	g_Console.writeToBuffer(c, " QUIT TO DESKTOP ");
+
 }
 
 void renderScore() 
@@ -896,7 +1043,6 @@ void renderCharacter()
 	if (c.X < 1 || c.X >= 1 + ((ROOM_Y + 2) << 2) || c.Y < 1 || c.Y >= 1 + ((ROOM_X + 2) << 1)) return;
 
 	WORD charColor = g_mEvent.wPlayerColor;
-	//WORD charColor = 0x0A;
 	g_Console.writeToBuffer(c, "@@@@", charColor);
 	c.Y++;
 	g_Console.writeToBuffer(c, "@@@@", charColor);
@@ -1097,6 +1243,7 @@ void moveScreen()
 
 	if (r_cRenderOffset.X == r_cTargetRenderOffset.X && r_cRenderOffset.Y == r_cTargetRenderOffset.Y)
 	{
+		loadBoss();
 		delete r_cswRenderTimer;
 	}
 }
@@ -1165,6 +1312,12 @@ void renderLevel()
 				break;
 			case '4':
 				render(c, " SS ", " SS ", 0x02);
+				break;
+			case '^':
+				render(c, " ^^ ", " ^^ ", 0x0c);
+				break;
+			case '+':
+				render(c, " ++ ", " ++ ", 0x04);
 				break;
 			}
 		}
@@ -1326,6 +1479,7 @@ void renderEnemy()
 		if (c.X < 1 || c.X >= 1 + ((ROOM_Y + 2) << 2) || c.Y < 1 || c.Y >= 1 + ((ROOM_X + 2) << 1)) continue;
 		render(c, enemy->getIdentifier()[0], enemy->getIdentifier()[1], enemy->getColor());
 	}
+	renderBoss();
 }
 void renderDeadEnemy()
 {
@@ -1333,6 +1487,14 @@ void renderDeadEnemy()
 	{
 		if (!enemy->isDying()) continue;
 		render(enemy->getRealLocation(), enemy->getIdentifier()[0], enemy->getIdentifier()[1], enemy->getColor());
+	}
+}
+
+void renderBoss()
+{
+	if (g_sEntities.boss != nullptr)
+	{
+		render(g_sEntities.boss->getRealLocation(), g_sEntities.boss->getIdentifier(), g_sEntities.boss->getColor());
 	}
 }
 
@@ -1377,6 +1539,24 @@ void renderStat()
 	c.X = g_Console.getConsoleSize().X - 83;
 	c.Y = 27;
 	g_Console.writeToBuffer(c, ss.str());
+}
+
+void checkTrapCollision()
+{
+	if (g_sLevel.getTile(g_sEntities.g_sChar.m_cLocation) == '^') //If player steps on a spike trap, take damage equal to spike trap's damage
+	{
+		g_sEntities.g_sChar.m_iPlayerHealth -= g_sEntities.m_vTrapList.m_vTrapList[0].m_iTrapDamage;
+		if (g_sEntities.g_sChar.m_iPlayerScore < 5)
+		{
+			g_sEntities.g_sChar.m_iPlayerScore = 0;
+		}
+		else
+		{
+			g_sEntities.g_sChar.m_iPlayerScore -= 5;
+		}
+		COORD c = g_sEntities.g_sChar.m_cLocation;
+		g_sLevel.modifyTile(c, '\0');
+	}
 }
 
 void checkHitPellets()
@@ -1548,6 +1728,15 @@ void render(COORD c, std::string& text, std::string& text2, WORD color)
 	g_Console.writeToBuffer(c, text2.c_str(), color);
 }
 
+void render(COORD c, std::string * text, WORD color)
+{
+	for (int i = 0; i < 4; i++)
+	{
+		g_Console.writeToBuffer(c, text[i], color);
+		c.Y++;
+	}
+}
+
 void changedRoomUpdate()
 {
 	g_sEntities.clearPellets();
@@ -1599,6 +1788,21 @@ bool loadEnemiesFromRoom()
 	return roomHasEnemies;
 }
 
+bool loadBoss()
+{
+	if (g_sLevel.floor == 5 && !g_sEntities.g_sChar.m_bDefeatedBoss && (g_sEntities.g_sChar.m_cLocation.X - 1) / (ROOM_X + 2) == g_sLevel.exitRoom.X && (g_sEntities.g_sChar.m_cLocation.Y - 1) / (ROOM_Y + 2) == g_sLevel.exitRoom.Y)
+	{
+		COORD c;
+		c.X = 4;
+		c.Y = 4;
+		std::string identifier[4] = { "GGGGJJJJ", "GGGGJJJJ", "GGGGJJJJ", "GGGGJJJJ" };
+		g_sEntities.boss = new Boss1(&g_sEntities.g_sChar, &g_sEntities.m_vPellets, identifier, 0x0c, 0x0e, 1000, 17.5, 1.5, 12.0, 1.5, 0.5, 0.3, 0.5, 0.3, 1.5, -4.0, 0.4);
+		g_sEntities.g_sChar.m_bInBattle = true;
+		return true;
+	}
+	return false;
+}
+
 void addEnemy(EnemyMelee * enemy)
 {
 	g_sEntities.m_vEnemy.push_back(std::move(std::unique_ptr<EnemyMelee>(enemy)));
@@ -1635,12 +1839,15 @@ void CharacterDeath()
 			}
 		else if(g_abKeyPressed[K_V])
 		{
+			g_sEntities.g_sChar.m_iGlobalScore += g_sEntities.g_sChar.m_iPlayerScore;
+			saveGame();
 			init();
 			g_eGameState = S_MENU;
 		}
 		else if (g_abKeyPressed[K_ESCAPE])
 		{
-			g_sEntities.g_sChar.m_iGlobalScore = g_sEntities.g_sChar.m_iPlayerScore;
+			g_sEntities.g_sChar.m_iGlobalScore += g_sEntities.g_sChar.m_iPlayerScore;
+			saveGame();
 			g_bQuitGame = true;
 		}
 		g_eRestartGame = false;

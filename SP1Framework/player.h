@@ -15,11 +15,12 @@ struct SGameChar
 	COORD m_cLocation; // Tile coordinates of the player
 	COORD m_cRoom; // Room coordinates that the player is in
 	bool m_bInBattle; // If player is in a room with enemies
+	bool m_bDefeatedBoss; // If player has defeated boss
 	int m_iMaxHealth = 10; //Max health of the player can only be increased by items, and does not go down when player is damaged
 	int m_iPlayerHealth = 10; //The constantly changing variable, increased by items and consumables.
 	int	m_iPlayerDamage = 3; //The amount of damage the player deals per pellet
 	unsigned int m_iPlayerScore = 0; //The player's score
-	unsigned int m_iGlobalScore = 0;
+	unsigned int m_iGlobalScore = 0; //The player's score after each run, to be spent at the shop
 	double m_dRange = 2.5; //How long the player's pellets will last before de-spawning
 	double m_dVelocity = SHOOTVELOCITY; //The velocity of the player's pellets
 	SAllItems m_sPlayerItems;

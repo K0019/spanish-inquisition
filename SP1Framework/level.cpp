@@ -154,10 +154,10 @@ void SLevel::generateLevel()
 	// -----Stairs Down-----
 
 	{
-		COORD c;
-		c.X = 2 + (ROOM_X >> 1) + this->exitRoom.X * (ROOM_X + 2);
-		c.Y = 2 + (ROOM_Y >> 1) + this->exitRoom.Y * (ROOM_Y + 2);
-		this->modifyTile(c, '&');
+		if (this->floor != 5)
+		{
+			this->createStairs();
+		}
 	}
 
 	// DEBUG
@@ -281,6 +281,14 @@ void SLevel::uncoverAll(COORD room, bool * roomsHaveExit)
 			break;
 		}
 	}
+}
+
+void SLevel::createStairs()
+{
+	COORD c;
+	c.X = 2 + (ROOM_X >> 1) + this->exitRoom.X * (ROOM_X + 2);
+	c.Y = 2 + (ROOM_Y >> 1) + this->exitRoom.Y * (ROOM_Y + 2);
+	this->modifyTile(c, '&');
 }
 
 void SLevel::modifyTile(COORD c, char ch)

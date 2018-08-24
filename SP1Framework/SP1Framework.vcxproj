@@ -78,6 +78,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="boss.cpp" />
     <ClCompile Include="consumables.cpp" />
     <ClCompile Include="enemy.cpp" />
     <ClCompile Include="entity.cpp" />
@@ -91,8 +92,10 @@
     <ClCompile Include="menu.cpp" />
     <ClCompile Include="pellet.cpp" />
     <ClCompile Include="player.cpp" />
+    <ClCompile Include="trap.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="boss.h" />
     <ClInclude Include="consumables.h" />
     <ClInclude Include="definitions.h" />
     <ClInclude Include="enemy.h" />
@@ -107,6 +110,7 @@
     <ClInclude Include="pellet.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="stat.h" />
+    <ClInclude Include="trap.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\res\MapData\FloorData\ItemRooms\Floor1.txt" />

@@ -76,15 +76,15 @@ void init(void)
 		g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[i].m_iWeaponTotalCost = g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[i].m_iWeaponCost + (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[i].m_iWeaponIncrement * g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[i].m_iWeaponLevel);
 	}
 	g_sEntities.g_sChar.m_cRoom = g_sLevel.playerStartRoom;
-	/*if (DEBUG)
-	{
-		COORD c;
-		c.X = 4;
-		c.Y = 4;
-		std::string identifier[4] = { "GGGGJJJJ", "GGGGJJJJ", "GGGGJJJJ", "GGGGJJJJ" };
-		g_sEntities.boss = new Boss1(&g_sEntities.g_sChar, &g_sEntities.m_vPellets, identifier, 0x0c, 0x0e, 200, 0.0, 2.0, 100.0, 2.0, 0.5, 0.3, 0.5, 0.3, 2.0, -4.0, 0.5);
-		g_sEntities.g_sChar.m_bInBattle = true;
-	}*/
+	//if (DEBUG)
+	//{
+	//	COORD c;
+	//	c.X = 4;
+	//	c.Y = 4;
+	//	std::string identifier[4] = { "GGGGJJJJ", "GGGGJJJJ", "GGGGJJJJ", "GGGGJJJJ" };
+	//	g_sEntities.boss = new Boss1(&g_sEntities.g_sChar, &g_sEntities.m_vPellets, identifier, 0x0c, 0x0e, 200, 0.0, 2.0, 100.0, 2.0, 0.5, 0.3, 0.5, 0.3, 2.0, -4.0, 0.5);
+	//	g_sEntities.g_sChar.m_bInBattle = true;
+	//}
 	r_cRenderOffset.X = r_cTargetRenderOffset.X = 1 + g_sEntities.g_sChar.m_cRoom.X * (ROOM_X + 2);
 	r_cRenderOffset.Y = r_cTargetRenderOffset.Y = 1 + g_sEntities.g_sChar.m_cRoom.Y * (ROOM_Y + 2);
 	r_dTargetRenderTime = SCREEN_SCROLL_LENGTH;
@@ -1834,7 +1834,7 @@ bool loadBoss()
 		COORD c;
 		c.X = 4;
 		c.Y = 4;
-		std::string identifier[4] = { "GGGGJJJJ", "GGGGJJJJ", "GGGGJJJJ", "GGGGJJJJ" };
+		std::string identifier[4] = { "EEEEOOOO", "EEEEOOOO", "EEEEOOOO", "EEEEOOOO" };
 		g_sEntities.boss = new Boss1(&g_sEntities.g_sChar, &g_sEntities.m_vPellets, identifier, 0x0c, 0x0e, 1000, 17.5, 1.5, 12.0, 1.5, 0.5, 0.3, 0.5, 0.3, 1.5, -4.0, 0.4);
 		g_sEntities.g_sChar.m_bInBattle = true;
 		return true;

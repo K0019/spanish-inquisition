@@ -49,7 +49,7 @@ bool SAllEntities::updateBoss()
 		this->boss->update();
 	else
 		return false;
-	if (this->boss->isDead())
+	if (this->boss->isDead(&g_sChar))
 	{
 		delete this->boss;
 		this->boss = nullptr;

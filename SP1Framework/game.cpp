@@ -70,7 +70,7 @@ void init(void)
 	g_sLevel.playerStartRoom.Y = GRID_Y >> 1;
 	g_sEntities.g_sChar.m_iPlayerScore = 0;
 	g_sEntities.g_sChar.m_iPlayerHealth = g_sEntities.g_sChar.m_iMaxHealth = 10;
-	for (int i = 0; i < 7; i++)
+	for (int i = 0; i < 7; i++) //for loop to initialise all items to false, so player starts with no items
 	{
 		g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[i].m_bHasWeapon = false;
 		g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[i].m_iWeaponTotalCost = g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[i].m_iWeaponCost + (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[i].m_iWeaponIncrement * g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[i].m_iWeaponLevel);
@@ -109,7 +109,7 @@ void init(void)
 	loadGame();
 	g_sEntities.g_sChar.m_sLastItem = "";
 	g_sEntities.g_sChar.m_sPlayerItems.ItemCount = 0;
-	g_sEntities.g_sChar.m_iPlayerDamage = 30;
+	g_sEntities.g_sChar.m_iPlayerDamage = 3;
 	g_sEntities.g_sChar.m_sPlayerItems.m_vItemsObtained[0];
 }
 //--------------------------------------------------------------

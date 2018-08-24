@@ -88,12 +88,12 @@ void init(void)
 	g_mEvent.r_pausecurspos.X = g_Console.getConsoleSize().X / 10 - 2;
 	g_mEvent.r_pausecurspos.Y = g_Console.getConsoleSize().Y / 5;
 	g_sLevel.floor = 1;
-	if (DEBUG)
-	{
-		g_sLevel.floor = 5;
-		g_sEntities.g_sChar.m_iPlayerDamage = 8;
-		g_sEntities.g_sChar.m_iPlayerHealth = 1000;
-	}
+	//if (DEBUG)
+	//{
+	//	g_sLevel.floor = 5;
+	//	g_sEntities.g_sChar.m_iPlayerDamage = 8;
+	//	g_sEntities.g_sChar.m_iPlayerHealth = 1000;
+	//}
 	g_sLevel.generateLevel();
 	g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
 	COORD c;
@@ -1838,6 +1838,8 @@ void CharacterDeath()
 		}
 			if (g_eRestartGame == true)
 			{
+				g_sEntities.g_sChar.m_iGlobalScore += unsigned int(double(g_sEntities.g_sChar.m_iPlayerScore) * 0.10);
+				saveGame();
 				init();
 			}
 		else if(g_abKeyPressed[K_V])

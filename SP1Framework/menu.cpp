@@ -446,7 +446,7 @@ void MenuEvent::renderItemSelected(std::vector<SItem> * itemList)
 	this->mainConsole->writeToBuffer(c, "Current Tier");
 	c.X = this->mainConsole->getConsoleSize().X >> 1;
 	this->mainConsole->writeToBuffer(c, "Next Tier");
-	c.X = this->mainConsole->getConsoleSize().X - (SHORT)strlen("Cost: ") - std::to_string((*itemList)[sh_shopItemSel].m_iWeaponCost).length() - 5;
+	c.X = this->mainConsole->getConsoleSize().X - (SHORT)strlen("Cost: ") - (SHORT)std::to_string((*itemList)[sh_shopItemSel].m_iWeaponCost).length() - 5;
 	c.Y = this->mainConsole->getConsoleSize().Y - 4;
 	std::ostringstream cost;
 	cost.str("");

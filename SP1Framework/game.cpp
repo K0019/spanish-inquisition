@@ -70,6 +70,7 @@ void init(void)
 	g_sLevel.playerStartRoom.Y = GRID_Y >> 1;
 	g_sEntities.g_sChar.m_iPlayerScore = 0;
 	g_sEntities.g_sChar.m_iPlayerHealth = g_sEntities.g_sChar.m_iMaxHealth = 10;
+	g_sEntities.g_sChar.m_iPlayerDamage = 3;
 	for (int i = 0; i < 7; i++) //for loop to initialise all items to false, so player starts with no items
 	{
 		g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[i].m_bHasWeapon = false;
@@ -96,7 +97,7 @@ void init(void)
 	//if (DEBUG)
 	//{
 	//	g_sLevel.floor = 5;
-	//	g_sEntities.g_sChar.m_iPlayerDamage = 8;
+	//	g_sEntities.g_sChar.m_iPlayerDamage = 100;
 	//	g_sEntities.g_sChar.m_iPlayerHealth = 1000;
 	//}
 	g_sLevel.generateLevel();
@@ -109,7 +110,6 @@ void init(void)
 	loadGame();
 	g_sEntities.g_sChar.m_sLastItem = "";
 	g_sEntities.g_sChar.m_sPlayerItems.ItemCount = 0;
-	g_sEntities.g_sChar.m_iPlayerDamage = 3;
 	g_sEntities.g_sChar.m_sPlayerItems.m_vItemsObtained[0];
 }
 //--------------------------------------------------------------
@@ -710,35 +710,34 @@ void controlPlayer()
 			{
 				if (++g_sLevel.floor > FINAL_FLOOR)
 				{
-					std::string ASCII[17];
-					ASCII[0] = "∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞";
-					ASCII[1] = "                                                                                         ";
-					ASCII[2] = "                         €€€€≤∞   €€€€≤∞                                                                                    ";
-					ASCII[3] = "                           €€≤∞   €€≤∞    €€€€€≤∞ €€€€€€€≤∞ €€€€≤∞                                                                    ";
-					ASCII[4] = "                            €€≤∞ €€≤∞   €€≤∞  €€≤∞  €€€≤∞    €≤∞                                                     ";
-					ASCII[5] = "                              €€€≤∞    €€≤∞    €€≤∞ €€€≤∞    €≤∞                                                ";
-					ASCII[6] = "                              €€€≤∞    €€≤∞    €€≤∞ €€€≤∞    €≤∞                                                  ";
-					ASCII[7] = "                              €€€≤∞    €€≤∞    €€≤∞  €€≤∞    €≤∞                                                         ";
-					ASCII[8] = "                              €€€≤∞     €€≤∞  €€≤∞   €€€≤∞  €€≤∞                                                      ";
-					ASCII[9] = "                             €€€€€≤∞      €€€€€≤∞      €€€€€€≤∞                                                                ";
-					ASCII[10] = "                                                                                         ";
-					ASCII[11] = "                €€€€€≤∞ €€€€€   €€€€≤∞   €€€€€€€€≤∞   €€€€€€€≤∞   €€€€€€€≤∞                                                                    ";
-					ASCII[12] = "                   €€≤∞    €€     €≤∞     €€€€≤∞       €€€€€≤∞    €€€≤∞                                                    ";
-					ASCII[13] = "                    €€≤∞   €€     €≤∞     €€€€≤∞       €€ €€€≤∞   €€€≤∞                                                    ";
-					ASCII[14] = "                     €€≤∞ €€ €€   €≤∞     €€€€≤∞       €€  €€€≤∞  €€€≤∞                                                   ";
-					ASCII[15] = "                      €€≤∞€€   €€ €≤∞     €€€€≤∞       €€   €€€€≤∞€€€≤∞                                                    ";
-					ASCII[16] = "                        €€      €≤∞     €€€€€€€€≤∞   €€€€€€   €€€€€€€€€≤∞                                                         ";
-					ASCII[17] = "∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞";
-					COORD c = g_Console.getConsoleSize;
-					int i = 0;
-					for (int j = 0; j < 17, j++;)
-					{
-						c.X = 0;
-						c.Y = 0;
-						g_Console.writeToBuffer(c, ASCII[i], 0x64);
-						c.Y++;
-						i++;
-					}
+					//std::string ASCII[17];
+					//ASCII[0] = "∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞";
+					//ASCII[1] = "                                                                                         ";
+					//ASCII[2] = "                         €€€€≤∞   €€€€≤∞                                                                                    ";
+					//ASCII[3] = "                           €€≤∞   €€≤∞    €€€€€≤∞ €€€€€€€≤∞ €€€€≤∞                                                                    ";
+					//ASCII[4] = "                            €€≤∞ €€≤∞   €€≤∞  €€≤∞  €€€≤∞    €≤∞                                                     ";
+					//ASCII[5] = "                              €€€≤∞    €€≤∞    €€≤∞ €€€≤∞    €≤∞                                                ";
+					//ASCII[6] = "                              €€€≤∞    €€≤∞    €€≤∞ €€€≤∞    €≤∞                                                  ";
+					//ASCII[7] = "                              €€€≤∞    €€≤∞    €€≤∞  €€≤∞    €≤∞                                                         ";
+					//ASCII[8] = "                              €€€≤∞     €€≤∞  €€≤∞   €€€≤∞  €€≤∞                                                      ";
+					//ASCII[9] = "                             €€€€€≤∞      €€€€€≤∞      €€€€€€≤∞                                                                ";
+					//ASCII[10] = "                                                                                         ";
+					//ASCII[11] = "                €€€€€≤∞ €€€€€   €€€€≤∞   €€€€€€€€≤∞   €€€€€€€≤∞   €€€€€€€≤∞                                                                    ";
+					//ASCII[12] = "                   €€≤∞    €€     €≤∞     €€€€≤∞       €€€€€≤∞    €€€≤∞                                                    ";
+					//ASCII[13] = "                    €€≤∞   €€     €≤∞     €€€€≤∞       €€ €€€≤∞   €€€≤∞                                                    ";
+					//ASCII[14] = "                     €€≤∞ €€ €€   €≤∞     €€€€≤∞       €€  €€€≤∞  €€€≤∞                                                   ";
+					//ASCII[15] = "                      €€≤∞€€   €€ €≤∞     €€€€≤∞       €€   €€€€≤∞€€€≤∞                                                    ";
+					//ASCII[16] = "                        €€      €≤∞     €€€€€€€€≤∞   €€€€€€   €€€€€€€€€≤∞                                                         ";
+					//ASCII[17] = "∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞";
+					//COORD c;
+					//int i = 0;
+					//for (int j = 0; j < 17, j++;)
+					//{
+					//	c.X = 0;
+					//	g_Console.writeToBuffer(c, ASCII[i], 0x64);
+					//	c.Y++;
+					//	i++;
+					//}
 					break;
 				}
 				else

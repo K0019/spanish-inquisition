@@ -51,12 +51,17 @@ void init(void)
 	for (int i = 0; i < K_COUNT; i++) g_adBounceTime[i] = 0.0;
 	// sets the initial state for the game
 	g_eGameState = S_SPLASHSCREEN;
-	/*if (DEBUG) g_eGameState = S_MENU;*/
+	if (DEBUG) g_eGameState = S_MENU;
 	if (g_eRestartGame) g_eGameState = S_GAME;
 	g_eRestartGame = false;
 
 	g_sEntities.clearEnemies();
 	g_sEntities.clearPellets();
+	if (g_sEntities.boss != nullptr)
+	{
+		delete g_sEntities.boss;
+		g_sEntities.boss = nullptr;
+	}
 	g_bHasShot = false;
 	g_sEntities.g_sChar.m_cLocation.X = 2 + (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
 	g_sEntities.g_sChar.m_cLocation.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
@@ -83,6 +88,12 @@ void init(void)
 	g_mEvent.r_pausecurspos.X = g_Console.getConsoleSize().X / 10 - 2;
 	g_mEvent.r_pausecurspos.Y = g_Console.getConsoleSize().Y / 5;
 	g_sLevel.floor = 1;
+	if (DEBUG)
+	{
+		g_sLevel.floor = 5;
+		g_sEntities.g_sChar.m_iPlayerDamage = 8;
+		g_sEntities.g_sChar.m_iPlayerHealth = 1000;
+	}
 	g_sLevel.generateLevel();
 	g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
 	COORD c;
@@ -259,7 +270,10 @@ void gameplay()            // gameplay logic
 			g_sEntities.updatePellets(); // update locations of pellets
 			checkHitPellets(); // checks if the pellets have hit anything, and update stats accordingly
 			g_sEntities.updateEnemies(); // update locations of enemies and add pellets of the enemies'
-			g_sEntities.updateBoss(); // update the boss
+			if (g_sEntities.updateBoss()) // update the boss
+			{
+				g_sLevel.createStairs(); // If boss is dead, create stairs
+			}
 			// sound can be played here too.
 			checkTrapCollision();
 		}
@@ -1220,6 +1234,7 @@ void moveScreen()
 
 	if (r_cRenderOffset.X == r_cTargetRenderOffset.X && r_cRenderOffset.Y == r_cTargetRenderOffset.Y)
 	{
+		loadBoss();
 		delete r_cswRenderTimer;
 	}
 }
@@ -1290,7 +1305,7 @@ void renderLevel()
 				render(c, " SS ", " SS ", 0x02);
 				break;
 			case '^':
-				render(c, " ^^ ", " ^^ ", 0x04);
+				render(c, " ^^ ", " ^^ ", 0x0c);
 				break;
 			case '+':
 				render(c, " ++ ", " ++ ", 0x04);
@@ -1731,7 +1746,6 @@ void changedRoomUpdate()
 	g_sEntities.clearEnemies();
 	if (loadEnemiesFromRoom())
 		g_sEntities.g_sChar.m_bInBattle = true;
-	loadBoss();
 	g_sLevel.miniMap->enteredRoom[(g_sEntities.g_sChar.m_cLocation.X - 1) / (ROOM_X + 2) * GRID_Y + (g_sEntities.g_sChar.m_cLocation.Y - 1) / (ROOM_Y + 2)] = true;
 	g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
 }
@@ -1785,7 +1799,7 @@ bool loadBoss()
 		c.X = 4;
 		c.Y = 4;
 		std::string identifier[4] = { "GGGGJJJJ", "GGGGJJJJ", "GGGGJJJJ", "GGGGJJJJ" };
-		g_sEntities.boss = new Boss1(&g_sEntities.g_sChar, &g_sEntities.m_vPellets, identifier, 0x0c, 0x0e, 200, 0.0, 2.0, 100.0, 2.0, 0.5, 0.3, 0.5, 0.3, 2.0, -4.0, 0.5);
+		g_sEntities.boss = new Boss1(&g_sEntities.g_sChar, &g_sEntities.m_vPellets, identifier, 0x0c, 0x0e, 1000, 17.5, 1.5, 12.0, 1.5, 0.5, 0.3, 0.5, 0.3, 1.5, -4.0, 0.4);
 		g_sEntities.g_sChar.m_bInBattle = true;
 		return true;
 	}

@@ -116,7 +116,7 @@ void Boss1::update()
 					break;
 				if (this->m_dCurrentAccurateTime >= this->m_dPlayerHitCooldown)
 				{
-					this->m_sPlayer->m_iPlayerHealth -= 3;
+					this->m_sPlayer->m_iPlayerHealth -= 4;
 					this->m_dPlayerHitCooldown = this->m_dCurrentAccurateTime + 0.4;
 				}
 				switch (code)
@@ -594,14 +594,28 @@ void Boss1::checkHit()
 	for (auto& pellet : (*this->m_pvPelletContainer))
 	{
 		if (pellet.m_bHit) continue;
+		if (!pellet.m_bFriendly) continue;
 		COORD c = this->getLocation(pellet.m_cLocation);
 
-		if ((this->m_dLocationX - 1.0 < c.X + 1 && this->m_dLocationX + 1.0 > c.X) &&
-			(this->m_dLocationY - 1.0 < c.Y + 1 && this->m_dLocationY + 1.0 > c.Y))
+		if (this->m_bEnemyState[0])
 		{
-			pellet.m_bHit = true;
-			pellet.m_bHitReason = pellet::P_ENEMY;
-			this->m_iHP -= pellet.m_iDamage;
+			if ((this->m_dLocationX - 1.0 < c.X + 1 && this->m_dLocationX + 1.0 > c.X) &&
+				(this->m_dLocationY - 1.0 < c.Y + 1 && this->m_dLocationY + 1.0 > c.Y))
+			{
+				pellet.m_bHit = true;
+				pellet.m_bHitReason = pellet::P_ENEMY;
+				this->m_iHP -= pellet.m_iDamage;
+			}
+		}
+		else
+		{
+			if ((this->m_dLocationCoord.X - 1.0 < c.X + 1 && this->m_dLocationCoord.X + 1.0 > c.X) &&
+				(this->m_dLocationCoord.Y - 1.0 < c.Y + 1 && this->m_dLocationCoord.Y + 1.0 > c.Y))
+			{
+				pellet.m_bHit = true;
+				pellet.m_bHitReason = pellet::P_ENEMY;
+				this->m_iHP -= pellet.m_iDamage;
+			}
 		}
 	}
 	if (this->isDying())

@@ -43,17 +43,19 @@ void SAllEntities::updateEnemies()
 	}
 }
 
-void SAllEntities::updateBoss()
+bool SAllEntities::updateBoss()
 {
 	if (this->boss != nullptr)
 		this->boss->update();
 	else
-		return;
+		return false;
 	if (this->boss->isDead())
 	{
 		delete this->boss;
 		this->boss = nullptr;
+		return true;
 	}
+	return false;
 }
 
 SAllEntities::~SAllEntities()

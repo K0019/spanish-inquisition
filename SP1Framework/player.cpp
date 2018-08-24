@@ -335,11 +335,19 @@ void SGameChar::hasConsumable(bool g_bHasConsumable, int index)
 		case 1: //Index 1: Minor Health Potion, restores 5 health (potion will not restore any higher than maximum hp)
 		{
 			this->m_iPlayerHealth += this->m_sConsumables.m_vConsumableList[0].m_iConsumableHealth;
+			if (this->m_iPlayerHealth > this->m_iMaxHealth) //Prevents the player's health from going above player's max health
+			{
+				this->m_iPlayerHealth = this->m_iMaxHealth;
+			}
 			break;
 		}
 		case 2: //Index 1: Greater Health Potion, restores 10 health (potion will not restore any higher than maximum hp)
 		{
 			this->m_iPlayerHealth += this->m_sConsumables.m_vConsumableList[1].m_iConsumableHealth;
+			if (this->m_iPlayerHealth > this->m_iMaxHealth) //Prevents the player's health from going above player's max health
+			{
+				this->m_iPlayerHealth = this->m_iMaxHealth;
+			}
 			break;
 		}
 		case 3: //Index 1: Small Medal, adds 20 score to the player
@@ -353,9 +361,5 @@ void SGameChar::hasConsumable(bool g_bHasConsumable, int index)
 			break;
 		}
 		}
-	}
-	if (this->m_iPlayerHealth > this->m_iMaxHealth) //Prevents the player's health from going above player's max health
-	{
-		this->m_iPlayerHealth = this->m_iMaxHealth;
 	}
 }

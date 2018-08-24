@@ -76,7 +76,7 @@ public:
 	std::string * getIdentifier(); // Get pointer to the string identifier array
 	WORD getColor(); // Get current color of boss
 	bool isDying(); // Check if boss is dying
-	bool isDead(); // Check if boss is dead
+	bool isDead(SGameChar * player); // Check if boss is dead
 	bool isOverlapping(COORD c); // Check if a specified coordinate is overlapping with the boss
 };
 

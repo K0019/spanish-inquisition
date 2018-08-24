@@ -20,14 +20,17 @@ struct SItem //Struct that holds item information
 	bool m_bHasWeapon;
 	int m_iWeaponLevel;
 	int m_iWeaponCost;
+	int m_iWeaponIncrement;
+	int m_iWeaponTotalCost;
 
-	SItem(std::string name, int index, int damage, int healthGiven, float attackSpeed, float velocity, float moveSpeed, bool hasWeapon, int weaponLevel, int cost);
+	SItem(std::string name, int index, int damage, int healthGiven, float attackSpeed, float velocity, float moveSpeed, bool hasWeapon, int weaponLevel, int cost, int increment, int totalCost);
 };
 
 struct SAllItems //Struct that holds all items as indiviual items
 {
 	std::vector<SItem> m_vItemsList;
 	std::vector<bool> m_vItemsObtained;
+	std::vector<std::string> m_vItemNameList;
 	int ItemCount;
 
 	SAllItems();

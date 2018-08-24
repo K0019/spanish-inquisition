@@ -375,10 +375,11 @@ void submenuNav()
 			{
 				if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[g_mEvent.sh_shopItemSel].m_iWeaponLevel < 3)
 				{
-					if (g_sEntities.g_sChar.m_iGlobalScore >= (unsigned int)g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[g_mEvent.sh_shopItemSel].m_iWeaponCost)
+					if (g_sEntities.g_sChar.m_iGlobalScore >= (unsigned int)g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[g_mEvent.sh_shopItemSel].m_iWeaponTotalCost)
 					{
-						g_sEntities.g_sChar.m_iGlobalScore -= g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[g_mEvent.sh_shopItemSel].m_iWeaponCost;
+						g_sEntities.g_sChar.m_iGlobalScore -= g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[g_mEvent.sh_shopItemSel].m_iWeaponTotalCost;
 						g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[g_mEvent.sh_shopItemSel].m_iWeaponLevel++;
+						g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[g_mEvent.sh_shopItemSel].m_iWeaponTotalCost = g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[g_mEvent.sh_shopItemSel].m_iWeaponCost + (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[g_mEvent.sh_shopItemSel].m_iWeaponIncrement * g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[g_mEvent.sh_shopItemSel].m_iWeaponLevel);
 						saveGame();
 						loadGame();
 					}
@@ -1505,33 +1506,45 @@ void renderStat()
 	std::ostringstream ss;
 	ss.str("");
 	ss << "HP: " << g_sEntities.g_sChar.m_iPlayerHealth << " / " << g_sEntities.g_sChar.m_iMaxHealth;
-	c.X = g_Console.getConsoleSize().X - 15;
-	c.Y = 2;
+	c.X = g_Console.getConsoleSize().X - 33;
+	c.Y = 0;
 	g_Console.writeToBuffer(c, ss.str());
 
 	//Rendering player's damage
 	ss.str("");
 	ss << "Damage: " << g_sEntities.g_sChar.m_iPlayerDamage;
-	c.Y = 3;
+	c.Y = 1;
 	g_Console.writeToBuffer(c, ss.str());
 
 	//Rendering player's item count
 	ss.str("");
 	ss << "Items: " << g_sEntities.g_sChar.m_sPlayerItems.ItemCount;
-	c.Y = 4;
+	c.Y = 2;
 	g_Console.writeToBuffer(c, ss.str());
 
 	//Rendering player's score
 	ss.str("");
 	ss << "Score: " << g_sEntities.g_sChar.m_iPlayerScore;
-	c.Y = 5;
+	c.Y = 3;
 	g_Console.writeToBuffer(c, ss.str());
 
 	//Rendering floor level
 	ss.str("");
 	ss << "Floor: " << g_sLevel.floor;
-	c.Y = 6;
+	c.Y = 4;
 	g_Console.writeToBuffer(c, ss.str());
+
+	//Rendering item list
+	ss.str("");
+	ss << "Items: " << "";
+	c.Y = 5;
+	for (auto& item : g_sEntities.g_sChar.m_sPlayerItems.m_vItemNameList)
+	{
+		ss.str("");
+		ss << item;
+		c.Y++;
+		g_Console.writeToBuffer(c, ss.str());
+	}
 
 	//Rendering player's last item
 	ss.str("");
@@ -1635,17 +1648,17 @@ void checkHitPellets()
 						}
 					case 1: //Glass Canon Level 2: All Enemies deal 3 more damage to the player
 						{
-							g_sEntities.g_sChar.m_iPlayerHealth -= (pellet->m_iDamage + 3);
+							g_sEntities.g_sChar.m_iPlayerHealth -= (pellet->m_iDamage + 2);
 							break;
 						}
 					case 2: //Glass Canon Level 3: All Enemies deal 4 more damage to the player
 						{
-							g_sEntities.g_sChar.m_iPlayerHealth -= (pellet->m_iDamage + 4);
+							g_sEntities.g_sChar.m_iPlayerHealth -= (pellet->m_iDamage + 3);
 							break;
 						}
 					case 3: //Glass Canon Level 4: All Enemies deal 5 more damage to the player
 						{
-							g_sEntities.g_sChar.m_iPlayerHealth -= (pellet->m_iDamage + 5);
+							g_sEntities.g_sChar.m_iPlayerHealth -= (pellet->m_iDamage + 3);
 							break;
 						}
 				}

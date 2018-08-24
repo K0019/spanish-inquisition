@@ -446,11 +446,11 @@ void MenuEvent::renderItemSelected(std::vector<SItem> * itemList)
 	this->mainConsole->writeToBuffer(c, "Current Tier");
 	c.X = this->mainConsole->getConsoleSize().X >> 1;
 	this->mainConsole->writeToBuffer(c, "Next Tier");
-	c.X = this->mainConsole->getConsoleSize().X - (SHORT)strlen("Cost: ") - std::to_string((*itemList)[sh_shopItemSel].m_iWeaponCost).length() - 5;
+	c.X = this->mainConsole->getConsoleSize().X - (SHORT)strlen("Cost: ") - (SHORT)std::to_string((*itemList)[sh_shopItemSel].m_iWeaponCost).length() - 5;
 	c.Y = this->mainConsole->getConsoleSize().Y - 4;
 	std::ostringstream cost;
 	cost.str("");
-	cost << "Cost: " << (*itemList)[sh_shopItemSel].m_iWeaponCost;
+	cost << "Cost: " << (*itemList)[sh_shopItemSel].m_iWeaponTotalCost;
 	this->mainConsole->writeToBuffer(c, cost.str());
 	c.X = c.Y = 2;
 	this->mainConsole->writeToBuffer(c, nameOfItem, 0x1f);
@@ -619,7 +619,7 @@ void MenuEvent::renderItemSelected(std::vector<SItem> * itemList)
 			{
 				c.Y += 4;
 				if (currentTier == 0) c.Y = 6;
-				this->mainConsole->writeToBuffer(c, "All enemies deal 3 more damage.");
+				this->mainConsole->writeToBuffer(c, "All enemies deal 2 more damage.");
 				c.Y++;
 				this->mainConsole->writeToBuffer(c, "Player deals 5 more damage.");
 				c.X = this->mainConsole->getConsoleSize().X >> 1;
@@ -629,7 +629,7 @@ void MenuEvent::renderItemSelected(std::vector<SItem> * itemList)
 			{
 				c.Y += 4;
 				if (currentTier == 1) c.Y = 6;
-				this->mainConsole->writeToBuffer(c, "All enemies deal 4 more damage.");
+				this->mainConsole->writeToBuffer(c, "All enemies deal 3 more damage.");
 				c.Y++;
 				this->mainConsole->writeToBuffer(c, "Player deals 6 more damage.");
 				c.X = this->mainConsole->getConsoleSize().X >> 1;
@@ -639,7 +639,7 @@ void MenuEvent::renderItemSelected(std::vector<SItem> * itemList)
 			{
 				c.Y += 4;
 				if (currentTier == 2) c.Y = 6;
-				this->mainConsole->writeToBuffer(c, "All enemies deal 5 more damage.");
+				this->mainConsole->writeToBuffer(c, "All enemies deal 3 more damage.");
 				c.Y++;
 				this->mainConsole->writeToBuffer(c, "Player deals 7 more damage.");
 				c.X = this->mainConsole->getConsoleSize().X >> 1;
@@ -772,7 +772,7 @@ void MenuEvent::renderItemSelected(std::vector<SItem> * itemList)
 			{
 				c.Y += 4;
 				if (currentTier == 2) c.Y = 6;
-				this->mainConsole->writeToBuffer(c, "50%.");
+				this->mainConsole->writeToBuffer(c, "Increases player's movement speed by 50%.");
 				c.X = this->mainConsole->getConsoleSize().X >> 1;
 				if (currentTier == 2) break;
 			}

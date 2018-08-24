@@ -710,22 +710,7 @@ void controlPlayer()
 			{
 				if (++g_sLevel.floor > FINAL_FLOOR)
 				{
-					// YAN QUAN TODO: End game stuff
-				}
-				else
-				{
-					resetLevel(g_sLevel.floor);
-					g_sEntities.g_sChar.m_iPlayerScore += 50; //Give player 50 score for completing a level
-					bSomethingHappened = true;
-				}
-				break;
-			}
-			case '%': //When spacebar is pressed on top of an item
-			{
-				g_sEntities.g_sChar.addItem(true);
-				COORD c = g_sEntities.g_sChar.m_cLocation;
-				g_sLevel.modifyTile(c, '\0');
-				std::string ASCII[17];
+					std::string ASCII[17];
 					ASCII[0] = "같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같같";
 					ASCII[1] = "                                                                                         ";
 					ASCII[2] = "                         栢栢껐   栢栢껐                                                                                    ";
@@ -749,12 +734,27 @@ void controlPlayer()
 					for (int j = 0; j < 17, j++;)
 					{
 						c.X = 0;
-					    c.Y = 0;
+						c.Y = 0;
 						g_Console.writeToBuffer(c, ASCII[i], 0x64);
 						c.Y++;
 						i++;
 					}
 					break;
+				}
+				else
+				{
+					resetLevel(g_sLevel.floor);
+					g_sEntities.g_sChar.m_iPlayerScore += 50; //Give player 50 score for completing a level
+					bSomethingHappened = true;
+				}
+				break;
+			}
+			case '%': //When spacebar is pressed on top of an item
+			{
+				g_sEntities.g_sChar.addItem(true);
+				COORD c = g_sEntities.g_sChar.m_cLocation;
+				g_sLevel.modifyTile(c, '\0');
+				break;
 			}
 			case '1':
 			{

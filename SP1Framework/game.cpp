@@ -68,10 +68,12 @@ void init(void)
 	g_sEntities.g_sChar.m_bDefeatedBoss = false;
 	g_sLevel.playerStartRoom.X = GRID_X >> 1;
 	g_sLevel.playerStartRoom.Y = GRID_Y >> 1;
+	g_sEntities.g_sChar.m_iPlayerScore = 0;
 	g_sEntities.g_sChar.m_iPlayerHealth = g_sEntities.g_sChar.m_iMaxHealth = 10;
 	for (int i = 0; i < 7; i++)
 	{
 		g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[i].m_bHasWeapon = false;
+		g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[i].m_iWeaponTotalCost = g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[i].m_iWeaponCost + (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[i].m_iWeaponIncrement * g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[i].m_iWeaponLevel);
 	}
 	g_sEntities.g_sChar.m_cRoom = g_sLevel.playerStartRoom;
 	/*if (DEBUG)
@@ -87,10 +89,6 @@ void init(void)
 	r_cRenderOffset.Y = r_cTargetRenderOffset.Y = 1 + g_sEntities.g_sChar.m_cRoom.Y * (ROOM_Y + 2);
 	r_dTargetRenderTime = SCREEN_SCROLL_LENGTH;
 	g_mEvent.r_menucurspos.X = g_Console.getConsoleSize().X / 5;
-<<<<<<< HEAD
-	g_mEvent.r_menucurspos.Y = g_Console.getConsoleSize().Y / 10 * 8 - 1;
-	g_sLevel.floor = 1;
-=======
 	g_mEvent.r_menucurspos.Y = g_Console.getConsoleSize().Y / 10 * 8 - 6;
 	g_mEvent.r_pausecurspos.X = g_Console.getConsoleSize().X / 10 - 2;
 	g_mEvent.r_pausecurspos.Y = g_Console.getConsoleSize().Y / 5;

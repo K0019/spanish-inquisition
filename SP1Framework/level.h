@@ -32,6 +32,7 @@ struct SLevel
 	SMiniMap * miniMap; // Hold minimap
 
 	void generateLevel(); // Create a new level
+	void createStairs(); // Create stairs for end room of floor 5
 	std::vector<COORD> seekToEnd(std::vector<COORD>& returned); // Find a path from playerStartRoom to exitRoom
 	void uncoverAll(COORD room, bool * roomsHaveExit); // Create doors to all blocked rooms
 	void modifyTile(COORD c, char ch); // Change a tile on the level, using tile coordinates

@@ -361,8 +361,35 @@ void EnemyMelee::update(SGameChar * player)
 		this->m_dAttackTime -= dt;
 		if (!this->m_bAttacked && this->m_dAttackTime <= this->m_dAttackTimeThreshold)
 		{
-			this->strikeAttack(player);
-			this->m_bAttacked = true;
+			if (player->m_sPlayerItems.m_vItemsList[3].m_bHasWeapon)
+			{
+				switch(player->m_sPlayerItems.m_vItemsList[3].m_iWeaponLevel)
+				{
+				case 0: 
+				case 1:
+				{
+					this->m_iStrength += 2;
+					this->strikeAttack(player);
+					this->m_bAttacked = true;
+					this->m_iStrength -= 2;
+					break;
+				}
+				case 2:
+				case 3:
+				{
+					this->m_iStrength += 3;
+					this->strikeAttack(player);
+					this->m_bAttacked = true;
+					this->m_iStrength -= 3;
+					break;
+				}
+				}
+			}
+			else
+			{
+				this->strikeAttack(player);
+				this->m_bAttacked = true;
+			}
 		}
 		this->m_dLastMoveTime -= this->checkAttackDelayExpire();
 		if (this->m_dAttackTime == 0.0)
@@ -371,14 +398,41 @@ void EnemyMelee::update(SGameChar * player)
 		}
 	}
 
-	if (this->updateMovement(player))
+	else if (this->updateMovement(player))
 	{
 		this->m_dAttackTime = this->m_dLengthOfAttack;
 		this->setAttackDirection(player);
 		if (this->m_dAttackTimeThreshold == 0.0)
 		{
-			this->strikeAttack(player);
-			this->m_bAttacked = true;
+			if (player->m_sPlayerItems.m_vItemsList[3].m_bHasWeapon)
+			{
+				switch (player->m_sPlayerItems.m_vItemsList[3].m_iWeaponLevel)
+				{
+				case 0:
+				case 1:
+				{
+					this->m_iStrength += 2;
+					this->strikeAttack(player);
+					this->m_bAttacked = true;
+					this->m_iStrength -= 2;
+					break;
+				}
+				case 2:
+				case 3:
+				{
+					this->m_iStrength += 3;
+					this->strikeAttack(player);
+					this->m_bAttacked = true;
+					this->m_iStrength -= 3;
+					break;
+				}
+				}
+			}
+			else
+			{
+				this->strikeAttack(player);
+				this->m_bAttacked = true;
+			}
 		}
 	}
 }

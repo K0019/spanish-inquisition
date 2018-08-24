@@ -51,6 +51,7 @@ void SGameChar::hasItem(bool g_bHasWeapon) //Function to determine what item the
 		weaponIndex = rand() % 7;
 	} while (this->m_sPlayerItems.m_vItemsList[weaponIndex].m_bHasWeapon); //If the player already has that item, go through the loop again
 
+
 	if ((weaponIndex == this->m_sPlayerItems.m_vItemsList[0].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[0].m_bHasWeapon == false)) //Checking if randomized weaponIndex gives the Heaven Cracker
 	{
 		switch (this->m_sPlayerItems.m_vItemsList[0].m_iWeaponLevel) //Index 1 (Heaven Cracker): Increase player damage by 0/2/3/4
@@ -310,6 +311,7 @@ void SGameChar::hasItem(bool g_bHasWeapon) //Function to determine what item the
 
 
 	this->m_sLastItem = this->m_sPlayerItems.m_vItemsList[weaponIndex].m_sName;
+	this->m_sPlayerItems.m_vItemNameList.push_back(m_sLastItem);
 }
 
 void SGameChar::minimumScore(int playerScore) //To make sure the minimum score is 0, it should not go to the negatives

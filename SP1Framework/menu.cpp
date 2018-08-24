@@ -772,7 +772,7 @@ void MenuEvent::renderItemSelected(std::vector<SItem> * itemList)
 			{
 				c.Y += 4;
 				if (currentTier == 2) c.Y = 6;
-				this->mainConsole->writeToBuffer(c, "50%.");
+				this->mainConsole->writeToBuffer(c, "Increases player's movement speed by 50%.");
 				c.X = this->mainConsole->getConsoleSize().X >> 1;
 				if (currentTier == 2) break;
 			}

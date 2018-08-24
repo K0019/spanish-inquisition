@@ -92,7 +92,7 @@ void init(void)
 	g_mEvent.r_menucurspos.Y = g_Console.getConsoleSize().Y / 10 * 8 - 6;
 	g_mEvent.r_pausecurspos.X = g_Console.getConsoleSize().X / 10 - 2;
 	g_mEvent.r_pausecurspos.Y = g_Console.getConsoleSize().Y / 5;
-	g_sLevel.floor = 1;
+	g_sLevel.floor = 5;
 	//if (DEBUG)
 	//{
 	//	g_sLevel.floor = 5;
@@ -109,7 +109,7 @@ void init(void)
 	loadGame();
 	g_sEntities.g_sChar.m_sLastItem = "";
 	g_sEntities.g_sChar.m_sPlayerItems.ItemCount = 0;
-	g_sEntities.g_sChar.m_iPlayerDamage = 3;
+	g_sEntities.g_sChar.m_iPlayerDamage = 30;
 	g_sEntities.g_sChar.m_sPlayerItems.m_vItemsObtained[0];
 }
 //--------------------------------------------------------------

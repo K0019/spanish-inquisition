@@ -282,7 +282,7 @@ COORD Boss1::getRealLocation()
 	{
 		COORD c = this->m_dLocationCoord;
 		std::swap(c.X, c.Y);
-		c.X = (c.X << 2) + 1;
+		c.X = (c.X << 2) + 2;
 		c.Y = (c.Y << 1) + 1;
 		return c;
 	}

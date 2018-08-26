@@ -131,9 +131,6 @@
     <ClInclude Include="consumables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="stat.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="boss.h">
       <Filter>Header Files</Filter>
     </ClInclude>

@@ -1,5 +1,7 @@
 #pragma once
 
+/* TRANSFERRED FROM FRAMEWORK, Modified by: Kendrick and Winston */
+
 #ifndef PLAYERHEAD
 #define PLAYERHEAD
 #include <Windows.h>
@@ -18,6 +20,7 @@ struct SGameChar
 	bool m_bDefeatedBoss; // If player has defeated boss
 	int m_iMaxHealth = 10; //Max health of the player can only be increased by items, and does not go down when player is damaged
 	int m_iPlayerHealth = 10; //The constantly changing variable, increased by items and consumables.
+	int m_iPreviousHealth;
 	int	m_iPlayerDamage = 3; //The amount of damage the player deals per pellet
 	unsigned int m_iPlayerScore = 0; //The player's score
 	unsigned int m_iGlobalScore = 0; //The player's score after each run, to be spent at the shop

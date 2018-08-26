@@ -109,7 +109,6 @@
     <ClInclude Include="menu.h" />
     <ClInclude Include="pellet.h" />
     <ClInclude Include="player.h" />
-    <ClInclude Include="stat.h" />
     <ClInclude Include="trap.h" />
   </ItemGroup>
   <ItemGroup>

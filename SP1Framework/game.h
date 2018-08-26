@@ -54,53 +54,54 @@ void shutdown    ( void ); /* FRAMEWORK */ // do clean up, free memory
 /*
 	THE UPDATE FUNCTIONS
 */
-void loadGame();
-void saveGame();
-void splashScreenWait();	// waits for time to pass in splash screen
-void playerShoot();			// allows the player to shoot
-void gameplay();			// gameplay logic
-void menuLogic();
-void menuNav();
-void submenuNav();
-void resetLevel(int floor); // Generate a new map, with input floor for what to put inside the rooms
-void controlPlayer();		// moves the character, collision detection, physics, etc
-void checkHitPellets();		// Check if pellets have hit anything
-void checkTrapCollision(); //Check if player is standing on a trap
-void doomButton();			// heehee
-void detectPauseMenuProc();
-void pauseScreen();
-void pauseScreenNav();
-void changedRoomUpdate(); // Stuff to do when the player exits current room
-bool loadEnemiesFromRoom(); // Load all enemies from the room that the player entered
-bool loadBoss(); // Load the boss into the exit room, if player is in floor 5
-void addEnemy(EnemyMelee * enemy); // Add an enemy to the enemy list
-void addEnemy(EnemyRanged * enemy); // Add an enemy to the enemy list
-void CharacterDeath();
-void setUpMoveScreen(); // Setup variables to move render screen
-void moveScreen(); // Moves the render scree
+void loadGame(); /* Made by: Yan Quan */
+void saveGame(); /* Made by: Yan Quan */
+void splashScreenWait(); /* FRAMEWORK */ // waits for time to pass in splash screen
+void playerShoot(); /* Made by: Kendrick */ // allows the player to shoot
+void gameplay(); /* SHARED */ // gameplay logic
+void menuLogic(); /* Made by: Yan Quan */
+void menuNav(); /* Made by: Yan Quan */
+void submenuNav(); /* Made by: Yan Quan */
+void resetLevel(int floor); /* Made by: Kendrick */ // Generate a new map, with input floor for what to put inside the rooms
+void controlPlayer(); /* Made by: Kendrick, modified by Winston and Yan Quan */ // moves the character, collision detection, physics, etc
+void checkHitPellets(); /* Made by: Kendrick, modified by Winston */ // Check if pellets have hit anything
+void checkTrapCollision(); /* Made by: Winston */ //Check if player is standing on a trap
+void doomButton(); /* Made by: Yan Quan */ // heehee
+void detectPauseMenuProc(); /* Made by: Yan Quan */
+void pauseScreen(); /* Made by: Yan Quan */
+void pauseScreenNav(); /* Made by: Yan Quan */
+void changedRoomUpdate(); /* Made by: Kendrick */ // Stuff to do when the player exits current room
+bool loadEnemiesFromRoom(); /* Made by: Kendrick */ // Load all enemies from the room that the player entered
+bool loadBoss(); /* Made by: Kendrick */ // Load the boss into the exit room, if player is in floor 5
+void addEnemy(EnemyMelee * enemy); /* Made by: Kendrick */ // Add an enemy to the enemy list
+void addEnemy(EnemyRanged * enemy); /* Made by: Kendrick */ // Add an enemy to the enemy list
+void CharacterDeath(); /* Made by: Jo Chu */
+void setUpMoveScreen(); /* Made by: Kendrick */ // Setup variables to move render screen
+void moveScreen(); /* Made by: Kendrick */ // Moves the render scree
 /*
 	THE RENDER FUNCTIONS
 */
-void clearScreen();			// clears the current screen and draw from scratch 
-void renderSplashScreen();	// renders the splash screen
-void renderMenu();			// renders the main menu
-void renderGame();			// renders the game stuff
-void renderPause();
-void renderPauseCursor();
-void renderPauseMenu();
-void renderScore();			// render the current score from
-void renderCharacter();		// renders the character into the buffer
-void renderFramerate();		// renders debug information, frame rate, elapsed time, etc
-void renderToScreen();		// dump the contents of the buffer to the screen, one frame worth of game
-void renderLevel();			// renders the borders of the rooms
-void renderPellets();		// render pellets to buffer
-void renderMiniMap();		// render minimap to buffer
-void renderEnemy();			// renders all alive enemies to the buffer
-void renderDeadEnemy();		// renders all dead enemies to the buffer
-void renderBoss();			// renders boss
-void renderStat();			//renders the player stats on the right side of the console
-void render(COORD c, LPCSTR text, LPCSTR text2, WORD color); // Render sprite to screen
-void render(COORD c, std::string& text, std::string& text2, WORD color); // Render sprite to screen
-void render(COORD c, std::string * text, WORD color); // Render boss to screen
+void clearScreen(); /* FRAMEWORK */ // clears the current screen and draw from scratch 
+void renderSplashScreen(); /* Modified by: Yan Quan */ // renders the splash screen
+void renderMenu(); /* Made by: Yan Quan */ // renders the main menu
+void renderGame(); /* FRAMEWORK */ // renders the game stuff
+void renderPause(); /* Made by: Yan Quan */
+void renderPauseCursor(); /* Made by: Yan Quan */
+void renderPauseMenu(); /* Made by: Yan Quan */
+void renderScore(); /* Made by: Winston */ // render the current score from
+void renderCharacter(); /* Modified by: Kendrick */ // renders the character into the buffer
+void renderFramerate(); /* Modified by: Kendrick */ // renders debug information, frame rate, elapsed time, etc
+void renderToScreen(); /* FRAMEWORK */ // dump the contents of the buffer to the screen, one frame worth of game
+void renderLevel(); /* Made by: Kendrick */ // render the level elements to buffer
+void renderPellets(); /* Made by: Kendrick */ // render pellets to buffer
+void renderMiniMap(); /* Made by: Kendrick */ // render minimap to buffer
+void renderEnemy(); /* Made by: Kendrick */ // renders all alive enemies to the buffer
+void renderDeadEnemy(); /* Made by: Kendrick */ // renders all dead enemies to the buffer
+void renderBoss(); /* Made by: Kendrick */ // renders boss
+void renderStat(); /* Made by: Winston */ //renders the player stats on the right side of the console
+void renderHealthIndicator(); /* Made by: Kendrick */ // renders the red border around the room when at 5 health or less health
+void render(COORD c, LPCSTR text, LPCSTR text2, WORD color); /* Made by: Kendrick */ // Render sprite to screen
+void render(COORD c, std::string& text, std::string& text2, WORD color); /* Made by: Kendrick */ // Render sprite to screen
+void render(COORD c, std::string * text, WORD color); /* Made by: Kendrick */ // Render boss to screen
 
 #endif // _GAME_H

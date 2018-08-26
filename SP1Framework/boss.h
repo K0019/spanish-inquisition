@@ -1,5 +1,7 @@
 #pragma once
 
+/* MADE BY: Kendrick */
+
 #ifndef BOSSHEAD
 #define BOSSHEAD
 #include "Framework/timer.h"

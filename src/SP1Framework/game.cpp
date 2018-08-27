@@ -1792,7 +1792,7 @@ void renderStat()
 		{
 			ss.str("");
 			index = 0;
-			ss << item << " Tier: " << g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_iWeaponLevel;
+			ss << item << " Tier: " << g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_iWeaponLevel + 1;
 		}
 		c.Y++;
 		g_Console.writeToBuffer(c, ss.str());

@@ -1568,8 +1568,50 @@ void renderStat()
 	c.Y = 5;
 	for (auto& item : g_sEntities.g_sChar.m_sPlayerItems.m_vItemNameList)
 	{
-		ss.str("");
-		ss << item;
+		int index;
+		int weaponLevel;
+		if (item == "Heaven Cracker")
+		{
+			ss.str("");
+			index = 0;
+			ss << item << " Level: " << g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[0].m_iWeaponLevel + 1;
+		}
+		else if (item == "Enchanted Sword")
+		{
+			ss.str("");
+			index = 0;
+			ss << item << " Level: " << g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[1].m_iWeaponLevel + 1;
+		}
+		else if (item == "Health Potion")
+		{
+			ss.str("");
+			index = 0;
+			ss << item << " Level: " << g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[2].m_iWeaponLevel + 1;
+		}
+		else if (item == "Glass Canon")
+		{
+			ss.str("");
+			index = 0;
+			ss << item << " Level: " << g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[3].m_iWeaponLevel + 1;
+		}
+		else if (item == "Magic Potion")
+		{
+			ss.str("");
+			index = 0;
+			ss << item << " Level: " << g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_iWeaponLevel + 1;
+		}
+		else if (item == "Bonus!")
+		{
+			ss.str("");
+			index = 0;
+			ss << item << " Level: " << g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[5].m_iWeaponLevel + 1;
+		}
+		else if (item == "Blue Feather")
+		{
+			ss.str("");
+			index = 0;
+			ss << item << " Level: " << g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_iWeaponLevel + 1;
+		}
 		c.Y++;
 		g_Console.writeToBuffer(c, ss.str());
 	}

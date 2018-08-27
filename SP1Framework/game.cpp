@@ -72,6 +72,7 @@ void init(void)
 	g_sEntities.g_sChar.m_iPlayerScore = 0;
 	g_sEntities.g_sChar.m_iPlayerHealth = g_sEntities.g_sChar.m_iMaxHealth = g_sEntities.g_sChar.m_iPreviousHealth = 10;
 	g_sEntities.g_sChar.m_iPlayerDamage = 3;
+	g_sEntities.g_sChar.m_dVelocity = SHOOTVELOCITY;
 	for (int i = 0; i < 7; i++) //for loop to initialise all items to false, so player starts with no items
 	{
 		g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[i].m_bHasWeapon = false;
@@ -1619,7 +1620,7 @@ void renderStat()
 	ss.str("");
 	ss << "Last Item: " << g_sEntities.g_sChar.m_sLastItem;
 	c.X = g_Console.getConsoleSize().X - 83;
-	c.Y = 27;
+	c.Y = 28;
 	g_Console.writeToBuffer(c, ss.str());
 }
 

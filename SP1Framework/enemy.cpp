@@ -302,7 +302,7 @@ bool Enemy::checkOutOfBounds()
 	{
 		if (&(*enemy) == this) continue;
 
-		if (enemy->m_cLocation.X == this->m_cLocation.X && enemy->m_cLocation.Y == this->m_cLocation.Y)
+		if (!enemy->isDying() && enemy->m_cLocation.X == this->m_cLocation.X && enemy->m_cLocation.Y == this->m_cLocation.Y)
 			return true;
 	}
 	return false;
@@ -316,7 +316,7 @@ bool Enemy::checkOutOfBounds(COORD c)
 	}
 	for (auto& enemy : *this->enemyContainerPointer)
 	{
-		if (enemy->m_cLocation.X == c.X && enemy->m_cLocation.Y == c.Y)
+		if (!enemy->isDying() && enemy->m_cLocation.X == c.X && enemy->m_cLocation.Y == c.Y)
 			return true;
 	}
 	return false;

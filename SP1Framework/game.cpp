@@ -96,7 +96,7 @@ void init(void)
 	g_mEvent.r_menucurspos.Y = g_Console.getConsoleSize().Y / 10 * 8 - 6;
 	g_mEvent.r_pausecurspos.X = g_Console.getConsoleSize().X / 10 - 2;
 	g_mEvent.r_pausecurspos.Y = g_Console.getConsoleSize().Y / 5;
-	g_sLevel.floor = 5;
+	g_sLevel.floor = 2;
 
 	//if (DEBUG)
 	//{
@@ -115,6 +115,40 @@ void init(void)
 	g_sEntities.g_sChar.m_sLastItem = "";
 	g_sEntities.g_sChar.m_sPlayerItems.ItemCount = 0;
 	g_sEntities.g_sChar.m_sPlayerItems.m_vItemsObtained[0];
+
+	switch (g_sLevel.floor)
+	{
+	case 1:
+	{
+		stopAllMusic();
+		MusicPlay("002", "repeat");
+		break;
+	}
+	case 2:
+	{
+		stopAllMusic();
+		MusicPlay("003", "repeat");
+		break;
+	}
+	case 3:
+	{
+		stopAllMusic();
+		MusicPlay("004", "repeat");
+		break;
+	}
+	case 4:
+	{
+		stopAllMusic();
+		MusicPlay("005", "repeat");
+		break;
+	}
+	case 5:
+	{
+		stopAllMusic();
+		MusicPlay("006", "repeat");
+		break;
+	}
+	}
 }
 //--------------------------------------------------------------
 // Purpose  : Reset before exiting the program
@@ -999,7 +1033,9 @@ void pauseScreenNav()
 			g_mEvent.sh_pauseSel = 0;
 			g_mEvent.bPausedGame = false;
 			g_mEvent.bPreventAccident = true;
+			stopAllMusic();
 			g_eGameState = S_MENU;
+			MusicPlay("001", "repeat");
 			break;
 		case 3:
 			g_bQuitGame = true;
@@ -2027,39 +2063,6 @@ void CharacterDeath()
 				g_sEntities.g_sChar.m_iGlobalScore += unsigned int(double(g_sEntities.g_sChar.m_iPlayerScore) * 0.10);
 				saveGame();
 				init();
-				switch (g_sLevel.floor)
-				{
-				case 1:
-				{
-					stopAllMusic();
-					MusicPlay("002", "repeat");
-					break;
-				}
-				case 2:
-				{
-					stopAllMusic();
-					MusicPlay("003", "repeat");
-					break;
-				}
-				case 3:
-				{
-					stopAllMusic();
-					MusicPlay("004", "repeat");
-					break;
-				}
-				case 4:
-				{
-					stopAllMusic();
-					MusicPlay("005", "repeat");
-					break;
-				}
-				case 5:
-				{
-					stopAllMusic();
-					MusicPlay("006", "repeat");
-					break;
-				}
-				}
 			}
 		}
 		else if(g_abKeyPressed[K_V])

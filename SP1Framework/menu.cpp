@@ -15,7 +15,7 @@ void MenuEvent::MenuRender(unsigned short* OptionsDataArray, std::vector<SItem> 
 {
 	if (shMenuState > 0)
 	{
-		tipIndex = rand() % 5;
+		tipIndex = rand() % 6;
 	}
 	renderMenuControls();
 	switch (shMenuState)
@@ -214,6 +214,11 @@ void MenuEvent::renderMenu()
 	case 4:
 	{
 		this->mainConsole->writeToBuffer(c, "~Symmetry is key~", 0x0f);
+		break;
+	}
+	case 5:
+	{
+		this->mainConsole->writeToBuffer(c, "~Don't forget to spend your score! 90% is lost upon game start~", 0x0f);
 		break;
 	}
 	}

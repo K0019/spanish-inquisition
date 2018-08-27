@@ -305,13 +305,13 @@ void menuNav()
 	{
 		g_mEvent.sh_cursSel++;
 		g_mEvent.r_menucurspos.Y++;
-		g_adBounceTime[K_SHOOTDOWN] = g_dElapsedTime + 0.25;
+		g_adBounceTime[K_SHOOTDOWN] = g_dElapsedTime + 0.15;
 	}
 	else if (g_abKeyPressed[K_SHOOTUP] && g_mEvent.sh_cursSel > 0 && g_adBounceTime[K_SHOOTUP] < g_dElapsedTime && g_mEvent.shMenuState == 0)
 	{
 		g_mEvent.sh_cursSel--;
 		g_mEvent.r_menucurspos.Y--;
-		g_adBounceTime[K_SHOOTUP] = g_dElapsedTime + 0.25;
+		g_adBounceTime[K_SHOOTUP] = g_dElapsedTime + 0.15;
 	}
 	if (g_abKeyPressed[K_ENTER] && !g_mEvent.bHasPressedButton && g_mEvent.shMenuState == 0 && g_adBounceTime[K_ENTER] < g_dElapsedTime)
 	{
@@ -361,12 +361,12 @@ void submenuNav()
 		if (g_abKeyPressed[K_SHOOTLEFT] && g_mEvent.sh_shopItemSel > 0 && g_adBounceTime[K_SHOOTLEFT] < g_dElapsedTime)
 		{
 			g_mEvent.sh_shopItemSel--;
-			g_adBounceTime[K_SHOOTLEFT] = g_dElapsedTime + 0.25;
+			g_adBounceTime[K_SHOOTLEFT] = g_dElapsedTime + 0.15;
 		}
 		if (g_abKeyPressed[K_SHOOTRIGHT] && g_mEvent.sh_shopItemSel < 6 && g_adBounceTime[K_SHOOTRIGHT] < g_dElapsedTime)
 		{
 			g_mEvent.sh_shopItemSel++;
-			g_adBounceTime[K_SHOOTRIGHT] = g_dElapsedTime + 0.25;
+			g_adBounceTime[K_SHOOTRIGHT] = g_dElapsedTime + 0.15;
 		}
 		if (g_abKeyPressed[K_ENTER] && g_adBounceTime[K_ENTER] < g_dElapsedTime)
 		{
@@ -383,7 +383,7 @@ void submenuNav()
 						loadGame();
 					}
 				}
-				g_adBounceTime[K_ENTER] = g_dElapsedTime + 0.25;
+				g_adBounceTime[K_ENTER] = g_dElapsedTime + 0.15;
 			}
 		}
 		else
@@ -399,12 +399,12 @@ void submenuNav()
 		if (g_abKeyPressed[K_SHOOTUP] && g_adBounceTime[K_SHOOTUP] < g_dElapsedTime && g_mEvent.sh_optionSel > 0)
 		{
 			g_mEvent.sh_optionSel--;
-			g_adBounceTime[K_SHOOTUP] = g_dElapsedTime + 0.25;
+			g_adBounceTime[K_SHOOTUP] = g_dElapsedTime + 0.15;
 		}
 		if (g_abKeyPressed[K_SHOOTDOWN] && g_adBounceTime[K_SHOOTDOWN] < g_dElapsedTime && g_mEvent.sh_optionSel < 3)
 		{
 			g_mEvent.sh_optionSel++;
-			g_adBounceTime[K_SHOOTDOWN] = g_dElapsedTime + 0.25;
+			g_adBounceTime[K_SHOOTDOWN] = g_dElapsedTime + 0.15;
 		}
 		if (g_abKeyPressed[K_SHOOTLEFT] && g_adBounceTime[K_SHOOTLEFT] < g_dElapsedTime)
 		{
@@ -432,7 +432,7 @@ void submenuNav()
 			{
 				g_mEvent.bMinimap = !g_mEvent.bMinimap;
 			}
-			g_adBounceTime[K_SHOOTLEFT] = g_dElapsedTime + 0.25;
+			g_adBounceTime[K_SHOOTLEFT] = g_dElapsedTime + 0.15;
 
 		}
 		if (g_abKeyPressed[K_SHOOTRIGHT] && g_adBounceTime[K_SHOOTRIGHT] < g_dElapsedTime)
@@ -461,7 +461,7 @@ void submenuNav()
 			{
 				g_mEvent.bMinimap = !g_mEvent.bMinimap;
 			}
-			g_adBounceTime[K_SHOOTRIGHT] = g_dElapsedTime + 0.25;
+			g_adBounceTime[K_SHOOTRIGHT] = g_dElapsedTime + 0.15;
 
 		}
 		if (g_abKeyPressed[K_ENTER] && g_adBounceTime[K_ENTER] < g_dElapsedTime && g_mEvent.sh_optionSel == 3)
@@ -933,7 +933,7 @@ void pauseScreenNav()
 			g_bQuitGame = true;
 			break;
 		}
-		g_adBounceTime[K_ENTER] = g_dElapsedTime + 0.25;
+		g_adBounceTime[K_ENTER] = g_dElapsedTime + 0.15;
 	}
 }
 
@@ -1569,7 +1569,6 @@ void renderStat()
 	for (auto& item : g_sEntities.g_sChar.m_sPlayerItems.m_vItemNameList)
 	{
 		int index;
-		int weaponLevel;
 		if (item == "Heaven Cracker")
 		{
 			ss.str("");

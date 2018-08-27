@@ -211,9 +211,6 @@
     <Text Include="..\res\MapData\RoomData\NormalRooms\04.txt">
       <Filter>Resource Files\MapData\RoomData\NormalRooms</Filter>
     </Text>
-    <Text Include="..\res\MapData\RoomData\NormalRooms\05.txt">
-      <Filter>Resource Files\MapData\RoomData\NormalRooms</Filter>
-    </Text>
     <Text Include="..\res\MapData\RoomData\NormalRooms\07.txt">
       <Filter>Resource Files\MapData\RoomData\NormalRooms</Filter>
     </Text>
@@ -330,6 +327,9 @@
     </Text>
     <Text Include="..\res\MapData\RoomData\NormalRooms\31.txt">
       <Filter>Resource Files\MapData\RoomData\NormalRooms</Filter>
+    </Text>
+    <Text Include="..\res\MapData\RoomData\ItemRooms\05.txt">
+      <Filter>Resource Files\MapData\RoomData\ItemRooms</Filter>
     </Text>
   </ItemGroup>
 </Project>

@@ -73,6 +73,7 @@ void detectPauseMenuProc(); /* Made by: Yan Quan */
 void pauseScreen(); /* Made by: Yan Quan */
 void pauseScreenNav(); /* Made by: Yan Quan */
 void winWait();
+void checkWindowFocussed();
 void changedRoomUpdate(); /* Made by: Kendrick */ // Stuff to do when the player exits current room
 bool loadEnemiesFromRoom(); /* Made by: Kendrick */ // Load all enemies from the room that the player entered
 bool loadBoss(); /* Made by: Kendrick */ // Load the boss into the exit room, if player is in floor 5

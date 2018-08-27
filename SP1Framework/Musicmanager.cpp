@@ -27,7 +27,19 @@ void MusicInit()
 	// mpegvideo is Audio for MP3 (*.mp3) [VOLUME WILL NOT WORK IS WAVEAUDIO IS USED (*.wav)!!]
 	// volume is a string eg "0" - "100"
 	// &loaded is a MLoaded Struct.
-	MusicLoad("test.wav", "mpegvideo", "", "40", &loaded);
+	MusicLoad("./MusicManager/01Heart.mp3", "mpegvideo", "001", "40", &loaded);
+	LoadedFiles.push_back(loaded);
+	MusicLoad("./MusicManager/02Alone.mp3", "mpegvideo", "002", "40", &loaded);
+	LoadedFiles.push_back(loaded);
+	MusicLoad("./MusicManager/03IfISeeYouAgain.mp3", "mpegvideo", "003", "40", &loaded);
+	LoadedFiles.push_back(loaded);
+	MusicLoad("./MusicManager/04NightTheme.mp3", "mpegvideo", "004", "40", &loaded);
+	LoadedFiles.push_back(loaded);
+	MusicLoad("./MusicManager/05RacingHeart.mp3", "mpegvideo", "005", "40", &loaded);
+	LoadedFiles.push_back(loaded);
+	MusicLoad("./MusicManager/06Delta(Remaster).mp3", "mpegvideo", "006", "40", &loaded);
+	LoadedFiles.push_back(loaded);
+	MusicLoad("./MusicManager/07FromUpHere.mp3", "mpegvideo", "007", "40", &loaded);
 	LoadedFiles.push_back(loaded);
 }
 bool MusicLoad(std::string file, std::string type, std::string alias, std::string initalvolume, MLoaded* Returnfile)
@@ -75,4 +87,15 @@ bool MusicStop(std::string alias)
 		return false;
 	else
 		return true;
+}
+
+void stopAllMusic()
+{
+	MusicStop("001");
+	MusicStop("002");
+	MusicStop("003");
+	MusicStop("004");
+	MusicStop("005");
+	MusicStop("006");
+	MusicStop("007");
 }

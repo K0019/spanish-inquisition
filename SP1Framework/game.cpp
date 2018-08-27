@@ -16,6 +16,7 @@ bool	g_abKeyPressed[K_COUNT];
 COORD	r_cRenderOffset, r_cTargetRenderOffset; // Used for level rendering, tile coordinates
 double r_dRenderTime, r_dTargetRenderTime;
 CStopWatch * r_cswRenderTimer;
+bool g_bMusicInitialising;
 
 int		r_iMoveDirection;
 double	r_dMoveTime;
@@ -96,7 +97,8 @@ void init(void)
 	g_mEvent.r_menucurspos.Y = g_Console.getConsoleSize().Y / 10 * 8 - 6;
 	g_mEvent.r_pausecurspos.X = g_Console.getConsoleSize().X / 10 - 2;
 	g_mEvent.r_pausecurspos.Y = g_Console.getConsoleSize().Y / 5;
-	g_sLevel.floor = 1;
+	g_sLevel.floor = 5;
+
 	//if (DEBUG)
 	//{
 	//	g_sLevel.floor = 5;
@@ -261,9 +263,18 @@ void saveGame()
 
 void splashScreenWait()		// waits for time to pass in splash screen
 {
+	if (!g_bMusicInitialising)
+	{
+		g_bMusicInitialising = true;
+		MusicInit();
+	}
 	//processUserInput(); // checks if you should change states or do something else with the game, e.g. pause, exit
 	if (g_dAccurateElapsedTime > 3.0) // wait for 3 seconds to switch to game mode, else do nothing
+	{
 		g_eGameState = S_MENU;
+		stopAllMusic();
+		MusicPlay("001", "repeat");
+	}
 }
 
 void gameplay()            // gameplay logic
@@ -322,6 +333,39 @@ void menuNav()
 			g_sEntities.g_sChar.m_iGlobalScore = unsigned int(double(g_sEntities.g_sChar.m_iGlobalScore) * 0.10);
 			saveGame();
 			g_eGameState = S_GAME;
+			switch (g_sLevel.floor)
+			{
+			case 1:
+			{
+				stopAllMusic();
+				MusicPlay("002", "repeat");
+				break;
+			}
+			case 2:
+			{
+				stopAllMusic();
+				MusicPlay("003", "repeat");
+				break;
+			}
+			case 3:
+			{
+				stopAllMusic();
+				MusicPlay("004", "repeat");
+				break;
+			}
+			case 4:
+			{
+				stopAllMusic();
+				MusicPlay("005", "repeat");
+				break;
+			}
+			case 5:
+			{
+				stopAllMusic();
+				MusicPlay("006", "repeat");
+				break;
+			}
+			}
 			break;
 		case 1:
 			g_mEvent.shMenuState = 1;
@@ -748,6 +792,34 @@ void controlPlayer()
 					resetLevel(g_sLevel.floor);
 					g_sEntities.g_sChar.m_iPlayerScore += 50; //Give player 50 score for completing a level
 					bSomethingHappened = true;
+
+					switch (g_sLevel.floor)
+					{
+					case 2: 
+					{
+						stopAllMusic();
+						MusicPlay("003", "repeat");
+						break;
+					}
+					case 3:
+					{
+						stopAllMusic();
+						MusicPlay("004", "repeat");
+						break;
+					}
+					case 4:
+					{
+						stopAllMusic();
+						MusicPlay("005", "repeat");
+						break;
+					}
+					case 5:
+					{
+						stopAllMusic();
+						MusicPlay("006", "repeat");
+						break;
+					}
+					}
 				}
 				break;
 			}
@@ -1284,7 +1356,6 @@ void renderLevel()
 	COORD c;
 	c.X = 2;
 	c.Y = 1;
-
 	for (int row = r_cRenderOffset.X; row < r_cRenderOffset.X + ROOM_X + 2; row++)
 	{
 		for (int column = r_cRenderOffset.Y; column < r_cRenderOffset.Y + ROOM_Y + 2; column++)
@@ -1910,6 +1981,8 @@ bool loadBoss()
 {
 	if (g_sLevel.floor == 5 && !g_sEntities.g_sChar.m_bDefeatedBoss && (g_sEntities.g_sChar.m_cLocation.X - 1) / (ROOM_X + 2) == g_sLevel.exitRoom.X && (g_sEntities.g_sChar.m_cLocation.Y - 1) / (ROOM_Y + 2) == g_sLevel.exitRoom.Y)
 	{
+		stopAllMusic();
+		MusicPlay("007", "repeat");
 		COORD c;
 		c.X = 4;
 		c.Y = 4;
@@ -1950,19 +2023,54 @@ void CharacterDeath()
 		if (g_abKeyPressed[K_SPACE])
 		{
 			g_eRestartGame = true;
-		}
 			if (g_eRestartGame == true)
 			{
 				g_sEntities.g_sChar.m_iGlobalScore += unsigned int(double(g_sEntities.g_sChar.m_iPlayerScore) * 0.10);
 				saveGame();
 				init();
+				switch (g_sLevel.floor)
+				{
+				case 1:
+				{
+					stopAllMusic();
+					MusicPlay("002", "repeat");
+					break;
+				}
+				case 2:
+				{
+					stopAllMusic();
+					MusicPlay("003", "repeat");
+					break;
+				}
+				case 3:
+				{
+					stopAllMusic();
+					MusicPlay("004", "repeat");
+					break;
+				}
+				case 4:
+				{
+					stopAllMusic();
+					MusicPlay("005", "repeat");
+					break;
+				}
+				case 5:
+				{
+					stopAllMusic();
+					MusicPlay("006", "repeat");
+					break;
+				}
+				}
 			}
+		}
 		else if(g_abKeyPressed[K_V])
 		{
 			g_sEntities.g_sChar.m_iGlobalScore += g_sEntities.g_sChar.m_iPlayerScore;
 			saveGame();
 			init();
+			stopAllMusic();
 			g_eGameState = S_MENU;
+			MusicPlay("001", "repeat");
 		}
 		else if (g_abKeyPressed[K_ESCAPE])
 		{

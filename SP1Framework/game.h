@@ -52,6 +52,7 @@ void getInput    ( void ); /* FRAMEWORK */ // get input from player
 void update      ( CStopWatch * timer, double missedTime ); /* FRAMEWORK */ // update the game and the state of the game
 void render      ( CStopWatch * timer ); /* FRAMEWORK */ // renders the current state of the game to the console
 void shutdown    ( void ); /* FRAMEWORK */ // do clean up, free memory
+
 /*
 	THE UPDATE FUNCTIONS
 */

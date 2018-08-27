@@ -11,6 +11,7 @@
 #include "fileio.h"
 #include "menu.h"
 #include "definitions.h"
+#include "MusicManager.h"
 #include <string>
 #include <cstdlib>
 #include <vector>

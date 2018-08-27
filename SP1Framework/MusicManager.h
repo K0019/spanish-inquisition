@@ -20,4 +20,5 @@ struct MLoaded
 bool MusicLoad(std::string file, std::string type, std::string alias, std::string initalvolume, MLoaded* Returnfile);
 bool MusicPlay(std::string alias, std::string arguments);
 bool MusicStop(std::string alias);
+void stopAllMusic();
 #endif // !MUSIC_MAN

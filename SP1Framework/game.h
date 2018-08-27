@@ -43,6 +43,7 @@ enum EGAMESTATES /* FRAMEWORK */
     S_SPLASHSCREEN,
 	S_MENU,
     S_GAME,
+	S_WIN,
 	S_PAUSED,
     S_COUNT
 };
@@ -52,7 +53,6 @@ void getInput    ( void ); /* FRAMEWORK */ // get input from player
 void update      ( CStopWatch * timer, double missedTime ); /* FRAMEWORK */ // update the game and the state of the game
 void render      ( CStopWatch * timer ); /* FRAMEWORK */ // renders the current state of the game to the console
 void shutdown    ( void ); /* FRAMEWORK */ // do clean up, free memory
-
 /*
 	THE UPDATE FUNCTIONS
 */
@@ -72,6 +72,7 @@ void doomButton(); /* Made by: Yan Quan */ // heehee
 void detectPauseMenuProc(); /* Made by: Yan Quan */
 void pauseScreen(); /* Made by: Yan Quan */
 void pauseScreenNav(); /* Made by: Yan Quan */
+void winWait();
 void changedRoomUpdate(); /* Made by: Kendrick */ // Stuff to do when the player exits current room
 bool loadEnemiesFromRoom(); /* Made by: Kendrick */ // Load all enemies from the room that the player entered
 bool loadBoss(); /* Made by: Kendrick */ // Load the boss into the exit room, if player is in floor 5
@@ -90,6 +91,8 @@ void renderGame(); /* FRAMEWORK */ // renders the game stuff
 void renderPause(); /* Made by: Yan Quan */
 void renderPauseCursor(); /* Made by: Yan Quan */
 void renderPauseMenu(); /* Made by: Yan Quan */
+void renderWin();
+void renderWonScore();
 void renderScore(); /* Made by: Winston */ // render the current score from
 void renderCharacter(); /* Modified by: Kendrick */ // renders the character into the buffer
 void renderFramerate(); /* Modified by: Kendrick */ // renders debug information, frame rate, elapsed time, etc

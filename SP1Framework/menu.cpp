@@ -443,15 +443,18 @@ void MenuEvent::renderItemSelected(std::vector<SItem> * itemList)
 	COORD c;
 	c.Y = 4;
 	c.X = 2;
+
 	std::ostringstream currTierText;
-	currTierText << "Current Tier (Tier " << (*itemList)[sh_shopItemSel].m_iWeaponLevel << ")";
+	currTierText << "Current Tier (Tier " << (*itemList)[sh_shopItemSel].m_iWeaponLevel + 1 << ")";
 	this->mainConsole->writeToBuffer(c, currTierText.str());
 	c.X = this->mainConsole->getConsoleSize().X >> 1;
+
 	std::ostringstream nextTierText;
-	nextTierText << "Next Tier " << (((*itemList)[sh_shopItemSel].m_iWeaponLevel) > 3 ? "N/A" : "(Tier ") << (*itemList)[sh_shopItemSel].m_iWeaponLevel + 1 << ")";
+	nextTierText << "Next Tier " << (((*itemList)[sh_shopItemSel].m_iWeaponLevel) > 3 ? "N/A" : "(Tier ") << (*itemList)[sh_shopItemSel].m_iWeaponLevel + 2 << ")";
 	this->mainConsole->writeToBuffer(c, nextTierText.str());
 	c.X = this->mainConsole->getConsoleSize().X - (SHORT)strlen("Cost: ") - (SHORT)std::to_string((*itemList)[sh_shopItemSel].m_iWeaponCost).length() - 5;
 	c.Y = this->mainConsole->getConsoleSize().Y - 4;
+
 	std::ostringstream cost;
 	cost.str("");
 	cost << "Cost: " << (*itemList)[sh_shopItemSel].m_iWeaponTotalCost;

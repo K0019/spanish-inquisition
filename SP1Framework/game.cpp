@@ -795,9 +795,10 @@ void controlPlayer()
 			{
 				if (++g_sLevel.floor > FINAL_FLOOR)
 				{
-					g_dWinScreenTime = g_dElapsedTime + 8.00f;
+					g_dWinScreenTime = g_dElapsedTime + 3.00f;
 					g_sEntities.g_sChar.m_iGlobalScore += g_sEntities.g_sChar.m_iPlayerScore;
 					saveGame();
+					init();
 					g_eGameState = S_WIN;
 				}
 				else
@@ -1027,7 +1028,7 @@ void pauseScreenNav()
 
 void winWait()
 {
-	if (g_dWinScreenTime < g_dElapsedTime)
+	if (g_dWinScreenTime < g_dAccurateElapsedTime)
 	{
 		g_eGameState = S_MENU;
 	}

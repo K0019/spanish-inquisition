@@ -115,6 +115,40 @@ void init(void)
 	g_sEntities.g_sChar.m_sLastItem = "";
 	g_sEntities.g_sChar.m_sPlayerItems.ItemCount = 0;
 	g_sEntities.g_sChar.m_sPlayerItems.m_vItemsObtained[0];
+
+	switch (g_sLevel.floor)
+	{
+	case 1:
+	{
+		stopAllMusic();
+		MusicPlay("002", "repeat");
+		break;
+	}
+	case 2:
+	{
+		stopAllMusic();
+		MusicPlay("003", "repeat");
+		break;
+	}
+	case 3:
+	{
+		stopAllMusic();
+		MusicPlay("004", "repeat");
+		break;
+	}
+	case 4:
+	{
+		stopAllMusic();
+		MusicPlay("005", "repeat");
+		break;
+	}
+	case 5:
+	{
+		stopAllMusic();
+		MusicPlay("006", "repeat");
+		break;
+	}
+	}
 }
 //--------------------------------------------------------------
 // Purpose  : Reset before exiting the program
@@ -761,9 +795,10 @@ void controlPlayer()
 			{
 				if (++g_sLevel.floor > FINAL_FLOOR)
 				{
-					g_dWinScreenTime = g_dElapsedTime + 8.00f;
+					g_dWinScreenTime = g_dElapsedTime + 3.00f;
 					g_sEntities.g_sChar.m_iGlobalScore += g_sEntities.g_sChar.m_iPlayerScore;
 					saveGame();
+					init();
 					g_eGameState = S_WIN;
 				}
 				else
@@ -979,7 +1014,9 @@ void pauseScreenNav()
 			g_mEvent.sh_pauseSel = 0;
 			g_mEvent.bPausedGame = false;
 			g_mEvent.bPreventAccident = true;
+			stopAllMusic();
 			g_eGameState = S_MENU;
+			MusicPlay("001", "repeat");
 			break;
 		case 3:
 			g_bQuitGame = true;
@@ -991,7 +1028,7 @@ void pauseScreenNav()
 
 void winWait()
 {
-	if (g_dWinScreenTime < g_dElapsedTime)
+	if (g_dWinScreenTime < g_dAccurateElapsedTime)
 	{
 		g_eGameState = S_MENU;
 	}
@@ -1719,43 +1756,43 @@ void renderStat()
 		{
 			ss.str("");
 			index = 0;
-			ss << item << " Level: " << g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[0].m_iWeaponLevel + 1;
+			ss << item << " Tier: " << g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[0].m_iWeaponLevel + 1;
 		}
 		else if (item == "Enchanted Sword")
 		{
 			ss.str("");
 			index = 0;
-			ss << item << " Level: " << g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[1].m_iWeaponLevel + 1;
+			ss << item << " Tier: " << g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[1].m_iWeaponLevel + 1;
 		}
 		else if (item == "Health Potion")
 		{
 			ss.str("");
 			index = 0;
-			ss << item << " Level: " << g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[2].m_iWeaponLevel + 1;
+			ss << item << " Tier: " << g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[2].m_iWeaponLevel + 1;
 		}
 		else if (item == "Glass Canon")
 		{
 			ss.str("");
 			index = 0;
-			ss << item << " Level: " << g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[3].m_iWeaponLevel + 1;
+			ss << item << " Tier: " << g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[3].m_iWeaponLevel + 1;
 		}
 		else if (item == "Magic Potion")
 		{
 			ss.str("");
 			index = 0;
-			ss << item << " Level: " << g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_iWeaponLevel + 1;
+			ss << item << " Tier: " << g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_iWeaponLevel + 1;
 		}
 		else if (item == "Bonus!")
 		{
 			ss.str("");
 			index = 0;
-			ss << item << " Level: " << g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[5].m_iWeaponLevel + 1;
+			ss << item << " Tier: " << g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[5].m_iWeaponLevel + 1;
 		}
 		else if (item == "Blue Feather")
 		{
 			ss.str("");
 			index = 0;
-			ss << item << " Level: " << g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_iWeaponLevel + 1;
+			ss << item << " Tier: " << g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_iWeaponLevel;
 		}
 		c.Y++;
 		g_Console.writeToBuffer(c, ss.str());
@@ -2102,39 +2139,6 @@ void CharacterDeath()
 				g_sEntities.g_sChar.m_iGlobalScore += unsigned int(double(g_sEntities.g_sChar.m_iPlayerScore) * 0.10);
 				saveGame();
 				init();
-				switch (g_sLevel.floor)
-				{
-				case 1:
-				{
-					stopAllMusic();
-					MusicPlay("002", "repeat");
-					break;
-				}
-				case 2:
-				{
-					stopAllMusic();
-					MusicPlay("003", "repeat");
-					break;
-				}
-				case 3:
-				{
-					stopAllMusic();
-					MusicPlay("004", "repeat");
-					break;
-				}
-				case 4:
-				{
-					stopAllMusic();
-					MusicPlay("005", "repeat");
-					break;
-				}
-				case 5:
-				{
-					stopAllMusic();
-					MusicPlay("006", "repeat");
-					break;
-				}
-				}
 			}
 		}
 		else if(g_abKeyPressed[K_V])

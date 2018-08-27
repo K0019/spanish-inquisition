@@ -21,7 +21,7 @@ COORD SGameChar::getRealCoords()
 	while (c.Y > ROOM_Y + 2)
 		c.Y -= (ROOM_Y + 2);
 	std::swap(c.X, c.Y);
-	c.X = (c.X << 2) - 3;
+	c.X = (c.X << 2) - 2;
 	c.Y = (c.Y << 1) - 1;
 	return c;
 }

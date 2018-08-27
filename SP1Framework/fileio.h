@@ -1,5 +1,7 @@
 #pragma once
 
+/* MADE BY: Yan Quan */
+
 #ifndef _FILEIO_H
 #define _FILEIO_H
 #include <fstream>
@@ -11,11 +13,11 @@ void g_LoadFromSave(unsigned int* SaveDataArray);
 void g_SaveToSave(unsigned int* SaveDataArray);
 
 // Loads from Floor data of index in res/MapData/FloorData/***/Floor<index>.txt
-void g_LoadFromFloor(short FloorNumber, std::vector<std::string> *selectionAvailable);
-void g_LoadFromFloorItem(short FloorNumber, std::vector<std::string> * selectionAvailable);
+void g_LoadFromFloor(short FloorNumber, std::vector<std::string> *selectionAvailable); /* MADE BY: Kendrick */
+void g_LoadFromFloorItem(short FloorNumber, std::vector<std::string> * selectionAvailable); /* MADE BY: Kendrick */
 // Loads from room data of index in red/MapData/RoomData/***/<index>.txt
-void g_LoadFromRoom(std::string *RoomNumber, char (*Level)[(ROOM_X + 2) * GRID_X + 2][(ROOM_Y + 2) * GRID_Y + 2], COORD gridCoords);
-void g_LoadFromItemRoom(std::string *RoomNumber, char(*Level)[(ROOM_X + 2) * GRID_X + 2][(ROOM_Y + 2) * GRID_Y + 2], COORD gridCoords);
+void g_LoadFromRoom(std::string *RoomNumber, char (*Level)[(ROOM_X + 2) * GRID_X + 2][(ROOM_Y + 2) * GRID_Y + 2], COORD gridCoords); /* MADE BY: Kendrick */
+void g_LoadFromItemRoom(std::string *RoomNumber, char(*Level)[(ROOM_X + 2) * GRID_X + 2][(ROOM_Y + 2) * GRID_Y + 2], COORD gridCoords); /* MADE BY: Kendrick */
 
 void g_LoadOptions(unsigned short* OptionsDataArray);
 void g_SaveOptions(unsigned short* OptionsDataArray);

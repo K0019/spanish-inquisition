@@ -1,5 +1,7 @@
 // This is the main file to hold everthing together
 
+/* FRAMEWORK, Modified by: Kendrick */
+
 #include "Framework\timer.h"
 #include "game.h"
 
@@ -29,7 +31,7 @@ int main( void )
 // Input    : void
 // Output   : void
 //--------------------------------------------------------------
-void mainLoop( void )
+void mainLoop( void ) /* Modified by: Kendrick */
 {
 	g_Timer.startTimer();    // Start timer to calculate how long it takes to render this frame
 	double updateTime = g_Timer.getElapsedTime();

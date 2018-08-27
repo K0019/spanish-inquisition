@@ -10,12 +10,14 @@ double	g_dElapsedTime;
 double	g_dDeltaTime;
 double	g_dWinScreenTime;
 double	g_dTrappedTime;
+double	g_dHPIndicateUntilTime = 0.0;
 double	g_dAccurateElapsedTime;
 double	r_dRenderTime, r_dTargetRenderTime;
 int		g_iCurrentFrameCount, g_iLastFrameCount, g_iLastMeasuredSecond;
 bool	g_abKeyPressed[K_COUNT];
 COORD	r_cRenderOffset, r_cTargetRenderOffset; // Used for level rendering, tile coordinates
 CStopWatch * r_cswRenderTimer;
+bool g_bMusicInitialising;
 
 int		r_iMoveDirection;
 double	r_dMoveTime;
@@ -70,13 +72,15 @@ void init(void)
 	g_sLevel.playerStartRoom.X = GRID_X >> 1;
 	g_sLevel.playerStartRoom.Y = GRID_Y >> 1;
 	g_sEntities.g_sChar.m_iPlayerScore = 0;
-	g_sEntities.g_sChar.m_iPlayerHealth = g_sEntities.g_sChar.m_iMaxHealth = 10;
+	g_sEntities.g_sChar.m_iPlayerHealth = g_sEntities.g_sChar.m_iMaxHealth = g_sEntities.g_sChar.m_iPreviousHealth = 10;
 	g_sEntities.g_sChar.m_iPlayerDamage = 3;
+	g_sEntities.g_sChar.m_dVelocity = SHOOTVELOCITY;
 	for (int i = 0; i < 7; i++) //for loop to initialise all items to false, so player starts with no items
 	{
 		g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[i].m_bHasWeapon = false;
 		g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[i].m_iWeaponTotalCost = g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[i].m_iWeaponCost + (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[i].m_iWeaponIncrement * g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[i].m_iWeaponLevel);
 	}
+	g_sEntities.g_sChar.m_sPlayerItems.m_vItemNameList.clear();
 	g_sEntities.g_sChar.m_cRoom = g_sLevel.playerStartRoom;
 	//if (DEBUG)
 	//{
@@ -94,10 +98,6 @@ void init(void)
 	g_mEvent.r_menucurspos.Y = g_Console.getConsoleSize().Y / 10 * 8 - 6;
 	g_mEvent.r_pausecurspos.X = g_Console.getConsoleSize().X / 10 - 2;
 	g_mEvent.r_pausecurspos.Y = g_Console.getConsoleSize().Y / 5;
-	g_sLevel.floor = 5;
-	g_sEntities.g_sChar.m_iPlayerHealth = 10000;
-	g_sEntities.g_sChar.m_iMaxHealth = 10000;
-	g_sEntities.g_sChar.m_iPlayerDamage = 500;
 	//if (DEBUG)
 	//{
 	//	g_sLevel.floor = 5;
@@ -265,9 +265,18 @@ void saveGame()
 
 void splashScreenWait()		// waits for time to pass in splash screen
 {
+	if (!g_bMusicInitialising)
+	{
+		g_bMusicInitialising = true;
+		MusicInit();
+	}
 	//processUserInput(); // checks if you should change states or do something else with the game, e.g. pause, exit
 	if (g_dAccurateElapsedTime > 3.0) // wait for 3 seconds to switch to game mode, else do nothing
+	{
 		g_eGameState = S_MENU;
+		stopAllMusic();
+		MusicPlay("001", "repeat");
+	}
 }
 
 void gameplay()            // gameplay logic
@@ -311,13 +320,13 @@ void menuNav()
 	{
 		g_mEvent.sh_cursSel++;
 		g_mEvent.r_menucurspos.Y++;
-		g_adBounceTime[K_SHOOTDOWN] = g_dElapsedTime + 0.25;
+		g_adBounceTime[K_SHOOTDOWN] = g_dElapsedTime + 0.15;
 	}
 	else if (g_abKeyPressed[K_SHOOTUP] && g_mEvent.sh_cursSel > 0 && g_adBounceTime[K_SHOOTUP] < g_dElapsedTime && g_mEvent.shMenuState == 0)
 	{
 		g_mEvent.sh_cursSel--;
 		g_mEvent.r_menucurspos.Y--;
-		g_adBounceTime[K_SHOOTUP] = g_dElapsedTime + 0.25;
+		g_adBounceTime[K_SHOOTUP] = g_dElapsedTime + 0.15;
 	}
 	if (g_abKeyPressed[K_ENTER] && !g_mEvent.bHasPressedButton && g_mEvent.shMenuState == 0 && g_adBounceTime[K_ENTER] < g_dElapsedTime)
 	{
@@ -327,6 +336,39 @@ void menuNav()
 			g_sEntities.g_sChar.m_iGlobalScore = unsigned int(double(g_sEntities.g_sChar.m_iGlobalScore) * 0.10);
 			saveGame();
 			g_eGameState = S_GAME;
+			switch (g_sLevel.floor)
+			{
+			case 1:
+			{
+				stopAllMusic();
+				MusicPlay("002", "repeat");
+				break;
+			}
+			case 2:
+			{
+				stopAllMusic();
+				MusicPlay("003", "repeat");
+				break;
+			}
+			case 3:
+			{
+				stopAllMusic();
+				MusicPlay("004", "repeat");
+				break;
+			}
+			case 4:
+			{
+				stopAllMusic();
+				MusicPlay("005", "repeat");
+				break;
+			}
+			case 5:
+			{
+				stopAllMusic();
+				MusicPlay("006", "repeat");
+				break;
+			}
+			}
 			break;
 		case 1:
 			g_mEvent.shMenuState = 1;
@@ -367,12 +409,12 @@ void submenuNav()
 		if (g_abKeyPressed[K_SHOOTLEFT] && g_mEvent.sh_shopItemSel > 0 && g_adBounceTime[K_SHOOTLEFT] < g_dElapsedTime)
 		{
 			g_mEvent.sh_shopItemSel--;
-			g_adBounceTime[K_SHOOTLEFT] = g_dElapsedTime + 0.25;
+			g_adBounceTime[K_SHOOTLEFT] = g_dElapsedTime + 0.15;
 		}
 		if (g_abKeyPressed[K_SHOOTRIGHT] && g_mEvent.sh_shopItemSel < 6 && g_adBounceTime[K_SHOOTRIGHT] < g_dElapsedTime)
 		{
 			g_mEvent.sh_shopItemSel++;
-			g_adBounceTime[K_SHOOTRIGHT] = g_dElapsedTime + 0.25;
+			g_adBounceTime[K_SHOOTRIGHT] = g_dElapsedTime + 0.15;
 		}
 		if (g_abKeyPressed[K_ENTER] && g_adBounceTime[K_ENTER] < g_dElapsedTime)
 		{
@@ -389,7 +431,7 @@ void submenuNav()
 						loadGame();
 					}
 				}
-				g_adBounceTime[K_ENTER] = g_dElapsedTime + 0.25;
+				g_adBounceTime[K_ENTER] = g_dElapsedTime + 0.15;
 			}
 		}
 		else
@@ -405,12 +447,12 @@ void submenuNav()
 		if (g_abKeyPressed[K_SHOOTUP] && g_adBounceTime[K_SHOOTUP] < g_dElapsedTime && g_mEvent.sh_optionSel > 0)
 		{
 			g_mEvent.sh_optionSel--;
-			g_adBounceTime[K_SHOOTUP] = g_dElapsedTime + 0.25;
+			g_adBounceTime[K_SHOOTUP] = g_dElapsedTime + 0.15;
 		}
 		if (g_abKeyPressed[K_SHOOTDOWN] && g_adBounceTime[K_SHOOTDOWN] < g_dElapsedTime && g_mEvent.sh_optionSel < 3)
 		{
 			g_mEvent.sh_optionSel++;
-			g_adBounceTime[K_SHOOTDOWN] = g_dElapsedTime + 0.25;
+			g_adBounceTime[K_SHOOTDOWN] = g_dElapsedTime + 0.15;
 		}
 		if (g_abKeyPressed[K_SHOOTLEFT] && g_adBounceTime[K_SHOOTLEFT] < g_dElapsedTime)
 		{
@@ -438,7 +480,7 @@ void submenuNav()
 			{
 				g_mEvent.bMinimap = !g_mEvent.bMinimap;
 			}
-			g_adBounceTime[K_SHOOTLEFT] = g_dElapsedTime + 0.25;
+			g_adBounceTime[K_SHOOTLEFT] = g_dElapsedTime + 0.15;
 
 		}
 		if (g_abKeyPressed[K_SHOOTRIGHT] && g_adBounceTime[K_SHOOTRIGHT] < g_dElapsedTime)
@@ -467,7 +509,7 @@ void submenuNav()
 			{
 				g_mEvent.bMinimap = !g_mEvent.bMinimap;
 			}
-			g_adBounceTime[K_SHOOTRIGHT] = g_dElapsedTime + 0.25;
+			g_adBounceTime[K_SHOOTRIGHT] = g_dElapsedTime + 0.15;
 
 		}
 		if (g_abKeyPressed[K_ENTER] && g_adBounceTime[K_ENTER] < g_dElapsedTime && g_mEvent.sh_optionSel == 3)
@@ -728,6 +770,34 @@ void controlPlayer()
 					resetLevel(g_sLevel.floor);
 					g_sEntities.g_sChar.m_iPlayerScore += 50; //Give player 50 score for completing a level
 					bSomethingHappened = true;
+
+					switch (g_sLevel.floor)
+					{
+					case 2: 
+					{
+						stopAllMusic();
+						MusicPlay("003", "repeat");
+						break;
+					}
+					case 3:
+					{
+						stopAllMusic();
+						MusicPlay("004", "repeat");
+						break;
+					}
+					case 4:
+					{
+						stopAllMusic();
+						MusicPlay("005", "repeat");
+						break;
+					}
+					case 5:
+					{
+						stopAllMusic();
+						MusicPlay("006", "repeat");
+						break;
+					}
+					}
 				}
 				break;
 			}
@@ -914,7 +984,7 @@ void pauseScreenNav()
 			g_bQuitGame = true;
 			break;
 		}
-		g_adBounceTime[K_ENTER] = g_dElapsedTime + 0.25;
+		g_adBounceTime[K_ENTER] = g_dElapsedTime + 0.15;
 	}
 }
 
@@ -999,6 +1069,7 @@ void renderGame()
 	renderPellets();
 	renderMiniMap();
 	renderStat();
+	renderHealthIndicator();
 	CharacterDeath();
 }
 
@@ -1172,11 +1243,11 @@ void renderFramerate()
 		g_Console.writeToBuffer(c, ss.str());
 
 		// displays the elapsed time
-		ss.str("");
+		/*ss.str("");
 		ss << g_dAccurateElapsedTime << "secs";
 		c.X = 0;
 		c.Y = 0;
-		g_Console.writeToBuffer(c, ss.str(), 0x59);
+		g_Console.writeToBuffer(c, ss.str(), 0x59);*/
 
 		ss.str("");
 		// TODO: Show dropped frames
@@ -1354,16 +1425,15 @@ void moveScreen()
 
 void renderLevel()
 {
-	// Start from offset of 1,1
+	// Start from offset of 2,1
 	COORD c;
-	c.X = 1;
+	c.X = 2;
 	c.Y = 1;
-
 	for (int row = r_cRenderOffset.X; row < r_cRenderOffset.X + ROOM_X + 2; row++)
 	{
 		for (int column = r_cRenderOffset.Y; column < r_cRenderOffset.Y + ROOM_Y + 2; column++)
 		{
-			c.X = 1 + ((column - r_cRenderOffset.Y) << 2);
+			c.X = 2 + ((column - r_cRenderOffset.Y) << 2);
 			switch (g_sLevel.level[row][column])
 			{
 			case '#':
@@ -1609,7 +1679,7 @@ void renderStat()
 	std::ostringstream ss;
 	ss.str("");
 	ss << "HP: " << g_sEntities.g_sChar.m_iPlayerHealth << " / " << g_sEntities.g_sChar.m_iMaxHealth;
-	c.X = g_Console.getConsoleSize().X - 33;
+	c.X = g_Console.getConsoleSize().X - 32;
 	c.Y = 0;
 	g_Console.writeToBuffer(c, ss.str());
 
@@ -1643,8 +1713,49 @@ void renderStat()
 	c.Y = 5;
 	for (auto& item : g_sEntities.g_sChar.m_sPlayerItems.m_vItemNameList)
 	{
-		ss.str("");
-		ss << item;
+		int index;
+		if (item == "Heaven Cracker")
+		{
+			ss.str("");
+			index = 0;
+			ss << item << " Level: " << g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[0].m_iWeaponLevel + 1;
+		}
+		else if (item == "Enchanted Sword")
+		{
+			ss.str("");
+			index = 0;
+			ss << item << " Level: " << g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[1].m_iWeaponLevel + 1;
+		}
+		else if (item == "Health Potion")
+		{
+			ss.str("");
+			index = 0;
+			ss << item << " Level: " << g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[2].m_iWeaponLevel + 1;
+		}
+		else if (item == "Glass Canon")
+		{
+			ss.str("");
+			index = 0;
+			ss << item << " Level: " << g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[3].m_iWeaponLevel + 1;
+		}
+		else if (item == "Magic Potion")
+		{
+			ss.str("");
+			index = 0;
+			ss << item << " Level: " << g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[4].m_iWeaponLevel + 1;
+		}
+		else if (item == "Bonus!")
+		{
+			ss.str("");
+			index = 0;
+			ss << item << " Level: " << g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[5].m_iWeaponLevel + 1;
+		}
+		else if (item == "Blue Feather")
+		{
+			ss.str("");
+			index = 0;
+			ss << item << " Level: " << g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_iWeaponLevel + 1;
+		}
 		c.Y++;
 		g_Console.writeToBuffer(c, ss.str());
 	}
@@ -1653,8 +1764,43 @@ void renderStat()
 	ss.str("");
 	ss << "Last Item: " << g_sEntities.g_sChar.m_sLastItem;
 	c.X = g_Console.getConsoleSize().X - 83;
-	c.Y = 27;
+	c.Y = 28;
 	g_Console.writeToBuffer(c, ss.str());
+}
+
+void renderHealthIndicator()
+{
+	if (g_sEntities.g_sChar.m_iPreviousHealth > g_sEntities.g_sChar.m_iPlayerHealth)
+	{
+		g_dHPIndicateUntilTime = g_dAccurateElapsedTime + 0.5;
+	}
+	g_sEntities.g_sChar.m_iPreviousHealth = g_sEntities.g_sChar.m_iPlayerHealth;
+
+	WORD color = (g_dAccurateElapsedTime < g_dHPIndicateUntilTime) ? (0xc0) : (((double)g_sEntities.g_sChar.m_iPlayerHealth / (double)g_sEntities.g_sChar.m_iMaxHealth) * 100.0 <= 30) ? (0x40) : (0x00);
+	if (color != 0x00)
+	{
+		COORD c = { 0, 0 };
+		for (int column = 0; column < (ROOM_Y + 3) << 2; column++)
+		{
+			g_Console.writeToBuffer(c, ' ', color);
+			c.X++;
+		}
+		for (int roomRow = 0; roomRow < (ROOM_X + 2) << 1; roomRow++)
+		{
+			c.Y++;
+			c.X = 0;
+			g_Console.writeToBuffer(c, "  ", color);
+			c.X = ((ROOM_Y + 3) << 2) - 2;
+			g_Console.writeToBuffer(c, "  ", color);
+		}
+		c.Y++;
+		c.X = 0;
+		for (int column = 0; column < (ROOM_Y + 3) << 2; column++)
+		{
+			g_Console.writeToBuffer(c, ' ', color);
+			c.X++;
+		}
+	}
 }
 
 void checkTrapCollision()
@@ -1908,6 +2054,8 @@ bool loadBoss()
 {
 	if (g_sLevel.floor == 5 && !g_sEntities.g_sChar.m_bDefeatedBoss && (g_sEntities.g_sChar.m_cLocation.X - 1) / (ROOM_X + 2) == g_sLevel.exitRoom.X && (g_sEntities.g_sChar.m_cLocation.Y - 1) / (ROOM_Y + 2) == g_sLevel.exitRoom.Y)
 	{
+		stopAllMusic();
+		MusicPlay("007", "repeat");
 		COORD c;
 		c.X = 4;
 		c.Y = 4;
@@ -1948,19 +2096,54 @@ void CharacterDeath()
 		if (g_abKeyPressed[K_SPACE])
 		{
 			g_eRestartGame = true;
-		}
 			if (g_eRestartGame == true)
 			{
 				g_sEntities.g_sChar.m_iGlobalScore += unsigned int(double(g_sEntities.g_sChar.m_iPlayerScore) * 0.10);
 				saveGame();
 				init();
+				switch (g_sLevel.floor)
+				{
+				case 1:
+				{
+					stopAllMusic();
+					MusicPlay("002", "repeat");
+					break;
+				}
+				case 2:
+				{
+					stopAllMusic();
+					MusicPlay("003", "repeat");
+					break;
+				}
+				case 3:
+				{
+					stopAllMusic();
+					MusicPlay("004", "repeat");
+					break;
+				}
+				case 4:
+				{
+					stopAllMusic();
+					MusicPlay("005", "repeat");
+					break;
+				}
+				case 5:
+				{
+					stopAllMusic();
+					MusicPlay("006", "repeat");
+					break;
+				}
+				}
 			}
+		}
 		else if(g_abKeyPressed[K_V])
 		{
 			g_sEntities.g_sChar.m_iGlobalScore += g_sEntities.g_sChar.m_iPlayerScore;
 			saveGame();
 			init();
+			stopAllMusic();
 			g_eGameState = S_MENU;
+			MusicPlay("001", "repeat");
 		}
 		else if (g_abKeyPressed[K_ESCAPE])
 		{

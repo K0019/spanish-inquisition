@@ -1,5 +1,7 @@
 #pragma once
 
+/* Made by: Kendrick */
+
 #ifndef PELLETHEAD
 #define PELLETHEAD
 #include <Windows.h>

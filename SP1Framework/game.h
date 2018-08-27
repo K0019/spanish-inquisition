@@ -42,6 +42,7 @@ enum EGAMESTATES /* FRAMEWORK */
     S_SPLASHSCREEN,
 	S_MENU,
     S_GAME,
+	S_WIN,
 	S_PAUSED,
     S_COUNT
 };
@@ -70,6 +71,8 @@ void doomButton();			// heehee
 void detectPauseMenuProc();
 void pauseScreen();
 void pauseScreenNav();
+void winWait();
+void checkWindowFocussed();
 void changedRoomUpdate(); // Stuff to do when the player exits current room
 bool loadEnemiesFromRoom(); // Load all enemies from the room that the player entered
 bool loadBoss(); // Load the boss into the exit room, if player is in floor 5
@@ -77,7 +80,7 @@ void addEnemy(EnemyMelee * enemy); // Add an enemy to the enemy list
 void addEnemy(EnemyRanged * enemy); // Add an enemy to the enemy list
 void CharacterDeath();
 void setUpMoveScreen(); // Setup variables to move render screen
-void moveScreen(); // Moves the render scree
+void moveScreen(); // Moves the render screen
 /*
 	THE RENDER FUNCTIONS
 */
@@ -88,6 +91,8 @@ void renderGame();			// renders the game stuff
 void renderPause();
 void renderPauseCursor();
 void renderPauseMenu();
+void renderWin();
+void renderWonScore();
 void renderScore();			// render the current score from
 void renderCharacter();		// renders the character into the buffer
 void renderFramerate();		// renders debug information, frame rate, elapsed time, etc

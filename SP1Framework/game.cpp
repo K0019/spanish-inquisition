@@ -8,12 +8,13 @@
 
 double	g_dElapsedTime;
 double	g_dDeltaTime;
-double g_dTrappedTime;
-int		g_iCurrentFrameCount, g_iLastFrameCount, g_iLastMeasuredSecond;
+double	g_dWinScreenTime;
+double	g_dTrappedTime;
 double	g_dAccurateElapsedTime;
+double	r_dRenderTime, r_dTargetRenderTime;
+int		g_iCurrentFrameCount, g_iLastFrameCount, g_iLastMeasuredSecond;
 bool	g_abKeyPressed[K_COUNT];
 COORD	r_cRenderOffset, r_cTargetRenderOffset; // Used for level rendering, tile coordinates
-double r_dRenderTime, r_dTargetRenderTime;
 CStopWatch * r_cswRenderTimer;
 
 int		r_iMoveDirection;
@@ -93,7 +94,10 @@ void init(void)
 	g_mEvent.r_menucurspos.Y = g_Console.getConsoleSize().Y / 10 * 8 - 6;
 	g_mEvent.r_pausecurspos.X = g_Console.getConsoleSize().X / 10 - 2;
 	g_mEvent.r_pausecurspos.Y = g_Console.getConsoleSize().Y / 5;
-	g_sLevel.floor = 1;
+	g_sLevel.floor = 5;
+	g_sEntities.g_sChar.m_iPlayerHealth = 10000;
+	g_sEntities.g_sChar.m_iMaxHealth = 10000;
+	g_sEntities.g_sChar.m_iPlayerDamage = 500;
 	//if (DEBUG)
 	//{
 	//	g_sLevel.floor = 5;
@@ -105,8 +109,7 @@ void init(void)
 	COORD c;
 	c.X = (GRID_X >> 1) * (ROOM_X + 2) + (ROOM_X >> 1);
 	c.Y = 2 + (GRID_Y >> 1) * (ROOM_Y + 2) + (ROOM_Y >> 1);
-	// sets the width, height and the font name to use in the console
-	g_Console.setConsoleFont(0, 16, L"Consolas");
+	g_Console.setConsoleFont(0, 20, L"Consolas");
 	loadGame();
 	g_sEntities.g_sChar.m_sLastItem = "";
 	g_sEntities.g_sChar.m_sPlayerItems.ItemCount = 0;
@@ -190,6 +193,8 @@ void update(CStopWatch * timer, double missedTime)
 			break;
 		case S_PAUSED: pauseScreen();
 			break;
+		case S_WIN: winWait();
+			break;
 	}
 }
 //--------------------------------------------------------------
@@ -212,6 +217,8 @@ void render(CStopWatch * timer)
 		case S_GAME: renderGame();
 			break;
 		case S_PAUSED: renderPause();
+			break;
+		case S_WIN: renderWin();
 			break;
 	}
     renderFramerate();	// renders debug information, frame rate, elapsed time, etc
@@ -289,6 +296,7 @@ void gameplay()            // gameplay logic
 	{
 		moveScreen();
 	}
+	checkWindowFocussed();
 }
 
 void menuLogic()
@@ -710,35 +718,10 @@ void controlPlayer()
 			{
 				if (++g_sLevel.floor > FINAL_FLOOR)
 				{
-					//std::string ASCII[17];
-					//ASCII[0] = "∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞";
-					//ASCII[1] = "                                                                                         ";
-					//ASCII[2] = "                         €€€€≤∞   €€€€≤∞                                                                                    ";
-					//ASCII[3] = "                           €€≤∞   €€≤∞    €€€€€≤∞ €€€€€€€≤∞ €€€€≤∞                                                                    ";
-					//ASCII[4] = "                            €€≤∞ €€≤∞   €€≤∞  €€≤∞  €€€≤∞    €≤∞                                                     ";
-					//ASCII[5] = "                              €€€≤∞    €€≤∞    €€≤∞ €€€≤∞    €≤∞                                                ";
-					//ASCII[6] = "                              €€€≤∞    €€≤∞    €€≤∞ €€€≤∞    €≤∞                                                  ";
-					//ASCII[7] = "                              €€€≤∞    €€≤∞    €€≤∞  €€≤∞    €≤∞                                                         ";
-					//ASCII[8] = "                              €€€≤∞     €€≤∞  €€≤∞   €€€≤∞  €€≤∞                                                      ";
-					//ASCII[9] = "                             €€€€€≤∞      €€€€€≤∞      €€€€€€≤∞                                                                ";
-					//ASCII[10] = "                                                                                         ";
-					//ASCII[11] = "                €€€€€≤∞ €€€€€   €€€€≤∞   €€€€€€€€≤∞   €€€€€€€≤∞   €€€€€€€≤∞                                                                    ";
-					//ASCII[12] = "                   €€≤∞    €€     €≤∞     €€€€≤∞       €€€€€≤∞    €€€≤∞                                                    ";
-					//ASCII[13] = "                    €€≤∞   €€     €≤∞     €€€€≤∞       €€ €€€≤∞   €€€≤∞                                                    ";
-					//ASCII[14] = "                     €€≤∞ €€ €€   €≤∞     €€€€≤∞       €€  €€€≤∞  €€€≤∞                                                   ";
-					//ASCII[15] = "                      €€≤∞€€   €€ €≤∞     €€€€≤∞       €€   €€€€≤∞€€€≤∞                                                    ";
-					//ASCII[16] = "                        €€      €≤∞     €€€€€€€€≤∞   €€€€€€   €€€€€€€€€≤∞                                                         ";
-					//ASCII[17] = "∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞";
-					//COORD c;
-					//int i = 0;
-					//for (int j = 0; j < 17, j++;)
-					//{
-					//	c.X = 0;
-					//	g_Console.writeToBuffer(c, ASCII[i], 0x64);
-					//	c.Y++;
-					//	i++;
-					//}
-					break;
+					g_dWinScreenTime = g_dElapsedTime + 8.00f;
+					g_sEntities.g_sChar.m_iGlobalScore += g_sEntities.g_sChar.m_iPlayerScore;
+					saveGame();
+					g_eGameState = S_WIN;
 				}
 				else
 				{
@@ -935,6 +918,24 @@ void pauseScreenNav()
 	}
 }
 
+void winWait()
+{
+	if (g_dWinScreenTime < g_dElapsedTime)
+	{
+		g_eGameState = S_MENU;
+	}
+}
+
+void checkWindowFocussed()
+{
+	HWND currentWindow = GetForegroundWindow();
+	if (currentWindow != g_Console.consoleWindow)
+	{
+		g_mEvent.bPausedGame = true;
+		g_eGameState = S_PAUSED;
+	}
+}
+
 void renderSplashScreen()  // renders the splash screen
 {
 	COORD c;
@@ -1043,6 +1044,83 @@ void renderPauseMenu()
 	c.Y++;
 	g_Console.writeToBuffer(c, " QUIT TO DESKTOP ");
 
+}
+
+void renderWin()
+{
+	std::string ASCII[19];
+	ASCII[0] = "∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞";
+	ASCII[1] = "                                                             ";
+	ASCII[2] = "          €€€€≤∞   €€€€≤∞                                    ";
+	ASCII[3] = "            €€≤∞   €€≤∞    €€€€€≤∞ €€€€€€€≤∞ €€€€≤∞          ";
+	ASCII[4] = "             €€≤∞ €€≤∞   €€≤∞  €€≤∞  €€€≤∞    €≤∞            ";
+	ASCII[5] = "               €€€≤∞    €€≤∞    €€≤∞ €€€≤∞    €≤∞            ";
+	ASCII[6] = "               €€€≤∞    €€≤∞    €€≤∞ €€€≤∞    €≤∞            ";
+	ASCII[7] = "               €€€≤∞    €€≤∞    €€≤∞  €€≤∞    €≤∞            ";
+	ASCII[8] = "               €€€≤∞     €€≤∞  €€≤∞   €€€≤∞  €€≤∞            ";
+	ASCII[9] = "               €€€≤∞        €€€€€≤∞      €€€€€€≤∞            ";
+	ASCII[10] = "                                                             ";
+	ASCII[11] = " €€€€€≤∞ €€€€€≤∞ €€€€≤∞  €€€€€€€€€≤∞   €€€€€€€≤∞   €€€€€€€≤∞ ";
+	ASCII[12] = "    €€≤∞    €€≤∞   €≤∞     €€€€≤∞       €€€€€≤∞    €€€≤∞     ";
+	ASCII[13] = "     €€≤∞   €€≤∞   €≤∞     €€€€≤∞       €€≤€€€≤∞   €€€≤∞     ";
+	ASCII[14] = "      €€≤∞ €€≤€€≤∞ €≤∞     €€€€≤∞       €€≤∞€€€≤∞  €€€≤∞     ";
+	ASCII[15] = "       €€≤∞€€≤∞ €€≤€≤∞     €€€€≤∞       €€≤∞ €€€€≤∞€€€≤∞     ";
+	ASCII[16] = "         €€≤∞    €≤∞     €€€€€€€€≤∞   €€€€€€≤∞ €€€€€€€€€≤∞   ";
+	ASCII[17] = "                                                             ";
+	ASCII[18] = "∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞∞";
+	COORD c = g_Console.getConsoleSize();
+	c.Y /= 10;
+	int paddingright = g_Console.getConsoleSize().X - ((g_Console.getConsoleSize().X >> 1) - 30);
+	int paddingleft = ((g_Console.getConsoleSize().X >> 1) - 31);
+	for (int i = 0; i < 19; i++)
+	{
+		c.X = 0;
+		for (int j = 0; j < paddingleft; j++)
+		{
+			if (i == 0 || i == 18)
+				g_Console.writeToBuffer(c, "∞", 0x64);
+			else
+				g_Console.writeToBuffer(c, " ", 0x64);
+			c.X++;
+		}
+		c.Y++;
+	}
+	c = g_Console.getConsoleSize();
+	c.X = (c.X >> 1) - 31;
+	c.Y /= 10;
+	for (int i = 0; i < 19; i++)
+	{
+		g_Console.writeToBuffer(c, ASCII[i], 0x64);
+		c.Y++;
+	}
+	c = g_Console.getConsoleSize();
+	c.Y /= 10;
+	for (int i = 0; i < 19; i++)
+	{
+		c.X = paddingright;
+		for (int j = paddingright; j < g_Console.getConsoleSize().X; j++)
+		{
+			if (i == 0 || i == 18)
+				g_Console.writeToBuffer(c, "∞", 0x64);
+			else
+				g_Console.writeToBuffer(c, " ", 0x64);
+			c.X++;
+		}
+		c.Y++;
+	}
+	renderWonScore();
+}
+
+void renderWonScore()
+{
+	COORD c = g_Console.getConsoleSize();
+	unsigned int score = g_sEntities.g_sChar.m_iPlayerScore;
+	int totalLength = 14 + (std::to_string(score)).length();
+	(c.X >>= 1) -= (totalLength >> 1);
+	c.Y -= 5;
+	std::ostringstream scoreText;
+	scoreText << "Final Score: " << score;
+	g_Console.writeToBuffer(c, scoreText.str());
 }
 
 void renderScore() 

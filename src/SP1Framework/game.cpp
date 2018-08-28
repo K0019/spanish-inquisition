@@ -1961,9 +1961,6 @@ void checkHitPellets()
 			{
 				g_sEntities.g_sChar.m_iPlayerScore -= 5;
 			}
-
-			// TODO: Check for death
-
 			pellet++;
 			continue;
 		}

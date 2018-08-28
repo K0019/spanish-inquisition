@@ -1,6 +1,6 @@
 #pragma once
 
-/* TRANSFERRED FROM FRAMEWORK, Modified by: Kendrick and Winston */
+/* TRANSFERED FROM FRAMEWORK, Modified by: Kendrick and Winston */
 
 #ifndef PLAYERHEAD
 #define PLAYERHEAD
@@ -9,7 +9,6 @@
 #include "item.h"
 #include "consumables.h"
 #include <algorithm>
-
 
 // Struct for the game character, containing information about the player
 struct SGameChar
@@ -20,14 +19,14 @@ struct SGameChar
 	bool m_bDefeatedBoss; // If player has defeated boss
 	int m_iMaxHealth = 10; //Max health of the player can only be increased by items, and does not go down when player is damaged
 	int m_iPlayerHealth = 10; //The constantly changing variable, increased by items and consumables.
-	int m_iPreviousHealth;
+	int m_iPreviousHealth; // The health of the player at the last update. Used for hit indicator
 	int	m_iPlayerDamage = 3; //The amount of damage the player deals per pellet
 	unsigned int m_iPlayerScore = 0; //The player's score
 	unsigned int m_iGlobalScore = 0; //The player's score after each run, to be spent at the shop
 	double m_dRange = 2.5; //How long the player's pellets will last before de-spawning
 	double m_dVelocity = SHOOTVELOCITY; //The velocity of the player's pellets
-	SAllItems m_sPlayerItems;
-	SAllConsumables m_sConsumables;
+	SAllItems m_sPlayerItems; // Container for items
+	SAllConsumables m_sConsumables; // Container for consumables
 	std::string m_sLastItem = ""; //Storing last item picked up
 
 	COORD getRealCoords(); // Get console coordinates of the player
@@ -39,6 +38,5 @@ struct SGameChar
 	void hasConsumable(bool g_bHasConsumable, int index); //Main to give the player the correct stat. increase depending on which consumable is collected
 	void minimumScore(int playerScore); //Ensures the player's score will not go below 0.
 };
-
 
 #endif // !PLAYERHEAD

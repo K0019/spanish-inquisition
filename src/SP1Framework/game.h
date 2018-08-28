@@ -72,8 +72,8 @@ void doomButton(); /* Made by: Yan Quan */ // heehee
 void detectPauseMenuProc(); /* Made by: Yan Quan */
 void pauseScreen(); /* Made by: Yan Quan */
 void pauseScreenNav(); /* Made by: Yan Quan */
-void winWait();
-void checkWindowFocussed();
+void winWait(); /* Made by: Yan Quan */ // Wait time for win screen
+void checkWindowFocussed(); /* Made by: Yan Quan */ // Check if user is focused on the game
 void changedRoomUpdate(); /* Made by: Kendrick */ // Stuff to do when the player exits current room
 bool loadEnemiesFromRoom(); /* Made by: Kendrick */ // Load all enemies from the room that the player entered
 bool loadBoss(); /* Made by: Kendrick */ // Load the boss into the exit room, if player is in floor 5
@@ -92,8 +92,8 @@ void renderGame(); /* FRAMEWORK */ // renders the game stuff
 void renderPause(); /* Made by: Yan Quan */
 void renderPauseCursor(); /* Made by: Yan Quan */
 void renderPauseMenu(); /* Made by: Yan Quan */
-void renderWin();
-void renderWonScore();
+void renderWin(); /* Made by: Yan Quan */
+void renderWonScore(); /* Made by: Yan Quan */
 void renderScore(); /* Made by: Winston */ // render the current score from
 void renderCharacter(); /* Modified by: Kendrick */ // renders the character into the buffer
 void renderFramerate(); /* Modified by: Kendrick */ // renders debug information, frame rate, elapsed time, etc

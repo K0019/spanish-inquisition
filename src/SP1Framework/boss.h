@@ -32,7 +32,7 @@ class Boss1
 {
 protected:
 	CStopWatch Timer; // When to update
-	double m_dCurrentAccurateTime;
+	double m_dCurrentAccurateTime; // Measure of accurate time since boss was spawned
 	double m_dLastMoveTime; // Time when boss last moved, in accurateTime
 	double m_dLastSwitchTime; // Time when boss last switched modes, in accurateTime
 	double m_dLastAttackTime, m_dLastAttackInitiateTime; // Time when boss last attacked, in accurateTime
@@ -61,7 +61,7 @@ public:
 	Boss1(SGameChar * player, std::vector<SPellet> * pelletContainer, std::string identifier[4], WORD colorMelee, WORD colorRanged, int hp, 
 		double whenSwitchToMelee, double switchToMeleeDuration, double whenSwitchToRanged, double switchToRangedDuration, double ranged1AttackDuration,
 		double ranged1AttackThreshold, double ranged2AttackDuration, double ranged2AttackThreshold, double meleeAttackThreshold, double deceleration,
-		double moveDelay);
+		double moveDelay); // Constructor
 
 	void update(); // Boss update function
 	void updateMovement(); // Update movement function

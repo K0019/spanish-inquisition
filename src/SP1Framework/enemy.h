@@ -72,7 +72,8 @@ public:
 class EnemyMelee : public Enemy
 {
 protected:
-	int attackDirection; // Up Right Down Left
+	int attackDirection; // 0 1 2 3 = Up Right Down Left
+
 public:
 	EnemyMelee(SLevel * levelPointer, std::vector<std::unique_ptr<Enemy>> * enemyContainerPointer, std::string name, std::string indicator, std::string indicator2, COORD location, WORD color, int HP, int damage, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration, int scoreGiven, int enemyID);
 
@@ -88,7 +89,6 @@ protected:
 	bool m_bMobile; // Ability to shoot while moving
 	double m_dShootVelocity; // Speed of pellet
 	std::vector<SPellet> * m_vPelletList; // Pointer to the list of pellets, to add pellets of the enemy's
-	
 
 public:
 	EnemyRanged(SLevel * levelPointer, std::vector<std::unique_ptr<Enemy>> * enemyContainerPointer, std::vector<SPellet> * pellets, std::string name, std::string indicator, std::string indicator2, COORD location, WORD color, int HP, int damage, double moveDuration, double lengthOfAttack, double attackTimeThreshold, double stunDuration, bool isMobile, double pelletVelocity, int scoreGiven, int enemyID);

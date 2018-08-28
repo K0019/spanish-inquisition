@@ -1,13 +1,13 @@
 #pragma once
 
 /* MADE BY: Woo Josh, Team 4
-   Some modifications made by: Kendrick */
+   Fix by: Kendrick */
 
 #ifndef MUSIC_MAN
 #define MUSIC_MAN
 #include <vector>
 #include <string>
-std::wstring s2ws(const std::string& s); /* Made by: Kendrick */
+std::wstring s2ws(const std::string& s);
 void Mshutdown();
 void MusicInit();
 struct MLoaded

@@ -160,19 +160,6 @@ void SLevel::generateLevel()
 		}
 	}
 
-	// DEBUG
-	std::ofstream dump("level.txt");
-	for (int row = 0; row < (ROOM_X + 2) * GRID_X + 2; row++)
-	{
-		for (int column = 0; column < (ROOM_Y + 2) * GRID_Y + 2; column++)
-		{
-			dump << level[row][column];
-		}
-		dump << std::endl;
-	}
-	dump.close();
-	// END DEBUG
-
 	// DELETE ALLOCATED STORAGE
 	delete[] roomsHaveExit;
 

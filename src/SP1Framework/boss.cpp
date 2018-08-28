@@ -137,37 +137,6 @@ void Boss1::update()
 					this->m_dDirY *= -1;
 					break;
 				}
-				/*switch (code)
-				{
-				case 1:
-					this->m_dLocationX += 2 * (this->getPlayerLocationX() - this->m_dLocationX);
-					break;
-				case 2:
-					this->m_dLocationX -= 2 * (this->m_dLocationX - this->getPlayerLocationX());
-					break;
-				case 3:
-					this->m_dLocationY += 2 * (this->getPlayerLocationY() - this->m_dLocationY);
-					break;
-				case 4:
-					this->m_dLocationY += 2 * (this->m_dLocationY - this->getPlayerLocationY());
-					break;
-				case 5:
-					this->m_dLocationX += 2 * (this->getPlayerLocationX() - this->m_dLocationX);
-					this->m_dLocationY += 2 * (this->getPlayerLocationY() - this->m_dLocationY);
-					break;
-				case 6:
-					this->m_dLocationX += 2 * (this->getPlayerLocationX() - this->m_dLocationX);
-					this->m_dLocationY -= 2 * (this->m_dLocationY - this->getPlayerLocationY());
-					break;
-				case 7:
-					this->m_dLocationX -= 2 * (this->m_dLocationX - this->getPlayerLocationX());
-					this->m_dLocationY += 2 * (this->getPlayerLocationY() - this->m_dLocationY);
-					break;
-				case 8:
-					this->m_dLocationX -= 2 * (this->m_dLocationX - this->getPlayerLocationX());
-					this->m_dLocationY -= 2 * (this->m_dLocationY - this->getPlayerLocationY());
-					break;
-				}*/
 			}
 		}
 		else // If ranged
@@ -230,18 +199,6 @@ void Boss1::update()
 	}
 	else // If ranged
 	{
-		//if (this->m_dCurrentAccurateTime >= this->m_dLastMoveTime)
-		//{
-		//	if (rand() / (RAND_MAX / 100) < 35) // Attack chance
-		//	{
-
-		//	}
-		//	else // Move chance
-		//	{
-
-		//	}
-		//}
-
 		if (this->m_dCurrentAccurateTime >= this->m_dNextAttackTime) // If boss should attack
 		{
 			if (rand() / (RAND_MAX / 2))
@@ -645,11 +602,21 @@ bool Boss1::isOverlapping(COORD c)
 {
 	c = this->getLocation(c);
 
-	if ((this->m_dLocationX - 1.0 < c.X + 1 && this->m_dLocationX + 1.0 > c.X) &&
-		(this->m_dLocationY - 1.0 < c.Y + 1 && this->m_dLocationY + 1.0 > c.Y))
+	if (this->m_bEnemyState[0] == true)
 	{
-		return true;
+		if ((this->m_dLocationX - 1.0 < c.X + 1 && this->m_dLocationX + 1.0 > c.X) &&
+			(this->m_dLocationY - 1.0 < c.Y + 1 && this->m_dLocationY + 1.0 > c.Y))
+		{
+			return true;
+		}
 	}
-
+	else
+	{
+		if ((this->m_dLocationCoord.X - 1.0 < c.X + 1 && this->m_dLocationCoord.X + 1.0 > c.X) &&
+			(this->m_dLocationCoord.Y - 1.0 < c.Y + 1 && this->m_dLocationCoord.Y + 1.0 > c.Y))
+		{
+			return true;
+		}
+	}
 	return false;
 }

@@ -82,15 +82,6 @@ void init(void)
 	}
 	g_sEntities.g_sChar.m_sPlayerItems.m_vItemNameList.clear();
 	g_sEntities.g_sChar.m_cRoom = g_sLevel.playerStartRoom;
-	//if (DEBUG)
-	//{
-	//	COORD c;
-	//	c.X = 4;
-	//	c.Y = 4;
-	//	std::string identifier[4] = { "GGGGJJJJ", "GGGGJJJJ", "GGGGJJJJ", "GGGGJJJJ" };
-	//	g_sEntities.boss = new Boss1(&g_sEntities.g_sChar, &g_sEntities.m_vPellets, identifier, 0x0c, 0x0e, 200, 0.0, 2.0, 100.0, 2.0, 0.5, 0.3, 0.5, 0.3, 2.0, -4.0, 0.5);
-	//	g_sEntities.g_sChar.m_bInBattle = true;
-	//}
 	r_cRenderOffset.X = r_cTargetRenderOffset.X = 1 + g_sEntities.g_sChar.m_cRoom.X * (ROOM_X + 2);
 	r_cRenderOffset.Y = r_cTargetRenderOffset.Y = 1 + g_sEntities.g_sChar.m_cRoom.Y * (ROOM_Y + 2);
 	r_dTargetRenderTime = SCREEN_SCROLL_LENGTH;
@@ -99,12 +90,6 @@ void init(void)
 	g_mEvent.r_pausecurspos.X = g_Console.getConsoleSize().X / 10 - 2;
 	g_mEvent.r_pausecurspos.Y = g_Console.getConsoleSize().Y / 5;
 	g_sLevel.floor = 1;
-	//if (DEBUG)
-	//{
-	//	g_sLevel.floor = 5;
-	//	g_sEntities.g_sChar.m_iPlayerDamage = 100;
-	//	g_sEntities.g_sChar.m_iPlayerHealth = 1000;
-	//}
 	g_sLevel.generateLevel();
 	g_sLevel.miniMap->refresh(g_sEntities.g_sChar.m_cLocation);
 	COORD c;
@@ -305,7 +290,6 @@ void splashScreenWait()		// waits for time to pass in splash screen
 		g_bMusicInitialising = true;
 		MusicInit();
 	}
-	//processUserInput(); // checks if you should change states or do something else with the game, e.g. pause, exit
 	if (g_dAccurateElapsedTime > 3.0) // wait for 3 seconds to switch to game mode, else do nothing
 	{
 		g_eGameState = S_MENU;
@@ -318,7 +302,6 @@ void gameplay()            // gameplay logic
 {
 	if (r_cRenderOffset.X == r_cTargetRenderOffset.X && r_cRenderOffset.Y == r_cTargetRenderOffset.Y)
 	{
-		//processUserInput();	// checks if you should change states or do something else with the game, e.g. pause, exit
 		detectPauseMenuProc();
 		controlPlayer();	// moves the character, collision detection, physics, etc
 		if (r_cRenderOffset.X == r_cTargetRenderOffset.X && r_cRenderOffset.Y == r_cTargetRenderOffset.Y)
@@ -332,7 +315,6 @@ void gameplay()            // gameplay logic
 			{
 				g_sLevel.createStairs(); // If boss is dead, create stairs
 			}
-			// sound can be played here too.
 			checkTrapCollision();
 		}
 	}
@@ -570,7 +552,6 @@ void controlPlayer()
 	bool bSomethingHappened = false;
 
 	// Updating the location of the character based on the key press
-	// providing a beep sound whenver we shift the character
 	if (g_abKeyPressed[K_UP] && g_sEntities.g_sChar.m_cLocation.X > 0 && g_adBounceTime[K_UP] < g_dElapsedTime)
 	{
 		g_sEntities.g_sChar.m_cLocation.X--;
@@ -617,7 +598,6 @@ void controlPlayer()
 				if (g_sEntities.g_sChar.m_cLocation.X < r_cRenderOffset.X)
 				{
 					r_cTargetRenderOffset.X -= (ROOM_X + 2);
-					//r_cRenderOffset.X -= (ROOM_X + 2);
 					g_sEntities.g_sChar.m_cLocation.X--;
 					changedRoomUpdate();
 					setUpMoveScreen();
@@ -671,7 +651,6 @@ void controlPlayer()
 				if (g_sEntities.g_sChar.m_cLocation.Y < r_cRenderOffset.Y)
 				{
 					r_cTargetRenderOffset.Y -= (ROOM_Y + 2);
-					//r_cRenderOffset.Y -= (ROOM_Y + 2);
 					g_sEntities.g_sChar.m_cLocation.Y--;
 					changedRoomUpdate();
 					setUpMoveScreen();
@@ -725,7 +704,6 @@ void controlPlayer()
 				if (g_sEntities.g_sChar.m_cLocation.X >= r_cRenderOffset.X + ROOM_X + 2)
 				{
 					r_cTargetRenderOffset.X += (ROOM_X + 2);
-					//r_cRenderOffset.X += (ROOM_X + 2);
 					g_sEntities.g_sChar.m_cLocation.X++;
 					changedRoomUpdate();
 					setUpMoveScreen();
@@ -779,7 +757,6 @@ void controlPlayer()
 				if (g_sEntities.g_sChar.m_cLocation.Y >= r_cRenderOffset.Y + ROOM_Y + 2)
 				{
 					r_cTargetRenderOffset.Y += (ROOM_Y + 2);
-					//r_cRenderOffset.Y += (ROOM_Y + 2);
 					g_sEntities.g_sChar.m_cLocation.Y++;
 					changedRoomUpdate();
 					setUpMoveScreen();
@@ -897,7 +874,7 @@ void controlPlayer()
 		{
 			if (g_abKeyPressed[i])
 			{
-				g_adBounceTime[i] = g_dElapsedTime + 0.175; //0.200 acts as the movement delay of the player, decreasing it makes the player go faster
+				g_adBounceTime[i] = g_dElapsedTime + 0.175; //0.175 acts as the movement delay of the player, decreasing it makes the player go faster
 				if (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_bHasWeapon) // Index 7 (Blue Feather): Decrease movement delay by 20/30/40/50%
 				{
 					switch (g_sEntities.g_sChar.m_sPlayerItems.m_vItemsList[6].m_iWeaponLevel)
@@ -967,7 +944,6 @@ void detectPauseMenuProc()
 {
 	if (g_abKeyPressed[K_ESCAPE] && g_adBounceTime[K_ESCAPE] < g_dElapsedTime && g_sEntities.g_sChar.m_iPlayerHealth > 0)
 	{
-		/*g_mEvent.bHasPaused = true;*/
 		g_mEvent.bPausedGame = !g_mEvent.bPausedGame;
 		g_adBounceTime[K_ESCAPE] = g_dElapsedTime + 0.25;
 	}
@@ -1103,7 +1079,7 @@ void renderGame()
 {
 	renderLevel();
 	renderDeadEnemy();
-	renderCharacter();    // renders the character into the buffer
+	renderCharacter();
 	renderEnemy();
 	renderPellets();
 	renderMiniMap();
@@ -1287,9 +1263,6 @@ void renderFramerate()
 		c.X = 0;
 		c.Y = 0;
 		g_Console.writeToBuffer(c, ss.str(), 0x59);*/
-
-		ss.str("");
-		// TODO: Show dropped frames
 	}
 }
 

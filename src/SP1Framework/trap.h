@@ -1,6 +1,7 @@
 #pragma once
 
 /* MADE BY: Winston */
+
 /*Other traps such as snares and turrets are too unhealthy for the game, thus they are not implemented. 
 trap.h and trap.cpp remains for easy implementation of traps in the future*/
 

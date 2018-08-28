@@ -31,6 +31,7 @@ struct MenuEvent
 	short sh_shopItemSel = 0;				// menu selector: stores the shop cursor's selection
 	short sh_pauseSel = 0;
 	unsigned int CreditsOffsetY = 0;		// scrapped idea: how much the credits should go up by
+	unsigned int LastWinScore;
 	int tipIndex;
 	MenuEvent(Console* mainConsole);		// Construcc
 

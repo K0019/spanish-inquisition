@@ -797,6 +797,7 @@ void controlPlayer()
 				{
 					g_dWinScreenTime = g_dElapsedTime + 3.00f;
 					g_sEntities.g_sChar.m_iGlobalScore += g_sEntities.g_sChar.m_iPlayerScore;
+					g_mEvent.LastWinScore = g_sEntities.g_sChar.m_iPlayerScore;
 					saveGame();
 					init();
 					g_eGameState = S_WIN;
@@ -1223,7 +1224,7 @@ void renderWin()
 void renderWonScore()
 {
 	COORD c = g_Console.getConsoleSize();
-	unsigned int score = g_sEntities.g_sChar.m_iPlayerScore;
+	unsigned int score = g_mEvent.LastWinScore;
 	int totalLength = 14 + (std::to_string(score)).length();
 	(c.X >>= 1) -= (totalLength >> 1);
 	c.Y -= 5;

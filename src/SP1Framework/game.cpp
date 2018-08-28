@@ -1484,7 +1484,7 @@ void renderLevel()
 					render(c, "    ", "    ", 0x20);
 					break;
 				case 3:
-					render(c, "    ", "    ", 0x30);
+					render(c, "    ", "    ", 0x10);
 					break;
 				case 4:
 					render(c, "    ", "    ", 0x60);
@@ -1593,7 +1593,7 @@ void renderPellets()
 					render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x29);
 					break;
 				case 3:
-					render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x39);
+					render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x19);
 					break;
 				case 4:
 					render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x69);
@@ -1644,7 +1644,7 @@ void renderPellets()
 					render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x24);
 					break;
 				case 3:
-					render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x34);
+					render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x14);
 					break;
 				case 4:
 					render(pellet.getRealCoords(), PELLET_CHARACTER_HIT_TOP, PELLET_CHARACTER_HIT_BOTTOM, 0x64);

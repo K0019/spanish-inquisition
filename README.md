@@ -5,7 +5,7 @@
 
 
 This game is made using the Studio Project Framework in Visual Studio 2015 and 2017. (Framework provided by Nanyang Polytechnic).
-Special Thanks to our supervisor Mr Chris Hong for guiding us in this project.
+Special Thanks to our supervisor Mr Chris Hong for guiding us in this project and to Breakbeat Heartbeat for his amazing chiptune music, Album: Leaving Home.
 
 ## Features
  - Everything a roguelike game needs to have: randomness with bouts of rage.

@@ -414,6 +414,9 @@ void MenuEvent::renderCreditsRollText()
 	c.X -= 10;
 	c.Y += 2;
 	this->mainConsole->writeToBuffer(c, "Developed in Visual Studio 2015/2017", 0x0f);
+	c.X -= 6;
+	c.Y++;
+	this->mainConsole->writeToBuffer(c, "Music by: Breakbeat Heartbeat: Leaving Home Album", 0x0f);
 
 }
 

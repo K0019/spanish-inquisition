@@ -21,6 +21,7 @@ bool g_bMusicInitialising;
 
 int		r_iMoveDirection;
 double	r_dMoveTime;
+unsigned int seed;
 
 // Console object
 Console g_Console(120, 30, "The Great Escapade");
@@ -46,7 +47,8 @@ bool g_eRestartGame;
 //--------------------------------------------------------------
 void init(void)
 {
-	srand((unsigned int)time(NULL));
+	seed = (unsigned int)time(NULL);
+	srand(1535422715);
 	// Set precision for floating point output
 	g_dElapsedTime = 0.0;
 	g_iCurrentFrameCount = g_iLastMeasuredSecond = 0;
@@ -99,6 +101,12 @@ void init(void)
 	g_mEvent.r_pausecurspos.X = g_Console.getConsoleSize().X / 10 - 2;
 	g_mEvent.r_pausecurspos.Y = g_Console.getConsoleSize().Y / 5;
 	g_sLevel.floor = 1;
+	if (PRESENTATION)
+	{
+		g_sLevel.floor = 5;
+		g_sEntities.g_sChar.m_iPlayerHealth = g_sEntities.g_sChar.m_iMaxHealth = g_sEntities.g_sChar.m_iPreviousHealth = 1000;
+		g_sEntities.g_sChar.m_iPlayerDamage = 12;
+	}
 	//if (DEBUG)
 	//{
 	//	g_sLevel.floor = 5;
@@ -797,6 +805,7 @@ void controlPlayer()
 				{
 					g_dWinScreenTime = g_dElapsedTime + 3.00f;
 					g_sEntities.g_sChar.m_iGlobalScore += g_sEntities.g_sChar.m_iPlayerScore;
+					g_mEvent.LastWinScore = g_sEntities.g_sChar.m_iPlayerScore;
 					saveGame();
 					init();
 					g_eGameState = S_WIN;
@@ -1223,7 +1232,7 @@ void renderWin()
 void renderWonScore()
 {
 	COORD c = g_Console.getConsoleSize();
-	unsigned int score = g_sEntities.g_sChar.m_iPlayerScore;
+	unsigned int score = g_mEvent.LastWinScore;
 	int totalLength = 14 + (std::to_string(score)).length();
 	(c.X >>= 1) -= (totalLength >> 1);
 	c.Y -= 5;

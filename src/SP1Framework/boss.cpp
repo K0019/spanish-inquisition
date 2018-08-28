@@ -645,10 +645,21 @@ bool Boss1::isOverlapping(COORD c)
 {
 	c = this->getLocation(c);
 
-	if ((this->m_dLocationX - 1.0 < c.X + 1 && this->m_dLocationX + 1.0 > c.X) &&
-		(this->m_dLocationY - 1.0 < c.Y + 1 && this->m_dLocationY + 1.0 > c.Y))
+	if (this->m_bEnemyState[0] == true)
 	{
-		return true;
+		if ((this->m_dLocationX - 1.0 < c.X + 1 && this->m_dLocationX + 1.0 > c.X) &&
+			(this->m_dLocationY - 1.0 < c.Y + 1 && this->m_dLocationY + 1.0 > c.Y))
+		{
+			return true;
+		}
+	}
+	else
+	{
+		if ((this->m_dLocationCoord.X - 1.0 < c.X + 1 && this->m_dLocationCoord.X + 1.0 > c.X) &&
+			(this->m_dLocationCoord.Y - 1.0 < c.Y + 1 && this->m_dLocationCoord.Y + 1.0 > c.Y))
+		{
+			return true;
+		}
 	}
 
 	return false;

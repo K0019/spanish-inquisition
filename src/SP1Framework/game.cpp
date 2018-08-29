@@ -101,38 +101,46 @@ void init(void)
 	g_sEntities.g_sChar.m_sPlayerItems.ItemCount = 0;
 	g_sEntities.g_sChar.m_sPlayerItems.m_vItemsObtained[0];
 
-	switch (g_sLevel.floor)
+	if (g_eGameState == S_GAME)
 	{
-	case 1:
+		switch (g_sLevel.floor)
+		{
+		case 1:
+		{
+			stopAllMusic();
+			MusicPlay("002", "repeat");
+			break;
+		}
+		case 2:
+		{
+			stopAllMusic();
+			MusicPlay("003", "repeat");
+			break;
+		}
+		case 3:
+		{
+			stopAllMusic();
+			MusicPlay("004", "repeat");
+			break;
+		}
+		case 4:
+		{
+			stopAllMusic();
+			MusicPlay("005", "repeat");
+			break;
+		}
+		case 5:
+		{
+			stopAllMusic();
+			MusicPlay("006", "repeat");
+			break;
+		}
+		}
+	}
+	else if (g_eGameState == S_MENU)
 	{
 		stopAllMusic();
-		MusicPlay("002", "repeat");
-		break;
-	}
-	case 2:
-	{
-		stopAllMusic();
-		MusicPlay("003", "repeat");
-		break;
-	}
-	case 3:
-	{
-		stopAllMusic();
-		MusicPlay("004", "repeat");
-		break;
-	}
-	case 4:
-	{
-		stopAllMusic();
-		MusicPlay("005", "repeat");
-		break;
-	}
-	case 5:
-	{
-		stopAllMusic();
-		MusicPlay("006", "repeat");
-		break;
-	}
+		MusicPlay("001", "repeat");
 	}
 }
 //--------------------------------------------------------------
@@ -1007,6 +1015,8 @@ void winWait()
 {
 	if (g_dWinScreenTime < g_dAccurateElapsedTime)
 	{
+		stopAllMusic();
+		MusicPlay("001", "repeat");
 		g_eGameState = S_MENU;
 	}
 }

@@ -593,6 +593,7 @@ bool Boss1::isDead(SGameChar * player)
 	if (this->isDying() && this->m_dDeadTime + 5.0 < this->m_dCurrentAccurateTime)
 	{
 		player->m_iPlayerScore += 500;
+		player->m_bDefeatedBoss = true;
 		return true;
 	}
 	return false;

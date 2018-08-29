@@ -772,7 +772,7 @@ void controlPlayer()
 			{
 				if (++g_sLevel.floor > FINAL_FLOOR)
 				{
-					g_dWinScreenTime = g_dElapsedTime + 3.00f;
+					g_dWinScreenTime = g_dAccurateElapsedTime + 3.00f;
 					g_sEntities.g_sChar.m_iGlobalScore += g_sEntities.g_sChar.m_iPlayerScore;
 					g_mEvent.LastWinScore = g_sEntities.g_sChar.m_iPlayerScore;
 					saveGame();

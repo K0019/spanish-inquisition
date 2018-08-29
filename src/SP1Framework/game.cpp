@@ -108,31 +108,31 @@ void init(void)
 		case 1:
 		{
 			stopAllMusic();
-			MusicPlay("002", "repeat");
+			MusicPlay("002", "from 0 repeat");
 			break;
 		}
 		case 2:
 		{
 			stopAllMusic();
-			MusicPlay("003", "repeat");
+			MusicPlay("003", "from 0 repeat");
 			break;
 		}
 		case 3:
 		{
 			stopAllMusic();
-			MusicPlay("004", "repeat");
+			MusicPlay("004", "from 0 repeat");
 			break;
 		}
 		case 4:
 		{
 			stopAllMusic();
-			MusicPlay("005", "repeat");
+			MusicPlay("005", "from 0 repeat");
 			break;
 		}
 		case 5:
 		{
 			stopAllMusic();
-			MusicPlay("006", "repeat");
+			MusicPlay("006", "from 0 repeat");
 			break;
 		}
 		}
@@ -140,7 +140,7 @@ void init(void)
 	else if (g_eGameState == S_MENU)
 	{
 		stopAllMusic();
-		MusicPlay("001", "repeat");
+		MusicPlay("001", "from 0 repeat");
 	}
 }
 //--------------------------------------------------------------
@@ -302,7 +302,7 @@ void splashScreenWait()		// waits for time to pass in splash screen
 	{
 		g_eGameState = S_MENU;
 		stopAllMusic();
-		MusicPlay("001", "repeat");
+		MusicPlay("001", "from 0 repeat");
 	}
 }
 
@@ -366,31 +366,31 @@ void menuNav()
 			case 1:
 			{
 				stopAllMusic();
-				MusicPlay("002", "repeat");
+				MusicPlay("002", "from 0 repeat");
 				break;
 			}
 			case 2:
 			{
 				stopAllMusic();
-				MusicPlay("003", "repeat");
+				MusicPlay("003", "from 0 repeat");
 				break;
 			}
 			case 3:
 			{
 				stopAllMusic();
-				MusicPlay("004", "repeat");
+				MusicPlay("004", "from 0 repeat");
 				break;
 			}
 			case 4:
 			{
 				stopAllMusic();
-				MusicPlay("005", "repeat");
+				MusicPlay("005", "from 0 repeat");
 				break;
 			}
 			case 5:
 			{
 				stopAllMusic();
-				MusicPlay("006", "repeat");
+				MusicPlay("006", "from 0 repeat");
 				break;
 			}
 			}
@@ -798,25 +798,25 @@ void controlPlayer()
 					case 2: 
 					{
 						stopAllMusic();
-						MusicPlay("003", "repeat");
+						MusicPlay("003", "from 0 repeat");
 						break;
 					}
 					case 3:
 					{
 						stopAllMusic();
-						MusicPlay("004", "repeat");
+						MusicPlay("004", "from 0 repeat");
 						break;
 					}
 					case 4:
 					{
 						stopAllMusic();
-						MusicPlay("005", "repeat");
+						MusicPlay("005", "from 0 repeat");
 						break;
 					}
 					case 5:
 					{
 						stopAllMusic();
-						MusicPlay("006", "repeat");
+						MusicPlay("006", "from 0 repeat");
 						break;
 					}
 					}
@@ -1001,7 +1001,7 @@ void pauseScreenNav()
 			g_mEvent.bPreventAccident = true;
 			stopAllMusic();
 			g_eGameState = S_MENU;
-			MusicPlay("001", "repeat");
+			MusicPlay("001", "from 0 repeat");
 			break;
 		case 3:
 			g_bQuitGame = true;
@@ -1016,7 +1016,7 @@ void winWait()
 	if (g_dWinScreenTime < g_dAccurateElapsedTime)
 	{
 		stopAllMusic();
-		MusicPlay("001", "repeat");
+		MusicPlay("001", "from 0 repeat");
 		g_eGameState = S_MENU;
 	}
 }
@@ -2074,7 +2074,7 @@ bool loadBoss()
 	if (g_sLevel.floor == 5 && !g_sEntities.g_sChar.m_bDefeatedBoss && (g_sEntities.g_sChar.m_cLocation.X - 1) / (ROOM_X + 2) == g_sLevel.exitRoom.X && (g_sEntities.g_sChar.m_cLocation.Y - 1) / (ROOM_Y + 2) == g_sLevel.exitRoom.Y)
 	{
 		stopAllMusic();
-		MusicPlay("007", "repeat");
+		MusicPlay("007", "from 0 repeat");
 		COORD c;
 		c.X = 4;
 		c.Y = 4;
@@ -2129,7 +2129,7 @@ void CharacterDeath()
 			init();
 			stopAllMusic();
 			g_eGameState = S_MENU;
-			MusicPlay("001", "repeat");
+			MusicPlay("001", "from 0 repeat");
 		}
 		else if (g_abKeyPressed[K_ESCAPE])
 		{

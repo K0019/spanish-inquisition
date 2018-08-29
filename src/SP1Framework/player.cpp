@@ -51,7 +51,6 @@ void SGameChar::hasItem(bool g_bHasWeapon) //Function to determine what item the
 		weaponIndex = rand() % 7;
 	} while (this->m_sPlayerItems.m_vItemsList[weaponIndex].m_bHasWeapon); //If the player already has that item, go through the loop again
 
-
 	if ((weaponIndex == this->m_sPlayerItems.m_vItemsList[0].m_iWeaponIndex) && (this->m_sPlayerItems.m_vItemsList[0].m_bHasWeapon == false)) //Checking if randomized weaponIndex gives the Heaven Cracker
 	{
 		switch (this->m_sPlayerItems.m_vItemsList[0].m_iWeaponLevel) //Index 1 (Heaven Cracker): Increase player damage by 0/2/3/4
@@ -212,6 +211,7 @@ void SGameChar::hasItem(bool g_bHasWeapon) //Function to determine what item the
 			case 0: //Magic Potion Level 1: Pellet velocity increased by 20%
 			{
 				this->m_dVelocity *= (this->m_sPlayerItems.m_vItemsList[4].m_fWeaponVelocity - 0.20);
+				this->m_dRange *= 1.2;
 				this->m_sPlayerItems.m_vItemsList[4].m_bHasWeapon = true;
 				this->m_sPlayerItems.ItemCount++;
 				break;
@@ -219,6 +219,7 @@ void SGameChar::hasItem(bool g_bHasWeapon) //Function to determine what item the
 			case 1: //Magic Potion Level 1: Pellet velocity increased by 30%
 			{
 				this->m_dVelocity *= (this->m_sPlayerItems.m_vItemsList[4].m_fWeaponVelocity - 0.30);
+				this->m_dRange *= 1.3;
 				this->m_sPlayerItems.m_vItemsList[4].m_bHasWeapon = true;
 				this->m_sPlayerItems.ItemCount++;
 				break;
@@ -226,6 +227,7 @@ void SGameChar::hasItem(bool g_bHasWeapon) //Function to determine what item the
 			case 2: //Magic Potion Level 1: Pellet velocity increased by 40%
 			{
 				this->m_dVelocity *= (this->m_sPlayerItems.m_vItemsList[4].m_fWeaponVelocity - 0.40);
+				this->m_dRange *= 1.4;
 				this->m_sPlayerItems.m_vItemsList[4].m_bHasWeapon = true;
 				this->m_sPlayerItems.ItemCount++;
 				break;
@@ -233,6 +235,7 @@ void SGameChar::hasItem(bool g_bHasWeapon) //Function to determine what item the
 			case 3: //Magic Potion Level 1: Pellet velocity increased by 50%
 			{
 				this->m_dVelocity *= (this->m_sPlayerItems.m_vItemsList[4].m_fWeaponVelocity - 0.50);
+				this->m_dRange *= 1.5;
 				this->m_sPlayerItems.m_vItemsList[4].m_bHasWeapon = true;
 				this->m_sPlayerItems.ItemCount++;
 				break;

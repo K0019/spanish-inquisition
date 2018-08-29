@@ -376,22 +376,7 @@ void MenuEvent::renderTutorialDetails()
 // ye... scrapped :/
 void MenuEvent::renderCreditsRollAnimation()
 {
-	/*COORD c = this->mainConsole->getConsoleSize();
-	if (uiCreditsRollTime > 1000)
-	{
-		(c.X >>= 1) -= 9;
-		c.Y >>= 1;
-		this->mainConsole->writeToBuffer(c, "Press [Enter] to go back", 0x0f);
-	}
-	if (!(uiCreditsRollTime % 10))
-	{
-		CreditsOffsetY += 1;
-	}
-	if (uiCreditsRollTime == 4294967294)
-	{
-		uiCreditsRollTime = 0;
-	}
-	uiCreditsRollTime++;*/
+
 }
 
 // static text of credits

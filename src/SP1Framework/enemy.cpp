@@ -356,11 +356,6 @@ void EnemyMelee::update(SGameChar * player)
 			{
 				this->m_dAttackTime = this->m_dLengthOfAttack;
 			}
-			/*else if (this->m_dAttackTime > 0)
-			{
-				this->m_dAttackTime += this->m_dStunTime;
-				this->m_dLastMoveTime -= this->checkAttackDelayExpire();
-			}*/
 			this->m_dStunTime = 0.0;
 		}
 		else

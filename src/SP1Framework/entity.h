@@ -31,9 +31,9 @@ struct SAllEntities
 	void clearEnemies(); // Erase the enemies that are dead
 
 	/*TRAP RELATED*/
-	SAllTraps m_vTrapList; /* MADE BY: Winston */ //Container for traps
+	SAllTraps m_vTrapList; /* MADE BY: Winston */ // Container for traps
 
-	~SAllEntities();
+	~SAllEntities(); // Destructor
 };
 
 #endif // !ENTITYHEAD

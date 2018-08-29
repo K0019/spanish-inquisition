@@ -40,7 +40,7 @@ struct SLevel
 	void modifyTile(COORD c, char ch); // Change a tile on the level, using tile coordinates
 	char getTile(COORD c); // Get what tile is at the coordinate, using tile coordinates
 	COORD * getCoordinatesForDoor(const SHORT& X, const SHORT& Y, const int& direction); // Get console coordinates of a door placement
-	~SLevel();
+	~SLevel(); // Destructor
 };
 
 COORD fastCoord(int& x, int& y); // Quick function to create a COORD

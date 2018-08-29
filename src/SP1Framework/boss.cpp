@@ -137,37 +137,6 @@ void Boss1::update()
 					this->m_dDirY *= -1;
 					break;
 				}
-				/*switch (code)
-				{
-				case 1:
-					this->m_dLocationX += 2 * (this->getPlayerLocationX() - this->m_dLocationX);
-					break;
-				case 2:
-					this->m_dLocationX -= 2 * (this->m_dLocationX - this->getPlayerLocationX());
-					break;
-				case 3:
-					this->m_dLocationY += 2 * (this->getPlayerLocationY() - this->m_dLocationY);
-					break;
-				case 4:
-					this->m_dLocationY += 2 * (this->m_dLocationY - this->getPlayerLocationY());
-					break;
-				case 5:
-					this->m_dLocationX += 2 * (this->getPlayerLocationX() - this->m_dLocationX);
-					this->m_dLocationY += 2 * (this->getPlayerLocationY() - this->m_dLocationY);
-					break;
-				case 6:
-					this->m_dLocationX += 2 * (this->getPlayerLocationX() - this->m_dLocationX);
-					this->m_dLocationY -= 2 * (this->m_dLocationY - this->getPlayerLocationY());
-					break;
-				case 7:
-					this->m_dLocationX -= 2 * (this->m_dLocationX - this->getPlayerLocationX());
-					this->m_dLocationY += 2 * (this->getPlayerLocationY() - this->m_dLocationY);
-					break;
-				case 8:
-					this->m_dLocationX -= 2 * (this->m_dLocationX - this->getPlayerLocationX());
-					this->m_dLocationY -= 2 * (this->m_dLocationY - this->getPlayerLocationY());
-					break;
-				}*/
 			}
 		}
 		else // If ranged
@@ -230,18 +199,6 @@ void Boss1::update()
 	}
 	else // If ranged
 	{
-		//if (this->m_dCurrentAccurateTime >= this->m_dLastMoveTime)
-		//{
-		//	if (rand() / (RAND_MAX / 100) < 35) // Attack chance
-		//	{
-
-		//	}
-		//	else // Move chance
-		//	{
-
-		//	}
-		//}
-
 		if (this->m_dCurrentAccurateTime >= this->m_dNextAttackTime) // If boss should attack
 		{
 			if (rand() / (RAND_MAX / 2))
@@ -636,6 +593,7 @@ bool Boss1::isDead(SGameChar * player)
 	if (this->isDying() && this->m_dDeadTime + 5.0 < this->m_dCurrentAccurateTime)
 	{
 		player->m_iPlayerScore += 500;
+		player->m_bDefeatedBoss = true;
 		return true;
 	}
 	return false;
@@ -661,6 +619,5 @@ bool Boss1::isOverlapping(COORD c)
 			return true;
 		}
 	}
-
 	return false;
 }

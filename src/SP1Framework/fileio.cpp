@@ -2,7 +2,7 @@
 
 void g_LoadFromSave(unsigned int* SaveDataArray)
 {
-	std::ifstream SaveFileData("../res/SaveData/saves.txt");
+	std::ifstream SaveFileData("res/SaveData/saves.txt");
 	if (SaveFileData.is_open())
 	{
 		int i = 0;
@@ -15,7 +15,7 @@ void g_LoadFromSave(unsigned int* SaveDataArray)
 	}
 	else
 	{
-		std::ofstream SaveFileData("../res/SaveData/saves.txt");
+		std::ofstream SaveFileData("res/SaveData/saves.txt");
 		if (SaveFileData.is_open())
 		{
 			for (int i = 0; i < 8; i++)
@@ -30,7 +30,7 @@ void g_LoadFromSave(unsigned int* SaveDataArray)
 
 void g_SaveToSave(unsigned int* SaveDataArray)
 {
-	std::ofstream SaveFileData("../res/SaveData/saves.txt");
+	std::ofstream SaveFileData("res/SaveData/saves.txt");
 	if (SaveFileData.is_open())
 	{
 		for (int i = 0; i < 9 ; i++)
@@ -44,7 +44,7 @@ void g_SaveToSave(unsigned int* SaveDataArray)
 
 void g_LoadFromFloor(short FloorNumber, std::vector<std::string> *selectionAvailable)
 {
-	std::string FloorSelector = "../res/MapData/FloorData/NormalRooms/Floor" + std::to_string(FloorNumber) + ".txt";
+	std::string FloorSelector = "res/MapData/FloorData/NormalRooms/Floor" + std::to_string(FloorNumber) + ".txt";
 	std::ifstream FloorFileData(FloorSelector);
 	if (FloorFileData.is_open())
 	{
@@ -58,7 +58,7 @@ void g_LoadFromFloor(short FloorNumber, std::vector<std::string> *selectionAvail
 }
 void g_LoadFromFloorItem(short FloorNumber, std::vector<std::string> * selectionAvailable)
 {
-	std::string FloorSelector = "../res/MapData/FloorData/ItemRooms/Floor" + std::to_string(FloorNumber) + ".txt";
+	std::string FloorSelector = "res/MapData/FloorData/ItemRooms/Floor" + std::to_string(FloorNumber) + ".txt";
 	std::ifstream FloorFileData(FloorSelector);
 	if (FloorFileData.is_open())
 	{
@@ -73,7 +73,7 @@ void g_LoadFromFloorItem(short FloorNumber, std::vector<std::string> * selection
 
 void g_LoadFromRoom(std::string *RoomNumber, char (*Level)[(ROOM_X + 2) * GRID_X + 2][(ROOM_Y + 2) * GRID_Y + 2], COORD gridCoords)
 {
-	std::string RoomSelector = "../res/MapData/RoomData/NormalRooms/" + *RoomNumber +".txt";
+	std::string RoomSelector = "res/MapData/RoomData/NormalRooms/" + *RoomNumber +".txt";
 	std::ifstream RoomFileData(RoomSelector);
 	unsigned int row = 0;
 	if (RoomFileData.is_open())
@@ -90,7 +90,7 @@ void g_LoadFromRoom(std::string *RoomNumber, char (*Level)[(ROOM_X + 2) * GRID_X
 }
 void g_LoadFromItemRoom(std::string *RoomNumber, char(*Level)[(ROOM_X + 2) * GRID_X + 2][(ROOM_Y + 2) * GRID_Y + 2], COORD gridCoords)
 {
-	std::string RoomSelector = "../res/MapData/RoomData/ItemRooms/" + *RoomNumber + ".txt";
+	std::string RoomSelector = "res/MapData/RoomData/ItemRooms/" + *RoomNumber + ".txt";
 	std::ifstream RoomFileData(RoomSelector);
 	unsigned int row = 0;
 	if (RoomFileData.is_open())
@@ -108,7 +108,7 @@ void g_LoadFromItemRoom(std::string *RoomNumber, char(*Level)[(ROOM_X + 2) * GRI
 
 void g_LoadOptions(unsigned short* OptionsDataArray)
 {
-	std::ifstream PlayerOptions("../res/SaveData/options.txt");
+	std::ifstream PlayerOptions("res/SaveData/options.txt");
 	if (PlayerOptions.is_open())
 	{
 		int i = 0;
@@ -121,7 +121,7 @@ void g_LoadOptions(unsigned short* OptionsDataArray)
 	}
 	else
 	{
-		std::ofstream PlayerOptions("../res/SaveData/options.txt");
+		std::ofstream PlayerOptions("res/SaveData/options.txt");
 		if (PlayerOptions.is_open())
 		{
 			PlayerOptions << "0\n";
@@ -134,7 +134,7 @@ void g_LoadOptions(unsigned short* OptionsDataArray)
 
 void g_SaveOptions(unsigned short* OptionsDataArray)
 {
-	std::ofstream PlayerOptions("../res/SaveData/options.txt");
+	std::ofstream PlayerOptions("res/SaveData/options.txt");
 	if (PlayerOptions.is_open())
 	{
 		if (PlayerOptions.is_open())
